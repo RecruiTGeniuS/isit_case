@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  app:
+    volumes:
+      - ./app:/app  # Монтирование локальной папки с кодом внутрь контейнера
+    environment:
+      FLASK_ENV: development  # Включение debug mode и auto-reload
+      FLASK_APP: app.py
+    command: flask run --host=0.0.0.0 --port=5000  # Запуск Flask через команду

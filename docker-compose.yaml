@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  # База данных приложения
+  postgres:
+    image: postgres:16
+    container_name: isit_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: isitdb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "5433:5432"  # 5433, чтобы избежать конфликтов
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db-init:/docker-entrypoint-initdb.d   # Подключение папки с дампом БД, чтобы при развёртывании данные из дампа были в БД приложения
+
+  # Backend приложения
+  app:
+    build: ./app
+    container_name: isit_app
+    environment:
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432        # 5432 для внутренней сети Docker
+      DATABASE_USER: user
+      DATABASE_PASSWORD: 1234
+      DATABASE_NAME: isitdb
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+
+volumes:
+  pgdata:

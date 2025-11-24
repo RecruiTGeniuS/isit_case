@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="ru" class="admin-page">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>УТОР - Панель администратора</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="admin-page">
+    <div class="admin-container">
+        <!-- Верхняя панель -->
+        <header class="admin-header">
+            <div class="header-left">
+                <h1 class="logo">УТОР</h1>
+            </div>
+            <div class="header-right">
+                <div class="user-menu" id="userMenu">
+                    <div class="user-info" onclick="toggleUserMenu()">
+                        <div class="avatar-container">
+                            {% if user.avatar_path %}
+                                <img src="{{ url_for('static', filename=user.avatar_path) }}" alt="Avatar" class="user-avatar" id="userAvatar">
+                            {% else %}
+                                <div class="user-avatar-empty" id="userAvatar">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <span class="user-name">{{ user.last_name }} {{ user.first_name[0] }}.{{ user.patronymic[0] }}.</span>
+                    </div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="dropdown-avatar-container">
+                            {% if user.avatar_path %}
+                                <img src="{{ url_for('static', filename=user.avatar_path) }}" alt="Avatar" class="dropdown-avatar" id="dropdownAvatar" onclick="document.getElementById('avatarInput').click()">
+                            {% else %}
+                                <div class="dropdown-avatar-empty" id="dropdownAvatar" onclick="document.getElementById('avatarInput').click()">
+                                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    <span class="avatar-hint">Нажмите для загрузки</span>
+                                </div>
+                            {% endif %}
+                            <input type="file" id="avatarInput" accept="image/*" style="display: none;" onchange="uploadAvatar(this)">
+                        </div>
+                        <div class="user-full-name">
+                            {{ user.last_name }} {{ user.first_name }} {{ user.patronymic or '' }}
+                        </div>
+                        <div class="user-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Должность:</span>
+                                <span class="detail-value">{{ user.post }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Роль:</span>
+                                <span class="detail-value">{{ get_role_translation(user.role) }}</span>
+                            </div>
+                        </div>
+
+                        <div class="support-block">
+                            <button type="button" class="support-link" id="supportToggle">
+                                Контакты службы поддержки
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </button>
+                            <div class="support-contacts" id="supportContacts">
+                                <div class="support-item">
+                                    <span class="support-label">Телефон</span>
+                                    <span class="support-value">+7 (800) 123-45-67</span>
+                                </div>
+                                <div class="support-item">
+                                    <span class="support-label">Email</span>
+                                    <span class="support-value">support@utor.example</span>
+                                </div>
+                                <div class="support-item">
+                                    <span class="support-label">Telegram</span>
+                                    <span class="support-value">@utor_support</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <div class="theme-toggle-container">
+                            <span class="theme-label">Тема интерфейса:</span>
+                            <button class="theme-toggle-btn" id="themeSwitch" onclick="toggleTheme()" aria-label="Переключить тему">
+                                <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="5"></circle>
+                                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                                </svg>
+                                <svg class="theme-icon moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="dropdown-actions">
+                            <a href="{{ url_for('logout') }}" class="logout-btn">Выйти</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Основной контент -->
+        <div class="admin-main">
+            <!-- Боковое меню -->
+            <aside class="admin-sidebar">
+                <nav class="sidebar-nav">
+                    <a href="{{ url_for('admin_dashboard', section='employees') }}" class="nav-item {% if section == 'employees' %}active{% endif %}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        <span>Сотрудники</span>
+                    </a>
+                    <a href="{{ url_for('admin_dashboard', section='equipment') }}" class="nav-item {% if section == 'equipment' %}active{% endif %}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="8" rx="2"></rect>
+                            <rect x="6" y="6" width="6" height="5" rx="1"></rect>
+                            <path d="M12 11V6h5l2 3" />
+                            <circle cx="8" cy="19" r="1.5"></circle>
+                            <circle cx="16" cy="19" r="1.5"></circle>
+                        </svg>
+                        <span>Оборудование</span>
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Контентная область -->
+            <main class="admin-content">
+                {% if section == 'employees' %}
+                    <div class="content-header">
+                        <h2>Сотрудники</h2>
+                    </div>
+                    <div class="table-controls">
+                        <div class="search-box">
+                            <input type="text" id="employeeSearch" placeholder="Введите текст для поиска">
+                            <button type="button" class="search-button" tabindex="-1">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="table-actions">
+                            <button class="filter-btn" id="filterToggle">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="3 4 21 4 14 14 14 20 10 22 10 14 3 4"></polygon>
+                                </svg>
+                                Фильтр
+                            </button>
+                            <div class="filter-dropdown" id="filterDropdown">
+                                <div class="filter-group">
+                                    <label for="roleFilter">Роль</label>
+                                    <div class="filter-select" data-target="roleFilter">
+                                        <button type="button" class="filter-select-btn" aria-haspopup="listbox" aria-expanded="false">
+                                            <span class="filter-select-label">Все</span>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        </button>
+                                        <div class="filter-options-list" role="listbox">
+                                            <button type="button" class="filter-option" data-value="">Все</button>
+                                            {% for role in role_options %}
+                                            <button type="button" class="filter-option" data-value="{{ role }}">{{ role_labels.get(role) or role }}</button>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <select id="roleFilter" class="filter-native-select">
+                                        <option value="">Все</option>
+                                        {% for role in role_options %}
+                                        <option value="{{ role }}">{{ get_role_translation(role) }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="departmentFilter">Отдел</label>
+                                    <div class="filter-select" data-target="departmentFilter">
+                                        <button type="button" class="filter-select-btn" aria-haspopup="listbox" aria-expanded="false">
+                                            <span class="filter-select-label">Все</span>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        </button>
+                                        <div class="filter-options-list" role="listbox">
+                                            <button type="button" class="filter-option" data-value="">Все</button>
+                                            {% for dept in department_options %}
+                                            <button type="button" class="filter-option" data-value="{{ dept }}">{{ dept }}</button>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <select id="departmentFilter" class="filter-native-select">
+                                        <option value="">Все</option>
+                                        {% for dept in department_options %}
+                                        <option value="{{ dept }}">{{ dept }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="facilityFilter">Предприятие</label>
+                                    <div class="filter-select" data-target="facilityFilter">
+                                        <button type="button" class="filter-select-btn" aria-haspopup="listbox" aria-expanded="false">
+                                            <span class="filter-select-label">Все</span>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        </button>
+                                        <div class="filter-options-list" role="listbox">
+                                            <button type="button" class="filter-option" data-value="">Все</button>
+                                            {% for fac in facility_options %}
+                                            <button type="button" class="filter-option" data-value="{{ fac }}">{{ fac }}</button>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <select id="facilityFilter" class="filter-native-select">
+                                        <option value="">Все</option>
+                                        {% for fac in facility_options %}
+                                        <option value="{{ fac }}">{{ fac }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <button type="button" class="reset-filter-btn" id="resetFilters">Сбросить все фильтры</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th class="number-column">№</th>
+                                    <th>Фамилия</th>
+                                    <th>Имя</th>
+                                    <th>Отчество</th>
+                                    <th>Должность</th>
+                                    <th>Телефон</th>
+                                    <th>Email</th>
+                                    <th>Отдел</th>
+                                    <th>Предприятие</th>
+                                    <th>Права доступа</th>
+                                    <th>Логин</th>
+                                    <th>Пароль</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for emp in employees %}
+                                <tr data-employee-id="{{ emp.id }}" data-role="{{ emp.role or '' }}" data-department="{{ emp.department or '' }}" data-facility="{{ emp.facility or '' }}">
+                                    <td class="number-column">{{ loop.index }}</td>
+                                    <td class="editable-cell" contenteditable="true" spellcheck="false" data-field="last_name">{{ emp.last_name or '' }}</td>
+                                    <td class="editable-cell" contenteditable="true" spellcheck="false" data-field="first_name">{{ emp.first_name or '' }}</td>
+                                    <td class="editable-cell" contenteditable="true" spellcheck="false" data-field="patronymic">{{ emp.patronymic or '' }}</td>
+                                    <td class="editable-cell" contenteditable="true" spellcheck="false" data-field="post">{{ emp.post or '' }}</td>
+                                    <td class="editable-cell" contenteditable="true" spellcheck="false" data-field="phone">{{ format_phone(emp.phone) or '' }}</td>
+                                    <td class="editable-cell" contenteditable="true" spellcheck="false" data-field="email">{{ emp.email or '' }}</td>
+                                    <td class="readonly-cell">{{ emp.department or '-' }}</td>
+                                    <td class="readonly-cell">{{ emp.facility or '-' }}</td>
+                                    <td class="role-cell" tabindex="0" data-field="role" data-role-value="{{ emp.role or '' }}" aria-haspopup="listbox" aria-expanded="false">
+                                        <div class="role-cell-content">
+                                            <span class="role-cell-label">{{ role_labels.get(emp.role) if emp.role else '—' }}</span>
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                                </svg>
+                                        </div>
+                                    </td>
+                                    <td class="editable-cell" contenteditable="true" spellcheck="false" data-field="login">{{ emp.login or '' }}</td>
+                                    <td class="editable-cell" contenteditable="true" spellcheck="false" data-field="password">{{ emp.password or '' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <div id="tableUpdateStatus" class="table-update-status" role="status" aria-live="polite"></div>
+                    </div>
+                    <div class="table-footer-actions">
+                        <button type="button" class="add-employee-btn" id="addEmployeeBtn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Добавить сотрудника
+                        </button>
+                    </div>
+                {% elif section == 'equipment' %}
+                    <div class="content-header">
+                        <h2>Оборудование</h2>
+                    </div>
+                    <div class="content-placeholder">
+                        <p>Раздел "Оборудование" в разработке</p>
+                    </div>
+                {% endif %}
+            </main>
+        </div>
+        <div class="decor-line"></div>
+    </div>
+
+    <div class="modal-overlay" id="employeeModal" aria-hidden="true">
+        <div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="employeeModalTitle">
+            <div class="modal-header">
+                <h3 id="employeeModalTitle">Добавление сотрудника</h3>
+                <button type="button" class="modal-close-btn" id="employeeModalClose" aria-label="Закрыть">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <form class="modal-form" id="employeeForm">
+                <div class="modal-section">
+                    <h4 class="modal-section-title">Данные сотрудника</h4>
+                    <div class="modal-row modal-row--thirds">
+                        <label class="modal-field">
+                            <span data-required="*">Фамилия</span>
+                            <input type="text" name="last_name" required>
+                        </label>
+                        <label class="modal-field">
+                            <span data-required="*">Имя</span>
+                            <input type="text" name="first_name" required>
+                        </label>
+                        <label class="modal-field">
+                            <span data-required="">Отчество</span>
+                            <input type="text" name="patronymic">
+                        </label>
+                    </div>
+                    <div class="modal-row modal-row--thirds">
+                        <label class="modal-field">
+                            <span data-required="*">Предприятие</span>
+                            <select name="facility_id" id="employeeFacilitySelect" required>
+                                <option value="">Выберите предприятие</option>
+                                {% for fac in facility_choices %}
+                                <option value="{{ fac.id }}">{{ fac.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        <label class="modal-field">
+                            <span data-required="*">Отдел</span>
+                            <select name="department_id" id="employeeDepartment" required disabled>
+                                <option value="">Сначала выберите предприятие</option>
+                            </select>
+                        </label>
+                        <label class="modal-field">
+                            <span data-required="*">Должность</span>
+                            <input type="text" name="post" required>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <h4 class="modal-section-title">Контактная информация</h4>
+                    <div class="modal-row modal-row--halves">
+                        <label class="modal-field">
+                            <span data-required="">Телефон</span>
+                            <input type="text" name="phone" placeholder="+7 (___) ___-__-__">
+                        </label>
+                        <label class="modal-field">
+                            <span data-required="">Email</span>
+                            <input type="email" name="email" placeholder="example@company.ru">
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <h4 class="modal-section-title">Доступ к УТОР</h4>
+                    <div class="modal-row modal-row--thirds">
+                        <label class="modal-field">
+                            <span data-required="*">Права доступа</span>
+                            <select name="role" id="employeeRoleSelect" required>
+                                <option value="">Выберите роль</option>
+                                {% for role in role_options %}
+                                <option value="{{ role }}">{{ role_labels.get(role) or role }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        <label class="modal-field">
+                            <span data-required="*">Логин</span>
+                            <input type="text" name="login" required>
+                        </label>
+                        <label class="modal-field password-field">
+                            <span data-required="*">Пароль</span>
+                            <div class="password-input-wrapper">
+                                <input type="text" name="password" required>
+                                <button type="button" class="ghost-btn generate-credentials-btn">
+                                    Сгенерировать
+                                </button>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <div class="modal-error" id="employeeFormError"></div>
+                    <div class="modal-actions">
+                        <button type="button" class="secondary-btn danger-btn" id="employeeModalCancel">Отмена</button>
+                        <button type="submit" class="primary-btn" id="employeeFormSubmit" data-default-label="Сохранить">
+                            Сохранить
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Переключение меню пользователя
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        // Закрытие меню при клике вне его
+        document.addEventListener('click', function(event) {
+            const userMenu = document.getElementById('userMenu');
+            if (!userMenu.contains(event.target)) {
+                document.getElementById('userDropdown').classList.remove('active');
+            }
+        });
+
+        // Загрузка аватара
+        function uploadAvatar(input) {
+            if (input.files && input.files[0]) {
+                const formData = new FormData();
+                formData.append('avatar', input.files[0]);
+                
+                fetch('{{ url_for("upload_avatar") }}', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка загрузки:', error);
+                });
+            }
+        }
+
+        // Переключение темы
+        function toggleTheme() {
+            const html = document.documentElement;
+            const sunIcon = document.querySelector('#themeSwitch .sun-icon');
+            const moonIcon = document.querySelector('#themeSwitch .moon-icon');
+            const isDark = html.classList.contains('dark-theme');
+            
+            if (isDark) {
+                html.classList.remove('dark-theme');
+                html.classList.add('light-theme');
+                localStorage.setItem('theme', 'light');
+                if (sunIcon) sunIcon.style.display = 'none';
+                if (moonIcon) moonIcon.style.display = 'block';
+            } else {
+                html.classList.remove('light-theme');
+                html.classList.add('dark-theme');
+                localStorage.setItem('theme', 'dark');
+                if (sunIcon) sunIcon.style.display = 'block';
+                if (moonIcon) moonIcon.style.display = 'none';
+            }
+        }
+
+        // Инициализация темы при загрузке
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            let theme = savedTheme;
+            
+            if (!theme) {
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    theme = 'dark';
+                } else {
+                    theme = 'light';
+                }
+            }
+            
+            document.documentElement.classList.add(theme + '-theme');
+            
+            // Обновляем иконки переключателя темы
+            const sunIcon = document.querySelector('#themeSwitch .sun-icon');
+            const moonIcon = document.querySelector('#themeSwitch .moon-icon');
+            if (theme === 'dark') {
+                if (sunIcon) sunIcon.style.display = 'block';
+                if (moonIcon) moonIcon.style.display = 'none';
+            } else {
+                if (sunIcon) sunIcon.style.display = 'none';
+                if (moonIcon) moonIcon.style.display = 'block';
+            }
+        })();
+
+        // Поиск и фильтрация таблицы
+        const roleOptionsMap = {{ role_labels|tojson }};
+        const departmentsData = {{ department_choices|tojson }};
+        const searchInput = document.getElementById('employeeSearch');
+        const filterToggle = document.getElementById('filterToggle');
+        const filterDropdown = document.getElementById('filterDropdown');
+        const roleFilter = document.getElementById('roleFilter');
+        const departmentFilter = document.getElementById('departmentFilter');
+        const facilityFilter = document.getElementById('facilityFilter');
+        const tableRows = document.querySelectorAll('.data-table tbody tr');
+        const supportToggle = document.getElementById('supportToggle');
+        const supportContacts = document.getElementById('supportContacts');
+        const addEmployeeBtn = document.getElementById('addEmployeeBtn');
+        const employeeModal = document.getElementById('employeeModal');
+        const employeeModalClose = document.getElementById('employeeModalClose');
+        const employeeModalCancel = document.getElementById('employeeModalCancel');
+        const employeeForm = document.getElementById('employeeForm');
+        const employeeFacilitySelect = document.getElementById('employeeFacilitySelect');
+        const employeeDepartmentSelect = document.getElementById('employeeDepartment');
+        const employeeFormError = document.getElementById('employeeFormError');
+        const employeeFormSubmit = document.getElementById('employeeFormSubmit');
+        const submitDefaultText = employeeFormSubmit ? (employeeFormSubmit.dataset.defaultLabel || employeeFormSubmit.textContent.trim()) : '';
+        const filterSelectWrappers = document.querySelectorAll('.filter-select[data-target]');
+        const filterSelectControllers = new Map();
+        let activeModal = null;
+
+        const facilityDeptMap = departmentsData.reduce((acc, dept) => {
+            const facilityId = dept.facility_id ? String(dept.facility_id) : '';
+            if (!facilityId) {
+                return acc;
+            }
+            if (!acc[facilityId]) {
+                acc[facilityId] = [];
+            }
+            acc[facilityId].push({
+                id: String(dept.id),
+                name: dept.name
+            });
+            return acc;
+        }, {});
+
+        Object.keys(facilityDeptMap).forEach(key => {
+            facilityDeptMap[key].sort((a, b) => a.name.localeCompare(b.name, 'ru', { sensitivity: 'base' }));
+        });
+
+        function populateDepartmentOptions(facilityId) {
+            if (!employeeDepartmentSelect) return;
+            employeeDepartmentSelect.innerHTML = '';
+            const placeholder = document.createElement('option');
+            placeholder.value = '';
+            placeholder.textContent = facilityId ? 'Выберите отдел' : 'Сначала выберите предприятие';
+            placeholder.disabled = !facilityId;
+            placeholder.selected = true;
+            employeeDepartmentSelect.appendChild(placeholder);
+
+            if (!facilityId) {
+                employeeDepartmentSelect.disabled = true;
+                return;
+            }
+
+            const departments = facilityDeptMap[facilityId] || [];
+            if (departments.length === 0) {
+                placeholder.textContent = 'Для выбранного предприятия нет отделов';
+                employeeDepartmentSelect.disabled = true;
+                return;
+            }
+            departments.forEach(dept => {
+                const option = document.createElement('option');
+                option.value = dept.id;
+                option.textContent = dept.name;
+                employeeDepartmentSelect.appendChild(option);
+            });
+            employeeDepartmentSelect.disabled = false;
+        }
+
+        function openEmployeeModal() {
+            if (!employeeModal) return;
+            employeeModal.classList.add('visible');
+            employeeModal.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('modal-open');
+            activeModal = employeeModal;
+            if (employeeForm) {
+                employeeForm.reset();
+            }
+            if (employeeFacilitySelect) {
+                employeeFacilitySelect.value = '';
+                handleFacilityChange();
+            } else {
+                populateDepartmentOptions('');
+            }
+            if (employeeFormError) {
+                employeeFormError.textContent = '';
+            }
+            const firstInput = employeeForm ? employeeForm.querySelector('input, select') : null;
+            if (firstInput) {
+                firstInput.focus();
+            }
+        }
+
+        function closeEmployeeModal() {
+            if (!employeeModal) return;
+            employeeModal.classList.remove('visible');
+            employeeModal.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('modal-open');
+            activeModal = null;
+        }
+
+        function handleFacilityChange() {
+            if (!employeeFacilitySelect) return;
+            const facilityId = employeeFacilitySelect.value;
+            populateDepartmentOptions(facilityId);
+            if (employeeDepartmentSelect) {
+                employeeDepartmentSelect.value = '';
+            }
+        }
+
+        function applyRowStriping() {
+            let visibleIndex = 0;
+            tableRows.forEach(row => {
+                if (row.style.display === 'none') {
+                    row.classList.remove('alt-row');
+                    return;
+                }
+                const isAlt = visibleIndex % 2 === 1;
+                row.classList.toggle('alt-row', isAlt);
+                visibleIndex += 1;
+            });
+        }
+
+        function applyTableFilters() {
+            const searchValue = searchInput ? searchInput.value.toLowerCase().trim() : '';
+            const roleValue = roleFilter ? roleFilter.value : '';
+            const departmentValue = departmentFilter ? departmentFilter.value : '';
+            const facilityValue = facilityFilter ? facilityFilter.value : '';
+
+            tableRows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const rowRole = (row.dataset.role || '').toLowerCase();
+                const rowDept = (row.dataset.department || '').toLowerCase();
+                const rowFac = (row.dataset.facility || '').toLowerCase();
+
+                const matchesSearch = searchValue === '' || text.includes(searchValue);
+                const matchesRole = roleValue === '' || rowRole === roleValue.toLowerCase();
+                const matchesDept = departmentValue === '' || rowDept === departmentValue.toLowerCase();
+                const matchesFac = facilityValue === '' || rowFac === facilityValue.toLowerCase();
+
+                row.style.display = (matchesSearch && matchesRole && matchesDept && matchesFac) ? '' : 'none';
+            });
+
+            applyRowStriping();
+        }
+
+        const resetFiltersBtn = document.getElementById('resetFilters');
+
+        if (searchInput) {
+            searchInput.addEventListener('input', applyTableFilters);
+        }
+
+        [roleFilter, departmentFilter, facilityFilter].forEach(select => {
+            if (select) {
+                select.addEventListener('change', applyTableFilters);
+            }
+        });
+
+        function closeFilterSelectMenus() {
+            filterSelectWrappers.forEach(wrapper => {
+                wrapper.classList.remove('open');
+                const btn = wrapper.querySelector('.filter-select-btn');
+                if (btn) {
+                    btn.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
+
+        if (filterToggle && filterDropdown) {
+            filterToggle.addEventListener('click', () => {
+                filterDropdown.classList.toggle('active');
+                if (!filterDropdown.classList.contains('active')) {
+                    closeFilterSelectMenus();
+                }
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!filterDropdown.contains(event.target) && !filterToggle.contains(event.target)) {
+                    filterDropdown.classList.remove('active');
+                    closeFilterSelectMenus();
+                }
+            });
+        }
+
+        if (resetFiltersBtn) {
+            resetFiltersBtn.addEventListener('click', () => {
+                if (searchInput) searchInput.value = '';
+                if (roleFilter) roleFilter.value = '';
+                if (departmentFilter) departmentFilter.value = '';
+                if (facilityFilter) facilityFilter.value = '';
+                applyTableFilters();
+                filterSelectControllers.forEach(controller => controller.sync());
+            });
+        }
+
+        if (supportToggle && supportContacts) {
+            supportToggle.addEventListener('click', (event) => {
+                event.stopPropagation();
+                supportContacts.classList.toggle('active');
+            });
+        }
+
+        if (addEmployeeBtn) {
+            addEmployeeBtn.addEventListener('click', () => {
+                closeFilterSelectMenus();
+                closeRoleDropdown();
+                openEmployeeModal();
+            });
+        }
+
+        [employeeModalClose, employeeModalCancel].forEach(btn => {
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    closeEmployeeModal();
+                });
+            }
+        });
+
+        if (employeeModal) {
+            employeeModal.addEventListener('click', (event) => {
+                if (event.target === employeeModal) {
+                    closeEmployeeModal();
+                }
+            });
+        }
+
+        if (employeeFacilitySelect) {
+            employeeFacilitySelect.addEventListener('change', handleFacilityChange);
+        }
+
+        const statusBox = document.getElementById('tableUpdateStatus');
+        const editableCells = document.querySelectorAll('.data-table td[contenteditable="true"][data-field]');
+        const roleCells = document.querySelectorAll('.role-cell');
+        let statusTimeoutId;
+        let currentRoleCell = null;
+
+        function showStatus(message, state = 'info') {
+            if (!statusBox) return;
+            statusBox.textContent = message;
+            statusBox.dataset.state = state;
+            statusBox.classList.remove('visible');
+            if (message) {
+                requestAnimationFrame(() => statusBox.classList.add('visible'));
+                clearTimeout(statusTimeoutId);
+                statusTimeoutId = setTimeout(() => {
+                    statusBox.classList.remove('visible');
+                }, 4000);
+            }
+        }
+
+        function revertCell(cell) {
+            if (!cell) return;
+            if (cell.classList.contains('role-cell')) {
+                const label = roleOptionsMap[cell.dataset.originalValue || ''] || '—';
+                const labelSpan = cell.querySelector('.role-cell-label');
+                if (labelSpan) labelSpan.textContent = label;
+                cell.dataset.roleValue = cell.dataset.originalValue || '';
+                return;
+            }
+            cell.textContent = cell.dataset.originalValue || '';
+        }
+
+        function updateEmployeeCell(cell, employeeId, field, value) {
+            cell.classList.add('saving');
+            fetch(`/admin/employees/${employeeId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ field, value })
+            })
+            .then(async response => {
+                const data = await response.json();
+                return { ok: response.ok, data };
+            })
+            .then(({ ok, data }) => {
+                cell.classList.remove('saving');
+                if (ok && data.success) {
+                    if (cell.classList.contains('role-cell')) {
+                        const labelSpan = cell.querySelector('.role-cell-label');
+                        const label = roleOptionsMap[data.value || ''] || '—';
+                        if (labelSpan) labelSpan.textContent = label;
+                        cell.dataset.roleValue = data.value || '';
+                        cell.dataset.originalValue = cell.dataset.roleValue;
+                        cell.setAttribute('aria-expanded', 'false');
+                    } else {
+                        cell.textContent = data.value || '';
+                        cell.dataset.originalValue = cell.textContent;
+                    }
+                    showStatus('Изменения сохранены', 'success');
+                } else {
+                    cell.classList.add('error');
+                    revertCell(cell);
+                    showStatus(data.message || 'Ошибка сохранения', 'error');
+                    setTimeout(() => cell.classList.remove('error'), 1500);
+                }
+            })
+            .catch(() => {
+                cell.classList.remove('saving');
+                cell.classList.add('error');
+                revertCell(cell);
+                showStatus('Сеть недоступна. Попробуйте позже.', 'error');
+                setTimeout(() => cell.classList.remove('error'), 1500);
+            });
+        }
+
+        editableCells.forEach(cell => {
+            cell.addEventListener('focus', () => {
+                cell.dataset.originalValue = cell.textContent.trim();
+            });
+
+            cell.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    cell.blur();
+                }
+                if (event.key === 'Escape') {
+                    event.preventDefault();
+                    revertCell(cell);
+                    cell.blur();
+                }
+            });
+
+            cell.addEventListener('paste', (event) => {
+                event.preventDefault();
+                const text = (event.clipboardData || window.clipboardData).getData('text');
+                document.execCommand('insertText', false, text);
+            });
+
+            cell.addEventListener('blur', () => {
+                const originalValue = cell.dataset.originalValue ?? '';
+                const newValue = cell.textContent.trim();
+                if (newValue === originalValue) {
+                    return;
+                }
+                const row = cell.closest('tr');
+                const employeeId = row ? row.dataset.employeeId : null;
+                if (!employeeId) {
+                    revertCell(cell);
+                    showStatus('Не удалось определить сотрудника.', 'error');
+                    return;
+                }
+                const field = cell.dataset.field;
+                if (!field) {
+                    revertCell(cell);
+                    return;
+                }
+                updateEmployeeCell(cell, employeeId, field, newValue);
+            });
+        });
+
+        const roleDropdown = document.createElement('div');
+        roleDropdown.className = 'role-dropdown';
+        document.body.appendChild(roleDropdown);
+
+        function populateRoleDropdown() {
+            roleDropdown.innerHTML = '';
+            Object.entries(roleOptionsMap).forEach(([value, label]) => {
+                const option = document.createElement('button');
+                option.type = 'button';
+                option.className = 'role-dropdown-option';
+                option.dataset.value = value;
+                option.textContent = label || value || '—';
+                option.addEventListener('click', () => {
+                    const targetCell = currentRoleCell;
+                    if (!targetCell) return;
+                    if (targetCell.dataset.roleValue === value) {
+                        closeRoleDropdown();
+                        return;
+                    }
+                    const row = targetCell.closest('tr');
+                    if (!row) return;
+                    const employeeId = row.dataset.employeeId;
+                    if (!employeeId) return;
+                    targetCell.dataset.originalValue = targetCell.dataset.roleValue || '';
+                    updateEmployeeCell(targetCell, employeeId, 'role', value);
+                    closeRoleDropdown();
+                });
+                roleDropdown.appendChild(option);
+            });
+        }
+
+        function positionRoleDropdown(cell) {
+            if (!cell || !roleDropdown) return;
+            
+            const rect = cell.getBoundingClientRect();
+            
+            // Используем offsetWidth для получения реальной ширины ячейки
+            // offsetWidth включает padding и border, что даёт точную ширину
+            const cellWidth = cell.offsetWidth;
+            
+            // Также проверяем rect.width для сравнения
+            const rectWidth = rect.width;
+            
+            // Используем максимальное значение для надёжности
+            const finalWidth = Math.max(cellWidth, rectWidth);
+            
+            // Позиционируем относительно viewport
+            roleDropdown.style.position = 'fixed';
+            roleDropdown.style.top = `${rect.bottom + 6}px`;
+            roleDropdown.style.left = `${rect.left}px`;
+            roleDropdown.style.width = `${finalWidth}px`;
+            roleDropdown.style.minWidth = `${finalWidth}px`;
+            roleDropdown.style.maxWidth = `${finalWidth}px`;
+            roleDropdown.style.boxSizing = 'border-box';
+            
+            // Сбрасываем любые ограничения ширины
+            roleDropdown.style.flexShrink = '0';
+            roleDropdown.style.flexGrow = '0';
+            
+            // Убеждаемся, что опции занимают всю ширину
+            const options = roleDropdown.querySelectorAll('.role-dropdown-option');
+            options.forEach(opt => {
+                opt.style.width = '100%';
+                opt.style.minWidth = '100%';
+                opt.style.maxWidth = '100%';
+                opt.style.boxSizing = 'border-box';
+                opt.classList.toggle('selected', opt.dataset.value === cell.dataset.roleValue);
+            });
+        }
+
+        function openRoleDropdown(cell) {
+            currentRoleCell = cell;
+            cell.setAttribute('aria-expanded', 'true');
+            populateRoleDropdown();
+            roleDropdown.classList.add('visible');
+            // Используем двойной requestAnimationFrame для точного позиционирования после всех изменений DOM
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    positionRoleDropdown(cell);
+                });
+            });
+        }
+
+        function closeRoleDropdown() {
+            if (currentRoleCell) {
+                currentRoleCell.setAttribute('aria-expanded', 'false');
+            }
+            currentRoleCell = null;
+            roleDropdown.classList.remove('visible');
+        }
+
+        document.addEventListener('click', (event) => {
+            if (roleDropdown.contains(event.target)) return;
+            if (event.target.closest('.role-cell')) return;
+            closeRoleDropdown();
+        });
+
+        window.addEventListener('resize', () => {
+            if (currentRoleCell) {
+                requestAnimationFrame(() => {
+                    positionRoleDropdown(currentRoleCell);
+                });
+            }
+        });
+
+        // Обработчик скролла страницы для перепозиционирования dropdown
+        window.addEventListener('scroll', () => {
+            if (currentRoleCell) {
+                requestAnimationFrame(() => {
+                    positionRoleDropdown(currentRoleCell);
+                });
+            }
+        }, true);
+
+        // Обработчик скролла таблицы для перепозиционирования dropdown
+        const tableContainer = document.querySelector('.table-container');
+        if (tableContainer) {
+            tableContainer.addEventListener('scroll', () => {
+                if (currentRoleCell) {
+                    requestAnimationFrame(() => {
+                        positionRoleDropdown(currentRoleCell);
+                    });
+                }
+            });
+        }
+
+        roleCells.forEach(cell => {
+            cell.addEventListener('click', () => {
+                if (currentRoleCell === cell && roleDropdown.classList.contains('visible')) {
+                    closeRoleDropdown();
+                } else {
+                    openRoleDropdown(cell);
+                }
+            });
+
+            cell.addEventListener('focus', () => {
+                cell.dataset.originalValue = cell.dataset.roleValue || '';
+            });
+
+            cell.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    openRoleDropdown(cell);
+                }
+                if (event.key === 'Escape') {
+                    closeRoleDropdown();
+                    cell.blur();
+                }
+            });
+        });
+
+        filterSelectWrappers.forEach(wrapper => {
+            const targetId = wrapper.dataset.target;
+            const selectEl = document.getElementById(targetId);
+            if (!selectEl) return;
+            const button = wrapper.querySelector('.filter-select-btn');
+            const labelEl = wrapper.querySelector('.filter-select-label');
+            const optionButtons = wrapper.querySelectorAll('.filter-option');
+
+            const syncUI = () => {
+                const value = selectEl.value || '';
+                const matchedOption = Array.from(selectEl.options).find(opt => opt.value === value);
+                const labelText = matchedOption ? matchedOption.textContent : optionButtons[0]?.textContent || 'Все';
+                if (labelEl) labelEl.textContent = labelText;
+                optionButtons.forEach(btn => {
+                    btn.classList.toggle('selected', btn.dataset.value === value);
+                });
+            };
+
+            optionButtons.forEach(btn => {
+                btn.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const value = btn.dataset.value || '';
+                    if (selectEl.value !== value) {
+                        selectEl.value = value;
+                        selectEl.dispatchEvent(new Event('change'));
+                    } else {
+                        selectEl.dispatchEvent(new Event('change'));
+                    }
+                    syncUI();
+                    closeFilterSelectMenus();
+                });
+            });
+
+            if (button) {
+                button.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const isOpen = wrapper.classList.contains('open');
+                    closeFilterSelectMenus();
+                    if (!isOpen) {
+                        wrapper.classList.add('open');
+                        button.setAttribute('aria-expanded', 'true');
+                    }
+                });
+            }
+
+            selectEl.addEventListener('change', syncUI);
+
+            syncUI();
+            filterSelectControllers.set(selectEl, { sync: syncUI });
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('.filter-select')) {
+                closeFilterSelectMenus();
+            }
+        });
+
+        if (employeeForm) {
+            employeeForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                if (employeeFormSubmit) {
+                    employeeFormSubmit.disabled = true;
+                    employeeFormSubmit.textContent = 'Сохранение...';
+                }
+                if (employeeFormError) {
+                    employeeFormError.textContent = '';
+                }
+
+                const formData = new FormData(employeeForm);
+                const payload = {
+                    last_name: formData.get('last_name')?.trim(),
+                    first_name: formData.get('first_name')?.trim(),
+                    patronymic: formData.get('patronymic')?.trim(),
+                    post: formData.get('post')?.trim(),
+                    phone: formData.get('phone')?.trim(),
+                    email: formData.get('email')?.trim(),
+                    facility_id: formData.get('facility_id'),
+                    department_id: formData.get('department_id'),
+                    role: formData.get('role'),
+                    login: formData.get('login')?.trim(),
+                    password: formData.get('password')?.trim()
+                };
+
+                fetch('/admin/employees', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                })
+                .then(async response => {
+                    const data = await response.json();
+                    return { ok: response.ok, data };
+                })
+                .then(({ ok, data }) => {
+                    if (ok && data.success) {
+                        closeEmployeeModal();
+                        showStatus('Сотрудник добавлен', 'success');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 600);
+                    } else {
+                        if (employeeFormError) {
+                            employeeFormError.textContent = data.message || 'Ошибка сохранения.';
+                        }
+                    }
+                })
+                .catch(() => {
+                    if (employeeFormError) {
+                        employeeFormError.textContent = 'Сеть недоступна. Попробуйте позже.';
+                    }
+                })
+                .finally(() => {
+                    if (employeeFormSubmit) {
+                        employeeFormSubmit.disabled = false;
+                        employeeFormSubmit.textContent = submitDefaultText || 'Сохранить';
+                    }
+                });
+            });
+        }
+
+        handleFacilityChange();
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                if (roleDropdown.classList.contains('visible')) {
+                    closeRoleDropdown();
+                    return;
+                }
+                if (activeModal) {
+                    closeEmployeeModal();
+                }
+            }
+        });
+
+        applyTableFilters();
+    </script>
+</body>
+</html>
+

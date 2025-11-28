@@ -1,0 +1,139 @@
+/* Стили для кнопок */
+.add-employee-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    background: linear-gradient(135deg, #dd9e00, #f5b942);
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(221, 158, 0, 0.3);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.add-employee-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px rgba(221, 158, 0, 0.35);
+}
+
+.add-employee-btn:active {
+    transform: scale(0.98);
+}
+
+.add-employee-btn svg {
+    stroke: currentColor;
+}
+
+.primary-btn {
+    border: none;
+    background: #dd9e00;
+    color: white;
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.primary-btn:hover {
+    background: #f5b010;
+    box-shadow: 0 8px 20px rgba(221, 158, 0, 0.3);
+}
+
+.primary-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.secondary-btn {
+    border: 1px solid #d0d0d0;
+    background: white;
+    color: #333;
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.secondary-btn:hover {
+    border-color: #dd9e00;
+    background: #fff8ec;
+}
+
+.danger-btn {
+    border: none;
+    background: rgba(220, 53, 69, 0.15);
+    color: #c63434;
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.danger-btn:hover {
+    background: rgba(220, 53, 69, 0.25);
+    color: #b42a2a;
+}
+
+.danger-btn:focus-visible {
+    outline: 2px solid rgba(220, 53, 69, 0.5);
+    outline-offset: 2px;
+}
+
+.ghost-btn {
+    border: 1px solid #d0d0d0;
+    background: transparent;
+    color: #444;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.ghost-btn:hover {
+    border-color: #dd9e00;
+    background: #fff8ec;
+}
+
+.ghost-btn:focus-visible {
+    outline: 2px solid rgba(221, 158, 0, 0.4);
+    outline-offset: 2px;
+}
+
+.generate-credentials-btn {
+    min-width: 150px;
+    font-size: 13px;
+}
+
+html.dark-theme .secondary-btn {
+    background: #2a2a2a;
+    border-color: #3a3a3a;
+    color: #e0e0e0;
+}
+
+html.dark-theme .secondary-btn:hover {
+    background: #332d22;
+    border-color: #dd9e00;
+}
+
+html.dark-theme .ghost-btn {
+    border-color: #3a3a3a;
+    color: #e0e0e0;
+}
+
+html.dark-theme .ghost-btn:hover {
+    background: #332d22;
+    border-color: #dd9e00;
+}
+
+

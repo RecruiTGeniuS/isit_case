@@ -1,0 +1,353 @@
+/* Стили для модальных окон */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(12, 12, 14, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 5000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    overflow-y: auto;
+}
+
+.modal-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-window {
+    width: min(1100px, 100%);
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-height: none;
+    overflow: visible;
+    margin: 32px 0;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 20px;
+    color: #1f1f1f;
+}
+
+.modal-close-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    transition: background 0.2s ease;
+}
+
+.modal-close-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+html.dark-theme .modal-close-btn svg {
+    stroke: #f5f5f5;
+}
+
+html.dark-theme .modal-close-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.modal-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+    color: #555;
+    min-width: 0;
+    flex: 0 0 300px;
+}
+
+.modal-section {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-bottom: 16px;
+}
+
+.modal-section:not(:last-of-type) {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    margin-bottom: 12px;
+}
+
+.modal-section-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1f1f1f;
+}
+
+.modal-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px 32px;
+    justify-content: flex-start;
+}
+
+.modal-row--thirds .modal-field {
+    flex: 0 0 280px;
+    max-width: 280px;
+}
+
+.modal-row--halves .modal-field {
+    flex: 0 0 340px;
+}
+
+@media (max-width: 1024px) {
+    .modal-row--thirds .modal-field,
+    .modal-row--halves .modal-field {
+        flex: 0 0 calc(50% - 24px);
+    }
+}
+
+@media (max-width: 768px) {
+    .modal-row {
+        gap: 20px;
+    }
+}
+
+@media (max-width: 640px) {
+    .modal-row--thirds .modal-field,
+    .modal-row--halves .modal-field,
+    .modal-row .modal-field {
+        flex: 1 1 100%;
+    }
+}
+
+.modal-field span {
+    font-weight: 600;
+    color: #333;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.modal-field span::after {
+    content: attr(data-required);
+    color: #dc3545;
+    font-size: 13px;
+}
+
+.modal-field span[data-required=""]::after,
+.modal-field span:not([data-required])::after {
+    content: '';
+}
+
+.modal-field input,
+.modal-field select {
+    width: 100%;
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.modal-field input:focus,
+.modal-field select:focus {
+    outline: none;
+    border-color: #dd9e00;
+    box-shadow: 0 0 0 3px rgba(221, 158, 0, 0.15);
+}
+
+.modal-field input::placeholder {
+    color: #9a9a9a;
+}
+
+.modal-field input[readonly] {
+    background: #f6f6f6;
+    color: #777;
+    cursor: not-allowed;
+}
+
+.modal-field select {
+    appearance: none;
+    padding-right: 34px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px;
+}
+
+.modal-field select:invalid {
+    color: #888;
+}
+
+.modal-error {
+    color: #c82333;
+    font-size: 13px;
+    min-height: 18px;
+}
+
+.modal-form input.error,
+.modal-form select.error {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.12);
+}
+
+.modal-form input.error:focus,
+.modal-form select.error:focus {
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
+}
+
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.modal-form input[type="text"],
+.modal-form input[type="email"],
+.modal-form select {
+    font-family: inherit;
+}
+
+.modal-overlay .modal-form select::-ms-expand {
+    display: none;
+}
+
+.modal-overlay .modal-form select option {
+    color: #333;
+}
+
+.modal-overlay .modal-form select option[value=""] {
+    color: #888;
+}
+
+.password-field .password-input-wrapper {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+    width: 100%;
+}
+
+.password-field {
+    flex: 0 0 420px !important;
+    max-width: 420px !important;
+}
+
+.password-field .password-input-wrapper input {
+    flex: 0 0 280px;
+    max-width: 280px;
+    min-width: 0;
+}
+
+.modal-form-grid label {
+    font-weight: 500;
+}
+
+.modal-form input[readonly] {
+    background: #f8f8f8;
+    color: #777;
+}
+
+.modal-overlay .modal-form select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+}
+
+.modal-overlay .modal-form select:focus {
+    background-color: white;
+}
+
+.modal-form-grid label span {
+    font-size: 13px;
+    color: #444;
+}
+
+.modal-form-grid label span::after {
+    content: '';
+}
+
+.modal-form-grid label select option[value=""] {
+    font-style: italic;
+    font-weight: 500;
+    color: #888;
+    background: transparent;
+}
+
+.modal-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+html.dark-theme .modal-window {
+    background: #2a2a2a;
+    color: #f5f5f5;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+}
+
+html.dark-theme .modal-header h3 {
+    color: #f5f5f5;
+}
+
+html.dark-theme .modal-section-title {
+    color: #f5f5f5;
+}
+
+html.dark-theme .modal-section:not(:last-of-type) {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+html.dark-theme .modal-field span {
+    color: #f0f0f0;
+}
+
+html.dark-theme .modal-field input,
+html.dark-theme .modal-field select {
+    background: #1f1f1f;
+    border-color: #3a3a3a;
+    color: #f5f5f5;
+}
+
+html.dark-theme .modal-field input[readonly] {
+    background: #2a2a2a;
+    color: #9a9a9a;
+}
+
+html.dark-theme .modal-field select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23ccc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+html.dark-theme .modal-form input[readonly] {
+    background: #2a2a2a;
+    color: #9a9a9a;
+}
+
+html.dark-theme .modal-overlay .modal-form select:focus {
+    background-color: #2a2a2a;
+}
+
+html.dark-theme .modal-form-grid label span {
+    color: #f0f0f0;
+}
+
+

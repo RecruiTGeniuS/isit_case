@@ -1,0 +1,59 @@
+/* CSS переменные для цветов, размеров и т.д. */
+:root {
+    /* Основные цвета */
+    --color-primary: #dd9e00;
+    --color-primary-hover: #f5b010;
+    --color-primary-light: #fff8ec;
+    
+    /* Фоны */
+    --bg-light: #f5f5f5;
+    --bg-white: #ffffff;
+    --bg-dark: #1b1b1c;
+    --bg-dark-secondary: #252525;
+    
+    /* Текст */
+    --text-dark: #333;
+    --text-medium: #555;
+    --text-light: #666;
+    --text-white: #ffffff;
+    
+    /* Границы */
+    --border-light: #e8e8e8;
+    --border-medium: #ddd;
+    --border-dark: #3a3a3a;
+    
+    /* Тени */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+    
+    /* Радиусы */
+    --radius-sm: 8px;
+    --radius-md: 10px;
+    --radius-lg: 12px;
+    
+    /* Отступы */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+    --spacing-xl: 24px;
+}
+
+/* Темная тема */
+html.dark-theme {
+    --bg-light: #1b1b1c;
+    --bg-white: #252525;
+    --bg-dark: #1e1e1e;
+    --bg-dark-secondary: #2a2a2a;
+    
+    --text-dark: #e0e0e0;
+    --text-medium: #b0b0b0;
+    --text-light: #888;
+    
+    --border-light: rgba(255, 255, 255, 0.08);
+    --border-medium: #3a3a3a;
+    --border-dark: rgba(255, 255, 255, 0.1);
+}
+
+

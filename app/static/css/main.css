@@ -1,0 +1,21 @@
+/* Главный файл CSS - импортирует все модули */
+
+/* 1. Базовые стили */
+@import 'base/reset.css';
+@import 'base/variables.css';
+
+/* 2. Общие компоненты */
+@import 'components/navigation.css';
+@import 'components/table.css';
+@import 'components/filter.css';
+@import 'components/modal.css';
+@import 'components/buttons.css';
+
+/* 3. Стили страниц */
+@import 'pages/auth.css';
+@import 'pages/employees.css';
+@import 'pages/equipment.css';
+@import 'pages/warehouse.css';
+@import 'pages/pto.css';
+@import 'pages/statistics.css';
+

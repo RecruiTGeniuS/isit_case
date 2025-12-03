@@ -1,37 +1,106 @@
 """Маршруты для работы со складом (админ-панель)"""
-from flask import Blueprint, render_template, session, redirect, url_for
+from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for
 from core.auth import get_current_user
+from services.admin_warehouse_service import AdminWarehouseService
 from utils.formatters import get_role_translation, format_phone
 
 bp = Blueprint('admin_warehouse', __name__, url_prefix='/admin/warehouse')
 
+def check_auth():
+    """Проверка авторизации"""
+    if 'user_id' not in session:
+        if request.is_json or request.headers.get('Content-Type') == 'application/json':
+            return jsonify({'success': False, 'message': 'Не авторизовано'}), 401
+        return redirect(url_for('auth.login'))
+    return None
+
 @bp.route('', methods=['GET'])
 def list_warehouse():
     """Список склада"""
-    if 'user_id' not in session:
-        return redirect(url_for('auth.login'))
+    auth_check = check_auth()
+    if auth_check:
+        return auth_check
     
     user = get_current_user()
+    service = AdminWarehouseService()
     
-    # Передаем пустые списки и словари для совместимости с шаблоном
-    employees = []
-    role_options = []
-    department_options = []
-    facility_options = []
-    role_labels = {}
-    department_choices = []
+    # Получаем department_id пользователя, если он начальник ремонтной службы
+    department_id = None
+    if user['role'] == 'repair_head':
+        from services.admin_employee_service import AdminEmployeeService
+        emp_service = AdminEmployeeService()
+        department_id = emp_service.get_user_department_id(user['user_id'])
+    
+    parts = service.get_all(user_role=user['role'], department_id=department_id)
+    
+    # Подготовка данных для фильтров
+    facility_options = sorted({part['facility_name'] for part in parts if part.get('facility_name') and part['facility_name'] != '—'})
+    warehouse_options = sorted({part['department_name'] for part in parts if part.get('department_name') and part['department_name'] != '—'})
+    spare_part_options = sorted({part['spare_part_name'] for part in parts if part.get('spare_part_name') and part['spare_part_name'] != '—'})
+    
+    # Доступные запчасти и склады для формы добавления
+    spare_part_choices = service.get_spare_parts()
+    warehouse_choices = service.get_warehouses()
+    
+    # Получаем список предприятий для формы
+    from services.admin_employee_service import AdminEmployeeService
+    emp_service = AdminEmployeeService()
+    department_choices = emp_service.get_departments()
     facility_choices = []
+    seen_facilities = set()
+    for dept in department_choices:
+        facility_id = dept.get('facility_id')
+        facility_name = dept.get('facility_name')
+        if facility_id and facility_id not in seen_facilities:
+            seen_facilities.add(facility_id)
+            facility_choices.append({
+                'id': facility_id,
+                'name': facility_name
+            })
+    facility_choices.sort(key=lambda item: (item['name'] or '').lower())
     
     return render_template('admin.html',
                          section='warehouse',
+                         parts=parts,
                          user=session,
-                         employees=employees,
                          get_role_translation=get_role_translation,
                          format_phone=format_phone,
-                         role_options=role_options,
-                         department_options=department_options,
                          facility_options=facility_options,
-                         role_labels=role_labels,
-                         department_choices=department_choices,
+                         warehouse_options=warehouse_options,
+                         spare_part_options=spare_part_options,
+                         spare_part_choices=spare_part_choices,
+                         warehouse_choices=warehouse_choices,
                          facility_choices=facility_choices)
+
+@bp.route('', methods=['POST'])
+def create_part():
+    """Создание записи на складе"""
+    auth_check = check_auth()
+    if auth_check:
+        return auth_check
+    
+    data = request.get_json(silent=True) or {}
+    required_fields = ['spare_part_name', 'quantity', 'warehouse_id']
+    missing = [field for field in required_fields if not str(data.get(field, '')).strip()]
+    if missing:
+        return jsonify({'success': False, 'message': 'Заполните обязательные поля.'}), 400
+    
+    try:
+        quantity = int(data.get('quantity', 0))
+        if quantity <= 0:
+            return jsonify({'success': False, 'message': 'Количество должно быть больше нуля.'}), 400
+    except (TypeError, ValueError):
+        return jsonify({'success': False, 'message': 'Некорректное количество.'}), 400
+    
+    try:
+        warehouse_id = int(data.get('warehouse_id'))
+    except (TypeError, ValueError):
+        return jsonify({'success': False, 'message': 'Некорректный склад.'}), 400
+    
+    try:
+        service = AdminWarehouseService()
+        part = service.create(data)
+        return jsonify({'success': True, 'part': part})
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Не удалось добавить деталь: {str(e)}'}), 500
 

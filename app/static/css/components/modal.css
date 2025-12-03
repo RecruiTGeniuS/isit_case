@@ -96,6 +96,36 @@
     padding-left: 20px;
 }
 
+/* Жёлтая разделительная линия под заголовком в окне добавления оборудования */
+#equipmentModal .modal-header {
+    padding-bottom: 16px;
+    border-bottom: 2px solid rgba(221, 158, 0, 0.4);
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom: 0;
+}
+
+/* Очень тонкая жёлтая граница для окна добавления оборудования */
+#equipmentModal .modal-window {
+    border: 1px solid rgba(221, 158, 0, 0.4);
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-right: 20px;
+    padding-left: 20px;
+}
+
+/* Уменьшаем расстояние между нижней разделительной линией и кнопками */
+#equipmentModal .modal-form {
+    gap: 3px;
+}
+
+#equipmentModal .modal-footer {
+    margin-top: 0;
+    padding-top: 0;
+}
+
 /* Уменьшаем расстояние между нижней разделительной линией и кнопками */
 #employeeModal .modal-form {
     gap: 3px;
@@ -279,7 +309,8 @@ html.dark-theme .modal-close-btn:focus-visible {
 }
 
 .modal-field input,
-.modal-field select {
+.modal-field select,
+.modal-field textarea {
     width: 100%;
     max-width: 100%;
     min-width: 0;
@@ -293,6 +324,14 @@ html.dark-theme .modal-close-btn:focus-visible {
     -moz-appearance: none;
     overflow: hidden;
     box-sizing: border-box;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.modal-field textarea {
+    min-height: 80px;
+    overflow-y: auto;
+    resize: vertical;
 }
 
 /* Стили только для input полей - без иконки выпадающего списка */
@@ -331,9 +370,11 @@ html.dark-theme .modal-close-btn:focus-visible {
 
 .modal-field input:focus,
 .modal-field select:focus,
+.modal-field textarea:focus,
 .modal-form input:focus,
 .modal-form input[type="text"]:focus,
-.modal-form input[type="email"]:focus {
+.modal-form input[type="email"]:focus,
+.modal-form textarea:focus {
     outline: none !important;
     border-color: rgba(221, 158, 0, 0.4) !important;
     box-shadow: none !important;
@@ -584,6 +625,10 @@ html:not(.dark-theme) #employeeModal .modal-window {
     border-width: 2px;
 }
 
+html:not(.dark-theme) #equipmentModal .modal-window {
+    border-width: 2px;
+}
+
 html:not(.dark-theme) .modal-section:not(:last-of-type) {
     border-bottom-color: rgba(0, 0, 0, 0.15);
 }
@@ -597,7 +642,8 @@ html.dark-theme .modal-field span {
     color: #f5f5f5;
 }
 
-html.dark-theme .modal-field input {
+html.dark-theme .modal-field input,
+html.dark-theme .modal-field textarea {
     background: #1f1f1f;
     border-color: #3a3a3a;
     color: #f5f5f5;

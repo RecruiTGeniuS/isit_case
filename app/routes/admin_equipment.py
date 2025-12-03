@@ -1,41 +1,179 @@
 """Маршруты для работы с оборудованием (админ-панель)"""
-from flask import Blueprint, render_template, session, redirect, url_for
+from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for
 from core.auth import get_current_user
+from services.admin_equipment_service import AdminEquipmentService
 from utils.formatters import get_role_translation, format_phone
 
 bp = Blueprint('admin_equipment', __name__, url_prefix='/admin/equipment')
 
+def check_auth():
+    """Проверка авторизации"""
+    if 'user_id' not in session:
+        if request.is_json or request.headers.get('Content-Type') == 'application/json':
+            return jsonify({'success': False, 'message': 'Не авторизовано'}), 401
+        return redirect(url_for('auth.login'))
+    return None
+
 @bp.route('', methods=['GET'])
 def list_equipment():
     """Список оборудования"""
-    if 'user_id' not in session:
-        return redirect(url_for('auth.login'))
+    auth_check = check_auth()
+    if auth_check:
+        return auth_check
     
     user = get_current_user()
+    service = AdminEquipmentService()
     
-    # TODO: Реализовать логику получения оборудования
-    # service = AdminEquipmentService()
-    # equipment = service.get_all()
+    # Получаем department_id пользователя, если он начальник ремонтной службы
+    department_id = None
+    if user['role'] == 'repair_head':
+        # Получаем department_id из employee
+        from services.admin_employee_service import AdminEmployeeService
+        emp_service = AdminEmployeeService()
+        department_id = emp_service.get_user_department_id(user['user_id'])
     
-    # Передаем пустые списки и словари для совместимости с шаблоном
-    employees = []
-    role_options = []
-    department_options = []
-    facility_options = []
-    role_labels = {}
-    department_choices = []
+    equipment = service.get_all(user_role=user['role'], department_id=department_id)
+    
+    # Подготовка данных для фильтров
+    type_options = sorted({eq['equipment_type'] for eq in equipment if eq.get('equipment_type')})
+    status_options = sorted({eq['equipment_status'] for eq in equipment if eq.get('equipment_status')})
+    location_options = sorted({eq['location'] for eq in equipment if eq.get('location')})
+    department_options = sorted({eq['department'] for eq in equipment if eq.get('department')})
+    
+    # Доступные отделы
+    department_choices = service.get_departments()
     facility_choices = []
+    seen_facilities = set()
+    for dept in department_choices:
+        facility_id = dept.get('facility_id')
+        facility_name = dept.get('facility_name')
+        if facility_id and facility_id not in seen_facilities:
+            seen_facilities.add(facility_id)
+            facility_choices.append({
+                'id': facility_id,
+                'name': facility_name
+            })
+    facility_choices.sort(key=lambda item: (item['name'] or '').lower())
     
-    return render_template('admin.html',
+    # Данные для формы добавления
+    equipment_types = service.get_types()
+    spare_part_types = service.get_spare_part_types()
+    image_paths = service.get_image_paths()
+    maintenance_frequencies = service.get_maintenance_frequencies()
+    
+    return render_template('admin.html', 
                          section='equipment',
+                         equipment=equipment,
                          user=session,
-                         employees=employees,
                          get_role_translation=get_role_translation,
                          format_phone=format_phone,
-                         role_options=role_options,
+                         type_options=type_options,
+                         status_options=status_options,
+                         location_options=location_options,
                          department_options=department_options,
-                         facility_options=facility_options,
-                         role_labels=role_labels,
+                         role_labels={},  # Пустой словарь для оборудования
+                         department_choices=department_choices,
+                         facility_choices=facility_choices,
+                         equipment_types=equipment_types,
+                         spare_part_types=spare_part_types,
+                         image_paths=image_paths,
+                         maintenance_frequencies=maintenance_frequencies)
+
+@bp.route('', methods=['POST'])
+def create_equipment():
+    """Создание оборудования"""
+    auth_check = check_auth()
+    if auth_check:
+        return auth_check
+    
+    data = request.get_json(silent=True) or {}
+    required_fields = ['equipment_name']
+    missing = [field for field in required_fields if not str(data.get(field, '')).strip()]
+    if missing:
+        return jsonify({'success': False, 'message': 'Заполните обязательные поля.'}), 400
+    
+    try:
+        service = AdminEquipmentService()
+        equipment = service.create(data)
+        return jsonify({'success': True, 'equipment': equipment})
+    except Exception as e:
+        return jsonify({'success': False, 'message': 'Не удалось добавить оборудование.'}), 500
+
+@bp.route('/<int:equipment_id>', methods=['PATCH'])
+def update_equipment_field(equipment_id):
+    """Обновление поля оборудования"""
+    auth_check = check_auth()
+    if auth_check:
+        return auth_check
+    
+    payload = request.get_json(silent=True) or {}
+    field = payload.get('field')
+    value = payload.get('value', '')
+    
+    try:
+        service = AdminEquipmentService()
+        service.update_field(equipment_id, field, value)
+        
+        display_value = value or ''
+        
+        return jsonify({'success': True, 'value': display_value})
+    except ValueError as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
+    except Exception:
+        return jsonify({'success': False, 'message': 'Не удалось сохранить изменения.'}), 500
+
+@bp.route('/<int:equipment_id>', methods=['DELETE'])
+def delete_equipment(equipment_id):
+    """Удаление оборудования"""
+    auth_check = check_auth()
+    if auth_check:
+        return auth_check
+    
+    try:
+        service = AdminEquipmentService()
+        service.delete(equipment_id)
+        return jsonify({'success': True, 'message': 'Оборудование успешно удалено'})
+    except ValueError as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
+    except Exception:
+        return jsonify({'success': False, 'message': 'Не удалось удалить оборудование.'}), 500
+
+@bp.route('/passport/<int:equipment_id>', methods=['GET'])
+def equipment_passport(equipment_id):
+    """Страница паспорта оборудования"""
+    auth_check = check_auth()
+    if auth_check:
+        return auth_check
+    
+    user = get_current_user()
+    service = AdminEquipmentService()
+    equipment = service.get_by_id(equipment_id)
+    
+    if not equipment:
+        return redirect(url_for('admin_equipment.list_equipment'))
+    
+    # Получаем необходимые данные для шаблона
+    department_choices = service.get_departments()
+    facility_choices = []
+    seen_facilities = set()
+    for dept in department_choices:
+        facility_id = dept.get('facility_id')
+        facility_name = dept.get('facility_name')
+        if facility_id and facility_id not in seen_facilities:
+            seen_facilities.add(facility_id)
+            facility_choices.append({
+                'id': facility_id,
+                'name': facility_name
+            })
+    facility_choices.sort(key=lambda item: (item['name'] or '').lower())
+    
+    return render_template('admin.html',
+                         section='equipment_passport',
+                         equipment=equipment,
+                         user=session,
+                         get_role_translation=get_role_translation,
+                         format_phone=format_phone,
+                         role_labels={},  # Пустой словарь для оборудования
                          department_choices=department_choices,
                          facility_choices=facility_choices)
 

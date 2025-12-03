@@ -12,6 +12,7 @@
 @import 'components/buttons.css';
 
 /* 3. Стили страниц */
+@import 'pages/auth.css';
 @import 'pages/employees.css';
 @import 'pages/equipment.css';
 @import 'pages/warehouse.css';

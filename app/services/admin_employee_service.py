@@ -10,7 +10,7 @@ class AdminEmployeeService:
             query = """
                 SELECT e.employee_id, e.last_name, e.first_name, e.patronymic,
                        e.employee_post, e.phone_number, e.email, e.login, e.password, e.user_role,
-                       d.department_name, f.facility_name
+                       e.department_id, d.department_name, f.facility_name
                 FROM employee e
                 LEFT JOIN department d ON e.department_id = d.department_id
                 LEFT JOIN facility f ON d.facility_id = f.facility_id
@@ -35,7 +35,7 @@ class AdminEmployeeService:
             cur.execute("""
                 SELECT e.employee_id, e.last_name, e.first_name, e.patronymic,
                        e.employee_post, e.phone_number, e.email, e.login, e.password,
-                       e.user_role, d.department_name, f.facility_name
+                       e.user_role, e.department_id, d.department_name, f.facility_name
                 FROM employee e
                 LEFT JOIN department d ON e.department_id = d.department_id
                 LEFT JOIN facility f ON d.facility_id = f.facility_id
@@ -80,15 +80,48 @@ class AdminEmployeeService:
             'email': 'email',
             'role': 'user_role',
             'login': 'login',
-            'password': 'password'
+            'password': 'password',
+            'facility': 'facility',
+            'department_id': 'department_id'
         }
         
         if field not in editable_fields:
             raise ValueError(f'Поле {field} недоступно для редактирования')
         
-        column = editable_fields[field]
-        db_value = value.strip() if isinstance(value, str) else value
-        db_value = db_value if db_value != '' else None
+        # Для facility всегда сбрасываем отдел при смене предприятия
+        if field == 'facility':
+            facility_name = value.strip() if isinstance(value, str) else ''
+            if not facility_name:
+                # Если предприятие пустое, устанавливаем department_id в NULL
+                with get_db_cursor(commit=True) as cur:
+                    cur.execute("UPDATE employee SET department_id = NULL WHERE employee_id = %s", 
+                               (employee_id,))
+                    if cur.rowcount == 0:
+                        raise ValueError('Сотрудник не найден')
+                return
+            
+            # При смене предприятия всегда сбрасываем отдел
+            with get_db_cursor(commit=True) as cur:
+                cur.execute("UPDATE employee SET department_id = NULL WHERE employee_id = %s", 
+                           (employee_id,))
+                if cur.rowcount == 0:
+                    raise ValueError('Сотрудник не найден')
+            return
+        
+        # Для department_id обрабатываем как число или None
+        if field == 'department_id':
+            if value == '' or value is None:
+                db_value = None
+            else:
+                try:
+                    db_value = int(value)
+                except (TypeError, ValueError):
+                    raise ValueError('Некорректный ID отдела')
+            column = 'department_id'
+        else:
+            column = editable_fields[field]
+            db_value = value.strip() if isinstance(value, str) else value
+            db_value = db_value if db_value != '' else None
         
         with get_db_cursor(commit=True) as cur:
             cur.execute(f"UPDATE employee SET {column} = %s WHERE employee_id = %s", 
@@ -115,6 +148,13 @@ class AdminEmployeeService:
                 for row in cur.fetchall()
             ]
     
+    def delete(self, employee_id):
+        """Удалить сотрудника"""
+        with get_db_cursor(commit=True) as cur:
+            cur.execute("DELETE FROM employee WHERE employee_id = %s", (employee_id,))
+            if cur.rowcount == 0:
+                raise ValueError('Сотрудник не найден')
+    
     def get_user_department_id(self, user_id):
         """Получить department_id пользователя"""
         with get_db_cursor() as cur:
@@ -136,7 +176,8 @@ class AdminEmployeeService:
             'login': row[7],
             'password': row[8],
             'role': row[9],
-            'department': row[10],
-            'facility': row[11],
+            'department_id': row[10],
+            'department': row[11],
+            'facility': row[12],
         }
 

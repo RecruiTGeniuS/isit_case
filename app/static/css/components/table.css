@@ -73,7 +73,36 @@ html.dark-theme .data-table th {
 /* Убираем padding у ячеек с .role-cell, чтобы содержимое растягивалось */
 .data-table td.role-cell {
     padding: 0;
+    vertical-align: middle;
+    position: relative;
+    height: 100%;
+    width: 180px !important;
+    max-width: 180px !important;
+    min-width: 150px;
 }
+
+/* Стили для ячеек с выпадающими списками предприятий */
+.data-table td.facility-cell {
+    padding: 0;
+    vertical-align: middle;
+    position: relative;
+    height: 100%;
+    width: 250px !important;
+    max-width: 250px !important;
+    min-width: 200px;
+}
+
+/* Стили для ячеек с выпадающими списками отделов */
+.data-table td.department-cell {
+    padding: 0;
+    vertical-align: middle;
+    position: relative;
+    height: 100%;
+    width: 200px !important;
+    max-width: 200px !important;
+    min-width: 150px;
+}
+
 
 /* Для ячеек с select - делаем flex-контейнером с растягиванием */
 .data-table td:has(select),
@@ -262,23 +291,36 @@ html.dark-theme .readonly-cell {
 .role-cell {
     cursor: pointer;
     user-select: none;
-    display: flex;
-    align-items: stretch;
-    gap: 6px;
     padding: 0;
-    height: 100%;
+    position: relative;
     width: 100%;
     box-sizing: border-box;
     transition: background 0.2s ease, box-shadow 0.2s ease;
 }
 
-.role-cell svg {
-    flex-shrink: 0;
-    color: #999;
-    transition: transform 0.2s ease, color 0.2s ease;
-    align-self: center;
-    margin-left: 0;
-    margin-right: 12px;
+.facility-cell,
+.department-cell {
+    cursor: pointer;
+    user-select: none;
+    padding: 0;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Обёртка содержимого, которая занимает всю высоту ячейки */
+.role-cell-content {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 .role-cell:focus {
@@ -286,7 +328,25 @@ html.dark-theme .readonly-cell {
     background: #fff8ec;
 }
 
-.role-cell[aria-expanded="true"] svg {
+.facility-cell:focus,
+.department-cell:focus {
+    outline: 2px solid #dd9e00;
+    background: #fff8ec;
+}
+
+.role-cell svg,
+.facility-cell svg,
+.department-cell svg {
+    flex-shrink: 0;
+    color: #999;
+    transition: transform 0.2s ease, color 0.2s ease;
+    margin-left: auto;
+    margin-right: 12px;
+}
+
+.role-cell[aria-expanded="true"] svg,
+.facility-cell[aria-expanded="true"] svg,
+.department-cell[aria-expanded="true"] svg {
     transform: rotate(180deg);
     color: #dd9e00;
 }
@@ -295,21 +355,27 @@ html.dark-theme .readonly-cell {
     flex: 1;
     display: flex;
     align-items: center;
-    height: 100%;
+    justify-content: flex-start;
     padding: 12px 16px;
     padding-right: 6px;
     box-sizing: border-box;
 }
 
-html.dark-theme .role-cell {
+html.dark-theme .role-cell,
+html.dark-theme .facility-cell,
+html.dark-theme .department-cell {
     color: #f5f5f5;
 }
 
-html.dark-theme .role-cell:focus {
+html.dark-theme .role-cell:focus,
+html.dark-theme .facility-cell:focus,
+html.dark-theme .department-cell:focus {
     background: #332d22;
 }
 
-html.dark-theme .role-cell svg {
+html.dark-theme .role-cell svg,
+html.dark-theme .facility-cell svg,
+html.dark-theme .department-cell svg {
     color: #bbb;
 }
 
@@ -359,6 +425,61 @@ html.dark-theme .data-table td:not(:last-child) {
 html.dark-theme .data-table .number-column {
     background: #342615;
     color: #e0e0e0;
+}
+
+.data-table .actions-column {
+    width: 50px;
+    min-width: 50px;
+    max-width: 50px;
+    text-align: center;
+    padding: 8px 4px !important;
+}
+
+.delete-employee-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #999;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.delete-employee-btn:hover {
+    background: #ffe2e2;
+    color: #dc3545;
+}
+
+.delete-employee-btn:focus {
+    outline: 2px solid #dc3545;
+    outline-offset: 2px;
+}
+
+.delete-employee-btn:active {
+    transform: scale(0.95);
+}
+
+.delete-employee-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+html.dark-theme .delete-employee-btn {
+    color: #999;
+}
+
+html.dark-theme .delete-employee-btn:hover {
+    background: rgba(220, 53, 69, 0.2);
+    color: #ff6b6b;
+}
+
+html.dark-theme .delete-employee-btn:focus {
+    outline-color: #ff6b6b;
 }
 
 .content-placeholder {
@@ -416,28 +537,105 @@ html.dark-theme .content-placeholder p {
 }
 
 .table-update-status {
-    margin-top: 12px;
-    font-size: 13px;
-    color: #555;
-    min-height: 18px;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    min-height: 44px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    z-index: 1000;
+    max-width: 90%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .table-update-status.visible {
     opacity: 1;
+    transform: translateX(-50%) translateY(0);
 }
+
 
 .table-update-status[data-state="success"] {
     color: #1f8b4c;
+    background: #e8f5e9;
+    border: 1px solid #c8e6c9;
+}
+
+.table-update-status[data-state="success"]::before {
+    content: '✓';
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #1f8b4c;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    flex-shrink: 0;
 }
 
 .table-update-status[data-state="error"] {
     color: #c82333;
+    background: #ffebee;
+    border: 1px solid #ffcdd2;
+}
+
+.table-update-status[data-state="error"]::before {
+    content: '✕';
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #c82333;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    flex-shrink: 0;
 }
 
 .table-update-status[data-state="info"] {
-    color: #555;
+    color: #1976d2;
+    background: #e3f2fd;
+    border: 1px solid #bbdefb;
+}
+
+html.dark-theme .table-update-status[data-state="success"] {
+    color: #81c784;
+    background: #1b3e1f;
+    border-color: #2e5f32;
+}
+
+html.dark-theme .table-update-status[data-state="success"]::before {
+    background: #4caf50;
+}
+
+html.dark-theme .table-update-status[data-state="error"] {
+    color: #e57373;
+    background: #3e1b1b;
+    border-color: #5f2e2e;
+}
+
+html.dark-theme .table-update-status[data-state="error"]::before {
+    background: #f44336;
+}
+
+html.dark-theme .table-update-status[data-state="info"] {
+    color: #64b5f6;
+    background: #1b2e3e;
+    border-color: #2e4f5f;
 }
 
 /* Role dropdown */
@@ -451,6 +649,11 @@ html.dark-theme .content-placeholder p {
     z-index: 2000;
     display: none;
     box-sizing: border-box;
+}
+
+/* Dropdown для модального окна должен быть выше модального окна */
+#modalDropdown {
+    z-index: 6000;
 }
 
 .role-dropdown.visible {
@@ -611,5 +814,3 @@ html.dark-theme .table-container::-webkit-scrollbar-button:horizontal:start:decr
 html.dark-theme .table-container::-webkit-scrollbar-button:horizontal:end:increment {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Cpath fill='%23aaa' d='M5.5 4L3 6.5V1.5z'/%3E%3C/svg%3E") !important;
 }
-
-

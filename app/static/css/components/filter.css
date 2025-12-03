@@ -64,12 +64,26 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
+.filter-btn.active,
+.filter-dropdown.active ~ .filter-btn {
+    border-color: #dd9e00;
+    box-shadow: 0 0 0 2px rgba(221, 158, 0, 0.2);
+}
+
 .filter-native-select {
     display: none;
 }
 
+.filter-select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .filter-select {
     position: relative;
+    flex: 1;
 }
 
 .filter-select-btn {
@@ -203,6 +217,51 @@ html.dark-theme .filter-option.selected {
     color: #f5b75e;
 }
 
+/* Кнопка сброса фильтра */
+.filter-reset-btn {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
+    color: #666;
+}
+
+.filter-reset-btn:hover {
+    background: #fff4e0;
+    border-color: #dd9e00;
+    color: #dd9e00;
+}
+
+.filter-reset-btn:active {
+    transform: scale(0.95);
+}
+
+.filter-reset-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke-width: 2.5;
+}
+
+html.dark-theme .filter-reset-btn {
+    background: #2c2c2c;
+    border-color: #3a3a3a;
+    color: #bbb;
+}
+
+html.dark-theme .filter-reset-btn:hover {
+    background: rgba(221, 158, 0, 0.15);
+    border-color: #dd9e00;
+    color: #dd9e00;
+}
+
 html.dark-theme .filter-options-list::-webkit-scrollbar-thumb {
     background-color: rgba(255, 255, 255, 0.25);
 }
@@ -286,6 +345,12 @@ html.dark-theme .filter-options-list::-webkit-scrollbar-thumb:hover {
     color: #e0e0e0;
 }
 
+.dark-theme .filter-btn.active,
+.dark-theme .filter-dropdown.active ~ .filter-btn {
+    border-color: #dd9e00;
+    box-shadow: 0 0 0 2px rgba(221, 158, 0, 0.3);
+}
+
 .dark-theme .filter-dropdown {
     background: #2a2a2a;
     border-color: #3a3a3a;
@@ -311,5 +376,6 @@ html.dark-theme .filter-options-list::-webkit-scrollbar-thumb:hover {
     background: #2a2a2a;
     border-color: #dd9e00;
 }
+
 
 

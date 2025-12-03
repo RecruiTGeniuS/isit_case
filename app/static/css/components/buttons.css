@@ -87,6 +87,35 @@
     outline-offset: 2px;
 }
 
+/* Стили для кнопки удаления (primary-btn + danger-btn) */
+.primary-btn.danger-btn {
+    border: 2px solid #c85a5a;
+    background: #c85a5a;
+    color: white;
+}
+
+.primary-btn.danger-btn:hover {
+    background: #b84a4a;
+    border-color: #b84a4a;
+    box-shadow: 0 8px 20px rgba(200, 90, 90, 0.25);
+}
+
+.primary-btn.danger-btn:focus-visible {
+    outline: 2px solid #c85a5a;
+    outline-offset: 2px;
+}
+
+html.dark-theme .primary-btn.danger-btn {
+    border-color: #d9776f;
+    background: #c85a5a;
+}
+
+html.dark-theme .primary-btn.danger-btn:hover {
+    background: #b84a4a;
+    border-color: #b84a4a;
+    box-shadow: 0 8px 20px rgba(200, 90, 90, 0.3);
+}
+
 .ghost-btn {
     border: 1px solid #d0d0d0;
     background: transparent;
@@ -135,5 +164,6 @@ html.dark-theme .ghost-btn:hover {
     background: #332d22;
     border-color: #dd9e00;
 }
+
 
 

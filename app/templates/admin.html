@@ -182,20 +182,28 @@
                             </button>
                             <div class="filter-dropdown" id="filterDropdown">
                                 <div class="filter-group">
-                                    <label for="roleFilter">Роль</label>
-                                    <div class="filter-select" data-target="roleFilter">
-                                        <button type="button" class="filter-select-btn" aria-haspopup="listbox" aria-expanded="false">
-                                            <span class="filter-select-label">Все</span>
+                                    <label for="roleFilter">Права доступа</label>
+                                    <div class="filter-select-wrapper">
+                                        <div class="filter-select" data-target="roleFilter">
+                                            <button type="button" class="filter-select-btn" aria-haspopup="listbox" aria-expanded="false">
+                                                <span class="filter-select-label">Все</span>
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                                </svg>
+                                            </button>
+                                            <div class="filter-options-list" role="listbox">
+                                                <button type="button" class="filter-option" data-value="">Все</button>
+                                                {% for role in role_options %}
+                                                <button type="button" class="filter-option" data-value="{{ role }}">{{ role_labels.get(role) or role }}</button>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <button type="button" class="filter-reset-btn" data-target="roleFilter" aria-label="Сбросить фильтр" title="Сбросить фильтр" style="display: none;">
                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
                                             </svg>
                                         </button>
-                                        <div class="filter-options-list" role="listbox">
-                                            <button type="button" class="filter-option" data-value="">Все</button>
-                                            {% for role in role_options %}
-                                            <button type="button" class="filter-option" data-value="{{ role }}">{{ role_labels.get(role) or role }}</button>
-                                            {% endfor %}
-                                        </div>
                                     </div>
                                     <select id="roleFilter" class="filter-native-select">
                                         <option value="">Все</option>
@@ -206,19 +214,27 @@
                                 </div>
                                 <div class="filter-group">
                                     <label for="departmentFilter">Отдел</label>
-                                    <div class="filter-select" data-target="departmentFilter">
-                                        <button type="button" class="filter-select-btn" aria-haspopup="listbox" aria-expanded="false">
-                                            <span class="filter-select-label">Все</span>
+                                    <div class="filter-select-wrapper">
+                                        <div class="filter-select" data-target="departmentFilter">
+                                            <button type="button" class="filter-select-btn" aria-haspopup="listbox" aria-expanded="false">
+                                                <span class="filter-select-label">Все</span>
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                                </svg>
+                                            </button>
+                                            <div class="filter-options-list" role="listbox">
+                                                <button type="button" class="filter-option" data-value="">Все</button>
+                                                {% for dept in department_options %}
+                                                <button type="button" class="filter-option" data-value="{{ dept }}">{{ dept }}</button>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <button type="button" class="filter-reset-btn" data-target="departmentFilter" aria-label="Сбросить фильтр" title="Сбросить фильтр" style="display: none;">
                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
                                             </svg>
                                         </button>
-                                        <div class="filter-options-list" role="listbox">
-                                            <button type="button" class="filter-option" data-value="">Все</button>
-                                            {% for dept in department_options %}
-                                            <button type="button" class="filter-option" data-value="{{ dept }}">{{ dept }}</button>
-                                            {% endfor %}
-                                        </div>
                                     </div>
                                     <select id="departmentFilter" class="filter-native-select">
                                         <option value="">Все</option>
@@ -229,19 +245,27 @@
                                 </div>
                                 <div class="filter-group">
                                     <label for="facilityFilter">Предприятие</label>
-                                    <div class="filter-select" data-target="facilityFilter">
-                                        <button type="button" class="filter-select-btn" aria-haspopup="listbox" aria-expanded="false">
-                                            <span class="filter-select-label">Все</span>
+                                    <div class="filter-select-wrapper">
+                                        <div class="filter-select" data-target="facilityFilter">
+                                            <button type="button" class="filter-select-btn" aria-haspopup="listbox" aria-expanded="false">
+                                                <span class="filter-select-label">Все</span>
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                                </svg>
+                                            </button>
+                                            <div class="filter-options-list" role="listbox">
+                                                <button type="button" class="filter-option" data-value="">Все</button>
+                                                {% for fac in facility_options %}
+                                                <button type="button" class="filter-option" data-value="{{ fac }}">{{ fac }}</button>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <button type="button" class="filter-reset-btn" data-target="facilityFilter" aria-label="Сбросить фильтр" title="Сбросить фильтр" style="display: none;">
                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
                                             </svg>
                                         </button>
-                                        <div class="filter-options-list" role="listbox">
-                                            <button type="button" class="filter-option" data-value="">Все</button>
-                                            {% for fac in facility_options %}
-                                            <button type="button" class="filter-option" data-value="{{ fac }}">{{ fac }}</button>
-                                            {% endfor %}
-                                        </div>
                                     </div>
                                     <select id="facilityFilter" class="filter-native-select">
                                         <option value="">Все</option>
@@ -270,34 +294,64 @@
                                     <th>Права доступа</th>
                                     <th>Логин</th>
                                     <th>Пароль</th>
+                                    <th class="actions-column">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="Корзина">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                        </svg>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for emp in employees %}
                                 <tr data-employee-id="{{ emp.id }}" data-role="{{ emp.role or '' }}" data-department="{{ emp.department or '' }}" data-facility="{{ emp.facility or '' }}">
                                     <td class="number-column">{{ loop.index }}</td>
-                                    <td class="editable-cell" contenteditable="true" spellcheck="false" data-field="last_name">{{ emp.last_name or '' }}</td>
-                                    <td class="editable-cell" contenteditable="true" spellcheck="false" data-field="first_name">{{ emp.first_name or '' }}</td>
-                                    <td class="editable-cell" contenteditable="true" spellcheck="false" data-field="patronymic">{{ emp.patronymic or '' }}</td>
-                                    <td class="editable-cell" contenteditable="true" spellcheck="false" data-field="post">{{ emp.post or '' }}</td>
-                                    <td class="editable-cell" contenteditable="true" spellcheck="false" data-field="phone">{{ format_phone(emp.phone) or '' }}</td>
-                                    <td class="editable-cell" contenteditable="true" spellcheck="false" data-field="email">{{ emp.email or '' }}</td>
-                                    <td class="readonly-cell">{{ emp.department or '-' }}</td>
-                                    <td class="readonly-cell">{{ emp.facility or '-' }}</td>
-                                    <td class="role-cell" tabindex="0" data-field="role" data-role-value="{{ emp.role or '' }}" aria-haspopup="listbox" aria-expanded="false">
-                                        <span class="role-cell-label">{{ role_labels.get(emp.role) if emp.role else '—' }}</span>
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                            <polyline points="6 9 12 15 18 9"></polyline>
-                                        </svg>
+                                    <td class="editable-cell" contenteditable="false" spellcheck="false" data-field="last_name">{{ emp.last_name or '' }}</td>
+                                    <td class="editable-cell" contenteditable="false" spellcheck="false" data-field="first_name">{{ emp.first_name or '' }}</td>
+                                    <td class="editable-cell" contenteditable="false" spellcheck="false" data-field="patronymic">{{ emp.patronymic or '' }}</td>
+                                    <td class="editable-cell" contenteditable="false" spellcheck="false" data-field="post">{{ emp.post or '' }}</td>
+                                    <td class="editable-cell" contenteditable="false" spellcheck="false" data-field="phone">{{ format_phone(emp.phone) or '' }}</td>
+                                    <td class="editable-cell" contenteditable="false" spellcheck="false" data-field="email">{{ emp.email or '' }}</td>
+                                    <td class="department-cell" tabindex="0" data-field="department_id" data-department-id="{{ emp.department_id or '' }}" data-facility-name="{{ emp.facility or '' }}" aria-haspopup="listbox" aria-expanded="false">
+                                        <div class="role-cell-content">
+                                            <span class="role-cell-label">{{ emp.department or '—' }}</span>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        </div>
                                     </td>
-                                    <td class="editable-cell" contenteditable="true" spellcheck="false" data-field="login">{{ emp.login or '' }}</td>
-                                    <td class="editable-cell" contenteditable="true" spellcheck="false" data-field="password">{{ emp.password or '' }}</td>
+                                    <td class="facility-cell" tabindex="0" data-field="facility" data-facility-value="{{ emp.facility or '' }}" aria-haspopup="listbox" aria-expanded="false">
+                                        <div class="role-cell-content">
+                                            <span class="role-cell-label">{{ emp.facility or '—' }}</span>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        </div>
+                                    </td>
+                                    <td class="role-cell" tabindex="0" data-field="role" data-role-value="{{ emp.role or '' }}" aria-haspopup="listbox" aria-expanded="false">
+                                        <div class="role-cell-content">
+                                            <span class="role-cell-label">{{ role_labels.get(emp.role) if emp.role else '—' }}</span>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        </div>
+                                    </td>
+                                    <td class="editable-cell" contenteditable="false" spellcheck="false" data-field="login">{{ emp.login or '' }}</td>
+                                    <td class="editable-cell" contenteditable="false" spellcheck="false" data-field="password">{{ emp.password or '' }}</td>
+                                    <td class="actions-column">
+                                        <button type="button" class="delete-employee-btn" data-employee-id="{{ emp.id }}" aria-label="Удалить сотрудника" title="Удалить сотрудника">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                            </svg>
+                                        </button>
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
-                        <div id="tableUpdateStatus" class="table-update-status" role="status" aria-live="polite"></div>
                     </div>
+                    <div id="tableUpdateStatus" class="table-update-status" role="status" aria-live="polite"></div>
                     <div class="table-footer-actions">
                         <button type="button" class="add-employee-btn" id="addEmployeeBtn">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -403,18 +457,34 @@
                     <div class="modal-row modal-row--thirds">
                         <label class="modal-field">
                             <span data-required="*">Предприятие</span>
-                            <select name="facility_id" id="employeeFacilitySelect" required>
-                                <option value="">Выберите предприятие</option>
-                                {% for fac in facility_choices %}
-                                <option value="{{ fac.id }}">{{ fac.name }}</option>
-                                {% endfor %}
-                            </select>
+                            <div class="modal-select-wrapper">
+                                <button type="button" class="modal-select-btn" id="modalFacilityBtn" data-field="facility_id" aria-haspopup="listbox" aria-expanded="false">
+                                    <span class="modal-select-label">Выберите предприятие</span>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </button>
+                                <select name="facility_id" id="employeeFacilitySelect" required style="display: none;">
+                                    <option value="">Выберите предприятие</option>
+                                    {% for fac in facility_choices %}
+                                    <option value="{{ fac.id }}">{{ fac.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                         </label>
                         <label class="modal-field">
                             <span data-required="*">Отдел</span>
-                            <select name="department_id" id="employeeDepartment" required disabled>
-                                <option value="">Сначала выберите предприятие</option>
-                            </select>
+                            <div class="modal-select-wrapper">
+                                <button type="button" class="modal-select-btn" id="modalDepartmentBtn" data-field="department_id" aria-haspopup="listbox" aria-expanded="false" disabled>
+                                    <span class="modal-select-label">Сначала выберите предприятие</span>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </button>
+                                <select name="department_id" id="employeeDepartment" required disabled style="display: none;">
+                                    <option value="">Сначала выберите предприятие</option>
+                                </select>
+                            </div>
                         </label>
                         <label class="modal-field">
                             <span data-required="*">Должность</span>
@@ -428,7 +498,7 @@
                     <div class="modal-row modal-row--halves">
                         <label class="modal-field">
                             <span data-required="">Телефон</span>
-                            <input type="text" name="phone" placeholder="+7 (___) ___-__-__">
+                            <input type="text" name="phone" id="employeePhone" placeholder="+7 (___) ___-__-__">
                         </label>
                         <label class="modal-field">
                             <span data-required="">Email</span>
@@ -439,26 +509,43 @@
 
                 <div class="modal-section">
                     <h4 class="modal-section-title">Доступ к УТОР</h4>
-                    <div class="modal-row modal-row--thirds">
+                    <div class="modal-row modal-row--credentials">
                         <label class="modal-field">
                             <span data-required="*">Права доступа</span>
-                            <select name="role" id="employeeRoleSelect" required>
-                                <option value="">Выберите роль</option>
-                                {% for role in role_options %}
-                                <option value="{{ role }}">{{ role_labels.get(role) or role }}</option>
-                                {% endfor %}
-                            </select>
+                            <div class="modal-select-wrapper">
+                                <button type="button" class="modal-select-btn" id="modalRoleBtn" data-field="role" aria-haspopup="listbox" aria-expanded="false">
+                                    <span class="modal-select-label">Выберите роль</span>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </button>
+                                <select name="role" id="employeeRoleSelect" required style="display: none;">
+                                    <option value="">Выберите роль</option>
+                                    {% for role in role_options %}
+                                    <option value="{{ role }}">{{ role_labels.get(role) or role }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                         </label>
-                        <label class="modal-field">
+                        <label class="modal-field login-field">
                             <span data-required="*">Логин</span>
-                            <input type="text" name="login" required>
+                            <input type="text" name="login" id="employeeLogin" required>
                         </label>
                         <label class="modal-field password-field">
                             <span data-required="*">Пароль</span>
                             <div class="password-input-wrapper">
-                                <input type="text" name="password" required>
-                                <button type="button" class="ghost-btn generate-credentials-btn">
-                                    Сгенерировать
+                                <input type="text" name="password" id="employeePassword" required>
+                                <button type="button" class="dice-btn" id="generateCredentialsBtn" aria-label="Сгенерировать логин и пароль" title="Случайная генерация логина и пароля">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                                        <circle cx="7.5" cy="7.5" r="1.2" fill="currentColor"></circle>
+                                        <circle cx="16.5" cy="7.5" r="1.2" fill="currentColor"></circle>
+                                        <circle cx="7.5" cy="16.5" r="1.2" fill="currentColor"></circle>
+                                        <circle cx="16.5" cy="16.5" r="1.2" fill="currentColor"></circle>
+                                        <circle cx="12" cy="12" r="1.2" fill="currentColor"></circle>
+                                    </svg>
                                 </button>
                             </div>
                         </label>
@@ -468,13 +555,35 @@
                 <div class="modal-footer">
                     <div class="modal-error" id="employeeFormError"></div>
                     <div class="modal-actions">
-                        <button type="button" class="secondary-btn danger-btn" id="employeeModalCancel">Отмена</button>
+                        <button type="button" class="secondary-btn" id="employeeModalCancel">Отмена</button>
                         <button type="submit" class="primary-btn" id="employeeFormSubmit" data-default-label="Сохранить">
                             Сохранить
                         </button>
                     </div>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Модальное окно подтверждения удаления сотрудника -->
+    <div class="modal-overlay" id="deleteEmployeeModal" aria-hidden="true">
+        <div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="deleteEmployeeModalTitle">
+            <div class="modal-header">
+                <h3 id="deleteEmployeeModalTitle">Подтверждение удаления</h3>
+                <button type="button" class="modal-close-btn" id="deleteEmployeeModalClose" aria-label="Закрыть">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="deleteEmployeeMessage">Вы уверены, что хотите удалить этого сотрудника? Это действие нельзя будет отменить.</p>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="secondary-btn" id="deleteEmployeeCancel">Отмена</button>
+                <button type="button" class="primary-btn danger-btn" id="deleteEmployeeConfirm">Удалить</button>
+            </div>
         </div>
     </div>
 
@@ -566,6 +675,24 @@
         // Поиск и фильтрация таблицы
         const roleOptionsMap = {{ role_labels|tojson }};
         const departmentsData = {{ department_choices|tojson }};
+        const facilityOptionsMap = {};
+        {% for fac in facility_choices %}
+        facilityOptionsMap[{{ fac.name|tojson }}] = {{ fac.name|tojson }};
+        {% endfor %}
+        // Создаём карту отделов по предприятиям для фильтрации
+        const departmentsByFacility = {};
+        {% for dept in department_choices %}
+        const facilityName_{{ loop.index }} = {{ dept.facility_name|tojson }};
+        if (facilityName_{{ loop.index }}) {
+            if (!departmentsByFacility[facilityName_{{ loop.index }}]) {
+                departmentsByFacility[facilityName_{{ loop.index }}] = [];
+            }
+            departmentsByFacility[facilityName_{{ loop.index }}].push({
+                id: {{ dept.id }},
+                name: {{ dept.name|tojson }}
+            });
+        }
+        {% endfor %}
         const searchInput = document.getElementById('employeeSearch');
         const filterToggle = document.getElementById('filterToggle');
         const filterDropdown = document.getElementById('filterDropdown');
@@ -579,6 +706,9 @@
         const employeeModal = document.getElementById('employeeModal');
         const employeeModalClose = document.getElementById('employeeModalClose');
         const employeeModalCancel = document.getElementById('employeeModalCancel');
+        const generateCredentialsBtn = document.getElementById('generateCredentialsBtn');
+        const employeeLoginInput = document.getElementById('employeeLogin');
+        const employeePasswordInput = document.getElementById('employeePassword');
         const employeeForm = document.getElementById('employeeForm');
         const employeeFacilitySelect = document.getElementById('employeeFacilitySelect');
         const employeeDepartmentSelect = document.getElementById('employeeDepartment');
@@ -588,6 +718,15 @@
         const filterSelectWrappers = document.querySelectorAll('.filter-select[data-target]');
         const filterSelectControllers = new Map();
         let activeModal = null;
+
+        // Кастомные dropdown'ы для модального окна (объявляем раньше, чтобы использовать в openEmployeeModal)
+        const modalDropdown = document.createElement('div');
+        modalDropdown.className = 'role-dropdown';
+        modalDropdown.id = 'modalDropdown';
+        document.body.appendChild(modalDropdown);
+
+        let currentModalSelect = null;
+        let modalSelectData = {};
 
         const facilityDeptMap = departmentsData.reduce((acc, dept) => {
             const facilityId = dept.facility_id ? String(dept.facility_id) : '';
@@ -610,6 +749,9 @@
 
         function populateDepartmentOptions(facilityId) {
             if (!employeeDepartmentSelect) return;
+            const modalDepartmentBtn = document.getElementById('modalDepartmentBtn');
+            const modalDepartmentLabel = modalDepartmentBtn?.querySelector('.modal-select-label');
+            
             employeeDepartmentSelect.innerHTML = '';
             const placeholder = document.createElement('option');
             placeholder.value = '';
@@ -620,6 +762,16 @@
 
             if (!facilityId) {
                 employeeDepartmentSelect.disabled = true;
+                if (modalDepartmentBtn) {
+                    modalDepartmentBtn.disabled = true;
+                    if (modalDepartmentLabel) {
+                        modalDepartmentLabel.textContent = 'Сначала выберите предприятие';
+                    }
+                }
+                // Обновляем данные для dropdown
+                if (modalSelectData) {
+                    modalSelectData.department = {};
+                }
                 return;
             }
 
@@ -627,8 +779,27 @@
             if (departments.length === 0) {
                 placeholder.textContent = 'Для выбранного предприятия нет отделов';
                 employeeDepartmentSelect.disabled = true;
+                if (modalDepartmentBtn) {
+                    modalDepartmentBtn.disabled = true;
+                    if (modalDepartmentLabel) {
+                        modalDepartmentLabel.textContent = 'Для выбранного предприятия нет отделов';
+                    }
+                }
+                // Обновляем данные для dropdown
+                if (modalSelectData) {
+                    modalSelectData.department = {};
+                }
                 return;
             }
+            
+            // Обновляем данные для dropdown
+            if (modalSelectData) {
+                modalSelectData.department = {};
+                departments.forEach(dept => {
+                    modalSelectData.department[dept.id] = dept.name;
+                });
+            }
+            
             departments.forEach(dept => {
                 const option = document.createElement('option');
                 option.value = dept.id;
@@ -636,6 +807,12 @@
                 employeeDepartmentSelect.appendChild(option);
             });
             employeeDepartmentSelect.disabled = false;
+            if (modalDepartmentBtn) {
+                modalDepartmentBtn.disabled = false;
+                if (modalDepartmentLabel) {
+                    modalDepartmentLabel.textContent = 'Выберите отдел';
+                }
+            }
         }
 
         function openEmployeeModal() {
@@ -647,6 +824,31 @@
             if (employeeForm) {
                 employeeForm.reset();
             }
+            
+            // Сбрасываем кастомные dropdown'ы
+            const modalFacilityBtn = document.getElementById('modalFacilityBtn');
+            const modalDepartmentBtn = document.getElementById('modalDepartmentBtn');
+            const modalRoleBtn = document.getElementById('modalRoleBtn');
+            
+            if (modalFacilityBtn) {
+                const label = modalFacilityBtn.querySelector('.modal-select-label');
+                if (label) label.textContent = 'Выберите предприятие';
+                modalFacilityBtn.setAttribute('aria-expanded', 'false');
+            }
+            if (modalDepartmentBtn) {
+                const label = modalDepartmentBtn.querySelector('.modal-select-label');
+                if (label) label.textContent = 'Сначала выберите предприятие';
+                modalDepartmentBtn.setAttribute('aria-expanded', 'false');
+                modalDepartmentBtn.disabled = true;
+            }
+            if (modalRoleBtn) {
+                const label = modalRoleBtn.querySelector('.modal-select-label');
+                if (label) label.textContent = 'Выберите роль';
+                modalRoleBtn.setAttribute('aria-expanded', 'false');
+            }
+            
+            closeModalDropdown();
+            
             if (employeeFacilitySelect) {
                 employeeFacilitySelect.value = '';
                 handleFacilityChange();
@@ -656,7 +858,7 @@
             if (employeeFormError) {
                 employeeFormError.textContent = '';
             }
-            const firstInput = employeeForm ? employeeForm.querySelector('input, select') : null;
+            const firstInput = employeeForm ? employeeForm.querySelector('input, .modal-select-btn') : null;
             if (firstInput) {
                 firstInput.focus();
             }
@@ -676,6 +878,14 @@
             populateDepartmentOptions(facilityId);
             if (employeeDepartmentSelect) {
                 employeeDepartmentSelect.value = '';
+            }
+            // Обновляем кастомную кнопку отдела
+            const modalDepartmentBtn = document.getElementById('modalDepartmentBtn');
+            if (modalDepartmentBtn) {
+                const label = modalDepartmentBtn.querySelector('.modal-select-label');
+                if (label) {
+                    label.textContent = facilityId ? 'Выберите отдел' : 'Сначала выберите предприятие';
+                }
             }
         }
 
@@ -740,6 +950,7 @@
         if (filterToggle && filterDropdown) {
             filterToggle.addEventListener('click', () => {
                 filterDropdown.classList.toggle('active');
+                filterToggle.classList.toggle('active');
                 if (!filterDropdown.classList.contains('active')) {
                     closeFilterSelectMenus();
                 }
@@ -748,6 +959,7 @@
             document.addEventListener('click', (event) => {
                 if (!filterDropdown.contains(event.target) && !filterToggle.contains(event.target)) {
                     filterDropdown.classList.remove('active');
+                    filterToggle.classList.remove('active');
                     closeFilterSelectMenus();
                 }
             });
@@ -775,6 +987,12 @@
             addEmployeeBtn.addEventListener('click', () => {
                 closeFilterSelectMenus();
                 closeRoleDropdown();
+                if (typeof closeFacilityDropdown === 'function') {
+                    closeFacilityDropdown();
+                }
+                if (typeof closeDepartmentDropdown === 'function') {
+                    closeDepartmentDropdown();
+                }
                 openEmployeeModal();
             });
         }
@@ -786,6 +1004,147 @@
                 });
             }
         });
+
+        // Генерация логина и пароля
+        if (generateCredentialsBtn) {
+            generateCredentialsBtn.addEventListener('click', () => {
+                // Получаем значения фамилии и имени
+                const lastNameInput = document.querySelector('input[name="last_name"]');
+                const firstNameInput = document.querySelector('input[name="first_name"]');
+                
+                const lastName = lastNameInput ? lastNameInput.value.trim() : '';
+                const firstName = firstNameInput ? firstNameInput.value.trim() : '';
+                
+                // Генерируем логин на основе фамилии и имени
+                let login = '';
+                if (lastName && firstName) {
+                    // Берём первые 3 буквы фамилии и первую букву имени, приводим к нижнему регистру
+                    const lastPart = lastName.substring(0, 3).toLowerCase();
+                    const firstPart = firstName.substring(0, 1).toLowerCase();
+                    // Транслитерация русских букв в латиницу
+                    const translitMap = {
+                        'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'e',
+                        'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
+                        'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
+                        'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch',
+                        'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya'
+                    };
+                    
+                    const transliterate = (str) => {
+                        return str.split('').map(char => {
+                            const lower = char.toLowerCase();
+                            return translitMap[lower] || lower;
+                        }).join('');
+                    };
+                    
+                    const lastPartTranslit = transliterate(lastPart);
+                    const firstPartTranslit = transliterate(firstPart);
+                    login = lastPartTranslit + firstPartTranslit;
+                } else {
+                    // Если нет фамилии и имени, генерируем случайный логин
+                    login = 'user' + Math.floor(Math.random() * 10000);
+                }
+                
+                // Генерируем пароль: pass + 4 случайные цифры
+                const randomDigits = Math.floor(1000 + Math.random() * 9000); // 4-значное число от 1000 до 9999
+                const password = 'pass' + randomDigits;
+                
+                // Заполняем поля
+                if (employeeLoginInput) {
+                    employeeLoginInput.value = login;
+                }
+                if (employeePasswordInput) {
+                    employeePasswordInput.value = password;
+                }
+            });
+        }
+
+        // Автоматическое форматирование номера телефона
+        const employeePhoneInput = document.getElementById('employeePhone');
+        if (employeePhoneInput) {
+            employeePhoneInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, ''); // Убираем все нецифровые символы
+                
+                // Если начинается с 8, заменяем на 7
+                if (value.startsWith('8')) {
+                    value = '7' + value.substring(1);
+                }
+                
+                // Если не начинается с 7, добавляем 7
+                if (value && !value.startsWith('7')) {
+                    value = '7' + value;
+                }
+                
+                // Ограничиваем длину (7 + 10 цифр = 11)
+                if (value.length > 11) {
+                    value = value.substring(0, 11);
+                }
+                
+                // Форматируем номер
+                let formatted = '';
+                if (value.length > 0) {
+                    formatted = '+7';
+                    if (value.length > 1) {
+                        formatted += ' (' + value.substring(1, 4);
+                        if (value.length > 4) {
+                            formatted += ') ' + value.substring(4, 7);
+                            if (value.length > 7) {
+                                formatted += '-' + value.substring(7, 9);
+                                if (value.length > 9) {
+                                    formatted += '-' + value.substring(9, 11);
+                                }
+                            }
+                        } else {
+                            formatted += ')';
+                        }
+                    }
+                }
+                
+                e.target.value = formatted;
+            });
+            
+            // Обработка вставки текста
+            employeePhoneInput.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                const digits = pastedText.replace(/\D/g, '');
+                
+                if (digits) {
+                    let value = digits;
+                    if (value.startsWith('8')) {
+                        value = '7' + value.substring(1);
+                    }
+                    if (value && !value.startsWith('7')) {
+                        value = '7' + value;
+                    }
+                    if (value.length > 11) {
+                        value = value.substring(0, 11);
+                    }
+                    
+                    let formatted = '';
+                    if (value.length > 0) {
+                        formatted = '+7';
+                        if (value.length > 1) {
+                            formatted += ' (' + value.substring(1, 4);
+                            if (value.length > 4) {
+                                formatted += ') ' + value.substring(4, 7);
+                                if (value.length > 7) {
+                                    formatted += '-' + value.substring(7, 9);
+                                    if (value.length > 9) {
+                                        formatted += '-' + value.substring(9, 11);
+                                    }
+                                }
+                            } else {
+                                formatted += ')';
+                            }
+                        }
+                    }
+                    
+                    this.value = formatted;
+                    this.dispatchEvent(new Event('input'));
+                }
+            });
+        }
 
         if (employeeModal) {
             employeeModal.addEventListener('click', (event) => {
@@ -800,7 +1159,7 @@
         }
 
         const statusBox = document.getElementById('tableUpdateStatus');
-        const editableCells = document.querySelectorAll('.data-table td[contenteditable="true"][data-field]');
+        const editableCells = document.querySelectorAll('.data-table td.editable-cell[data-field]');
         const roleCells = document.querySelectorAll('.role-cell');
         let statusTimeoutId;
         let currentRoleCell = null;
@@ -815,7 +1174,7 @@
                 clearTimeout(statusTimeoutId);
                 statusTimeoutId = setTimeout(() => {
                     statusBox.classList.remove('visible');
-                }, 4000);
+                }, 5000);
             }
         }
 
@@ -826,6 +1185,28 @@
                 const labelSpan = cell.querySelector('.role-cell-label');
                 if (labelSpan) labelSpan.textContent = label;
                 cell.dataset.roleValue = cell.dataset.originalValue || '';
+                return;
+            }
+            if (cell.classList.contains('facility-cell')) {
+                const facilityName = cell.dataset.originalValue || '';
+                const labelSpan = cell.querySelector('.role-cell-label');
+                if (labelSpan) labelSpan.textContent = facilityName || '—';
+                cell.dataset.facilityValue = facilityName;
+                return;
+            }
+            if (cell.classList.contains('department-cell')) {
+                const deptId = cell.dataset.originalValue || '';
+                const labelSpan = cell.querySelector('.role-cell-label');
+                if (deptId) {
+                    const facilityName = cell.dataset.facilityName || '';
+                    const departments = departmentsByFacility[facilityName] || [];
+                    const dept = departments.find(d => String(d.id) === String(deptId));
+                    if (labelSpan) labelSpan.textContent = dept ? dept.name : '—';
+                    cell.dataset.departmentId = deptId;
+                } else {
+                    if (labelSpan) labelSpan.textContent = '—';
+                    cell.dataset.departmentId = '';
+                }
                 return;
             }
             cell.textContent = cell.dataset.originalValue || '';
@@ -854,6 +1235,44 @@
                         cell.dataset.roleValue = data.value || '';
                         cell.dataset.originalValue = cell.dataset.roleValue;
                         cell.setAttribute('aria-expanded', 'false');
+                    } else if (cell.classList.contains('facility-cell')) {
+                        const labelSpan = cell.querySelector('.role-cell-label');
+                        const facilityName = data.value || '';
+                        // Отображаем название предприятия (не прочерк, если есть значение)
+                        if (labelSpan) labelSpan.textContent = facilityName || '—';
+                        cell.dataset.facilityValue = facilityName;
+                        cell.dataset.originalValue = facilityName;
+                        cell.setAttribute('aria-expanded', 'false');
+                        // Обновляем также department в строке
+                        const row = cell.closest('tr');
+                        if (row) {
+                            const departmentCell = row.querySelector('.department-cell');
+                            if (departmentCell) {
+                                const deptLabelSpan = departmentCell.querySelector('.role-cell-label');
+                                // Всегда ставим прочерк в отделе при смене предприятия
+                                if (deptLabelSpan) deptLabelSpan.textContent = '—';
+                                departmentCell.dataset.departmentId = '';
+                                // Обновляем facilityName для правильного отображения списка отделов
+                                departmentCell.dataset.facilityName = facilityName || '';
+                                row.dataset.department = '';
+                            }
+                        }
+                    } else if (cell.classList.contains('department-cell')) {
+                        const labelSpan = cell.querySelector('.role-cell-label');
+                        // data.value для отдела - это название отдела, а не ID
+                        const deptName = data.value || '';
+                        if (labelSpan) labelSpan.textContent = deptName || '—';
+                        // Нужно найти ID отдела по названию для обновления dataset
+                        const facilityName = cell.dataset.facilityName || '';
+                        const departments = departmentsByFacility[facilityName] || [];
+                        const dept = departments.find(d => d.name === deptName);
+                        if (dept) {
+                            cell.dataset.departmentId = String(dept.id);
+                        } else {
+                            cell.dataset.departmentId = '';
+                        }
+                        cell.dataset.originalValue = cell.dataset.departmentId;
+                        cell.setAttribute('aria-expanded', 'false');
                     } else {
                         cell.textContent = data.value || '';
                         cell.dataset.originalValue = cell.textContent;
@@ -876,11 +1295,29 @@
         }
 
         editableCells.forEach(cell => {
-            cell.addEventListener('focus', () => {
+            // Активация редактирования по двойному клику
+            cell.addEventListener('dblclick', () => {
+                cell.contentEditable = 'true';
                 cell.dataset.originalValue = cell.textContent.trim();
+                // Фокусируем ячейку и выделяем весь текст
+                cell.focus();
+                const range = document.createRange();
+                range.selectNodeContents(cell);
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+            });
+
+            cell.addEventListener('focus', () => {
+                // Сохраняем оригинальное значение только если ячейка уже в режиме редактирования
+                if (cell.contentEditable === 'true') {
+                    cell.dataset.originalValue = cell.textContent.trim();
+                }
             });
 
             cell.addEventListener('keydown', (event) => {
+                if (cell.contentEditable !== 'true') return;
+                
                 if (event.key === 'Enter') {
                     event.preventDefault();
                     cell.blur();
@@ -893,12 +1330,163 @@
             });
 
             cell.addEventListener('paste', (event) => {
+                if (cell.contentEditable !== 'true') return;
                 event.preventDefault();
                 const text = (event.clipboardData || window.clipboardData).getData('text');
-                document.execCommand('insertText', false, text);
+                
+                // Специальная обработка для поля телефона
+                if (cell.dataset.field === 'phone') {
+                    const digits = text.replace(/\D/g, '');
+                    if (digits) {
+                        let value = digits;
+                        if (value.startsWith('8')) {
+                            value = '7' + value.substring(1);
+                        }
+                        if (value && !value.startsWith('7')) {
+                            value = '7' + value;
+                        }
+                        if (value.length > 11) {
+                            value = value.substring(0, 11);
+                        }
+                        
+                        let formatted = '';
+                        if (value.length > 0) {
+                            formatted = '+7';
+                            if (value.length > 1) {
+                                formatted += ' (' + value.substring(1, 4);
+                                if (value.length > 4) {
+                                    formatted += ') ' + value.substring(4, 7);
+                                    if (value.length > 7) {
+                                        formatted += '-' + value.substring(7, 9);
+                                        if (value.length > 9) {
+                                            formatted += '-' + value.substring(9, 11);
+                                        }
+                                    }
+                                } else {
+                                    formatted += ')';
+                                }
+                            }
+                        }
+                        cell.textContent = formatted;
+                        // Устанавливаем курсор в конец
+                        const range = document.createRange();
+                        range.selectNodeContents(cell);
+                        range.collapse(false);
+                        const selection = window.getSelection();
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    }
+                } else {
+                    document.execCommand('insertText', false, text);
+                }
             });
+            
+            // Обработка ввода для поля телефона
+            if (cell.dataset.field === 'phone') {
+                cell.addEventListener('input', function(e) {
+                    if (cell.contentEditable !== 'true') return;
+                    
+                    // Получаем текущую позицию курсора и текст до курсора
+                    const selection = window.getSelection();
+                    const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+                    const cursorOffset = range ? range.startOffset : 0;
+                    
+                    // Получаем текст до курсора и после
+                    const textBeforeCursor = cell.textContent.substring(0, cursorOffset);
+                    const textAfterCursor = cell.textContent.substring(cursorOffset);
+                    
+                    // Подсчитываем количество цифр до курсора
+                    const digitsBeforeCursor = textBeforeCursor.replace(/\D/g, '').length;
+                    
+                    let value = cell.textContent.replace(/\D/g, ''); // Убираем все нецифровые символы
+                    
+                    // Если начинается с 8, заменяем на 7
+                    if (value.startsWith('8')) {
+                        value = '7' + value.substring(1);
+                    }
+                    
+                    // Если не начинается с 7, добавляем 7
+                    if (value && !value.startsWith('7')) {
+                        value = '7' + value;
+                    }
+                    
+                    // Ограничиваем длину (7 + 10 цифр = 11)
+                    if (value.length > 11) {
+                        value = value.substring(0, 11);
+                    }
+                    
+                    // Форматируем номер
+                    let formatted = '';
+                    if (value.length > 0) {
+                        formatted = '+7';
+                        if (value.length > 1) {
+                            formatted += ' (' + value.substring(1, 4);
+                            if (value.length > 4) {
+                                formatted += ') ' + value.substring(4, 7);
+                                if (value.length > 7) {
+                                    formatted += '-' + value.substring(7, 9);
+                                    if (value.length > 9) {
+                                        formatted += '-' + value.substring(9, 11);
+                                    }
+                                }
+                            } else {
+                                formatted += ')';
+                            }
+                        }
+                    }
+                    
+                    // Вычисляем новую позицию курсора на основе количества цифр
+                    let newCursorPosition = formatted.length;
+                    if (digitsBeforeCursor > 0) {
+                        // Находим позицию в отформатированной строке, где находится N-я цифра
+                        let digitCount = 0;
+                        for (let i = 0; i < formatted.length; i++) {
+                            if (/\d/.test(formatted[i])) {
+                                digitCount++;
+                                if (digitCount === digitsBeforeCursor) {
+                                    // Ставим курсор после этой цифры
+                                    newCursorPosition = i + 1;
+                                    break;
+                                }
+                            }
+                        }
+                    } else if (digitsBeforeCursor === 0 && value.length > 0) {
+                        // Если курсор был в начале, ставим после +7
+                        newCursorPosition = 2;
+                    }
+                    
+                    cell.textContent = formatted;
+                    
+                    // Восстанавливаем позицию курсора
+                    if (formatted.length > 0) {
+                        requestAnimationFrame(() => {
+                            try {
+                                const textNode = cell.firstChild;
+                                if (textNode) {
+                                    const newRange = document.createRange();
+                                    const finalPosition = Math.min(newCursorPosition, formatted.length);
+                                    newRange.setStart(textNode, finalPosition);
+                                    newRange.setEnd(textNode, finalPosition);
+                                    selection.removeAllRanges();
+                                    selection.addRange(newRange);
+                                }
+                            } catch (e) {
+                                // Если не удалось восстановить позицию, ставим курсор в конец
+                                const newRange = document.createRange();
+                                newRange.selectNodeContents(cell);
+                                newRange.collapse(false);
+                                selection.removeAllRanges();
+                                selection.addRange(newRange);
+                            }
+                        });
+                    }
+                });
+            }
 
             cell.addEventListener('blur', () => {
+                // Деактивируем редактирование
+                cell.contentEditable = 'false';
+                
                 const originalValue = cell.dataset.originalValue ?? '';
                 const newValue = cell.textContent.trim();
                 if (newValue === originalValue) {
@@ -927,11 +1515,13 @@
         function populateRoleDropdown() {
             roleDropdown.innerHTML = '';
             Object.entries(roleOptionsMap).forEach(([value, label]) => {
+                // Пропускаем пустые значения
+                if (!value || value.trim() === '') return;
                 const option = document.createElement('button');
                 option.type = 'button';
                 option.className = 'role-dropdown-option';
                 option.dataset.value = value;
-                option.textContent = label || value || '—';
+                option.textContent = label || value;
                 option.addEventListener('click', () => {
                     const targetCell = currentRoleCell;
                     if (!targetCell) return;
@@ -966,9 +1556,48 @@
             // Используем максимальное значение для надёжности
             const finalWidth = Math.max(cellWidth, rectWidth);
             
+            // Получаем реальную высоту dropdown
+            const dropdownHeight = roleDropdown.offsetHeight || 200;
+            const viewportHeight = window.innerHeight;
+            
+            // Проверяем границы контейнера таблицы
+            const tableContainer = document.querySelector('.table-container');
+            let containerRect = null;
+            if (tableContainer) {
+                containerRect = tableContainer.getBoundingClientRect();
+            }
+            
+            // Вычисляем доступное пространство
+            const spaceBelow = viewportHeight - rect.bottom;
+            const spaceAbove = rect.top;
+            
+            // Если есть контейнер таблицы, учитываем его границы
+            let availableSpaceBelow = spaceBelow;
+            let availableSpaceAbove = spaceAbove;
+            
+            if (containerRect) {
+                // Проверяем, сколько места есть в контейнере ниже ячейки
+                const containerBottom = containerRect.bottom;
+                const containerTop = containerRect.top;
+                availableSpaceBelow = Math.min(spaceBelow, containerBottom - rect.bottom);
+                availableSpaceAbove = Math.min(spaceAbove, rect.top - containerTop);
+            }
+            
+            // Определяем, открывать ли dropdown вверх или вниз
+            // Открываем вверх, если места внизу недостаточно и места вверху больше
+            const openUpward = availableSpaceBelow < dropdownHeight && availableSpaceAbove > availableSpaceBelow;
+            
             // Позиционируем относительно viewport
             roleDropdown.style.position = 'fixed';
-            roleDropdown.style.top = `${rect.bottom + 6}px`;
+            if (openUpward) {
+                // Открываем вверх
+                roleDropdown.style.bottom = `${viewportHeight - rect.top + 6}px`;
+                roleDropdown.style.top = 'auto';
+            } else {
+                // Открываем вниз (по умолчанию)
+                roleDropdown.style.top = `${rect.bottom + 6}px`;
+                roleDropdown.style.bottom = 'auto';
+            }
             roleDropdown.style.left = `${rect.left}px`;
             roleDropdown.style.width = `${finalWidth}px`;
             roleDropdown.style.minWidth = `${finalWidth}px`;
@@ -999,6 +1628,10 @@
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
                     positionRoleDropdown(cell);
+                    // Пересчитываем позицию после того, как dropdown получил реальную высоту
+                    requestAnimationFrame(() => {
+                        positionRoleDropdown(cell);
+                    });
                 });
             });
         }
@@ -1025,23 +1658,19 @@
             }
         });
 
-        // Обработчик скролла страницы для перепозиционирования dropdown
+        // Обработчик скролла страницы - закрываем dropdown при прокрутке
         window.addEventListener('scroll', () => {
-            if (currentRoleCell) {
-                requestAnimationFrame(() => {
-                    positionRoleDropdown(currentRoleCell);
-                });
+            if (currentRoleCell && roleDropdown.classList.contains('visible')) {
+                closeRoleDropdown();
             }
         }, true);
 
-        // Обработчик скролла таблицы для перепозиционирования dropdown
+        // Обработчик скролла таблицы - закрываем dropdown при прокрутке
         const tableContainer = document.querySelector('.table-container');
         if (tableContainer) {
             tableContainer.addEventListener('scroll', () => {
-                if (currentRoleCell) {
-                    requestAnimationFrame(() => {
-                        positionRoleDropdown(currentRoleCell);
-                    });
+                if (currentRoleCell && roleDropdown.classList.contains('visible')) {
+                    closeRoleDropdown();
                 }
             });
         }
@@ -1071,6 +1700,352 @@
             });
         });
 
+        // Выпадающие списки для предприятий
+        const facilityCells = document.querySelectorAll('.facility-cell');
+        const facilityDropdown = document.createElement('div');
+        facilityDropdown.className = 'role-dropdown';
+        document.body.appendChild(facilityDropdown);
+        let currentFacilityCell = null;
+
+        function populateFacilityDropdown() {
+            facilityDropdown.innerHTML = '';
+            // Используем facilityOptionsMap для предприятий
+            Object.keys(facilityOptionsMap).forEach(facilityName => {
+                // Пропускаем пустые значения
+                if (!facilityName || facilityName.trim() === '') return;
+                const option = document.createElement('button');
+                option.type = 'button';
+                option.className = 'role-dropdown-option';
+                option.dataset.value = facilityName;
+                // Используем название предприятия напрямую
+                option.textContent = facilityName;
+                option.addEventListener('click', () => {
+                    const targetCell = currentFacilityCell;
+                    if (!targetCell) return;
+                    if (targetCell.dataset.facilityValue === facilityName) {
+                        closeFacilityDropdown();
+                        return;
+                    }
+                    const row = targetCell.closest('tr');
+                    if (!row) return;
+                    const employeeId = row.dataset.employeeId;
+                    if (!employeeId) return;
+                    targetCell.dataset.originalValue = targetCell.dataset.facilityValue || '';
+                    updateEmployeeCell(targetCell, employeeId, 'facility', facilityName);
+                    closeFacilityDropdown();
+                });
+                facilityDropdown.appendChild(option);
+            });
+        }
+
+        function positionFacilityDropdown(cell) {
+            if (!cell || !facilityDropdown) return;
+            
+            const rect = cell.getBoundingClientRect();
+            const cellWidth = cell.offsetWidth;
+            const rectWidth = rect.width;
+            const finalWidth = Math.max(cellWidth, rectWidth);
+            const dropdownHeight = facilityDropdown.offsetHeight || 200;
+            const viewportHeight = window.innerHeight;
+            
+            const tableContainer = document.querySelector('.table-container');
+            let containerRect = null;
+            if (tableContainer) {
+                containerRect = tableContainer.getBoundingClientRect();
+            }
+            
+            const spaceBelow = viewportHeight - rect.bottom;
+            const spaceAbove = rect.top;
+            
+            let availableSpaceBelow = spaceBelow;
+            let availableSpaceAbove = spaceAbove;
+            
+            if (containerRect) {
+                const containerBottom = containerRect.bottom;
+                const containerTop = containerRect.top;
+                availableSpaceBelow = Math.min(spaceBelow, containerBottom - rect.bottom);
+                availableSpaceAbove = Math.min(spaceAbove, rect.top - containerTop);
+            }
+            
+            const openUpward = availableSpaceBelow < dropdownHeight && availableSpaceAbove > availableSpaceBelow;
+            
+            facilityDropdown.style.position = 'fixed';
+            if (openUpward) {
+                facilityDropdown.style.bottom = `${viewportHeight - rect.top + 6}px`;
+                facilityDropdown.style.top = 'auto';
+            } else {
+                facilityDropdown.style.top = `${rect.bottom + 6}px`;
+                facilityDropdown.style.bottom = 'auto';
+            }
+            facilityDropdown.style.left = `${rect.left}px`;
+            facilityDropdown.style.width = `${finalWidth}px`;
+            facilityDropdown.style.minWidth = `${finalWidth}px`;
+            facilityDropdown.style.maxWidth = `${finalWidth}px`;
+            facilityDropdown.style.boxSizing = 'border-box';
+            facilityDropdown.style.flexShrink = '0';
+            facilityDropdown.style.flexGrow = '0';
+            
+            const options = facilityDropdown.querySelectorAll('.role-dropdown-option');
+            options.forEach(opt => {
+                opt.style.width = '100%';
+                opt.style.minWidth = '100%';
+                opt.style.maxWidth = '100%';
+                opt.style.boxSizing = 'border-box';
+                opt.classList.toggle('selected', opt.dataset.value === cell.dataset.facilityValue);
+            });
+        }
+
+        function openFacilityDropdown(cell) {
+            currentFacilityCell = cell;
+            cell.setAttribute('aria-expanded', 'true');
+            populateFacilityDropdown();
+            facilityDropdown.classList.add('visible');
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    positionFacilityDropdown(cell);
+                    requestAnimationFrame(() => {
+                        positionFacilityDropdown(cell);
+                    });
+                });
+            });
+        }
+
+        function closeFacilityDropdown() {
+            if (currentFacilityCell) {
+                currentFacilityCell.setAttribute('aria-expanded', 'false');
+            }
+            currentFacilityCell = null;
+            facilityDropdown.classList.remove('visible');
+        }
+
+        document.addEventListener('click', (event) => {
+            if (facilityDropdown.contains(event.target)) return;
+            if (event.target.closest('.facility-cell')) return;
+            closeFacilityDropdown();
+        });
+
+        window.addEventListener('resize', () => {
+            if (currentFacilityCell) {
+                requestAnimationFrame(() => {
+                    positionFacilityDropdown(currentFacilityCell);
+                });
+            }
+        });
+
+        window.addEventListener('scroll', () => {
+            if (currentFacilityCell && facilityDropdown.classList.contains('visible')) {
+                closeFacilityDropdown();
+            }
+        }, true);
+
+        const tableContainerFacility = document.querySelector('.table-container');
+        if (tableContainerFacility) {
+            tableContainerFacility.addEventListener('scroll', () => {
+                if (currentFacilityCell && facilityDropdown.classList.contains('visible')) {
+                    closeFacilityDropdown();
+                }
+            });
+        }
+
+        facilityCells.forEach(cell => {
+            cell.addEventListener('click', () => {
+                if (currentFacilityCell === cell && facilityDropdown.classList.contains('visible')) {
+                    closeFacilityDropdown();
+                } else {
+                    openFacilityDropdown(cell);
+                }
+            });
+
+            cell.addEventListener('focus', () => {
+                cell.dataset.originalValue = cell.dataset.facilityValue || '';
+            });
+
+            cell.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    openFacilityDropdown(cell);
+                }
+                if (event.key === 'Escape') {
+                    closeFacilityDropdown();
+                    cell.blur();
+                }
+            });
+        });
+
+        // Выпадающие списки для отделов
+        const departmentCells = document.querySelectorAll('.department-cell');
+        const departmentDropdown = document.createElement('div');
+        departmentDropdown.className = 'role-dropdown';
+        document.body.appendChild(departmentDropdown);
+        let currentDepartmentCell = null;
+
+        function populateDepartmentDropdown(cell) {
+            departmentDropdown.innerHTML = '';
+            const facilityName = cell.dataset.facilityName || '';
+            const departments = departmentsByFacility[facilityName] || [];
+            
+            departments.forEach(dept => {
+                // Пропускаем отделы без названия
+                if (!dept || !dept.name || dept.name.trim() === '') return;
+                const option = document.createElement('button');
+                option.type = 'button';
+                option.className = 'role-dropdown-option';
+                option.dataset.value = dept.id;
+                option.textContent = dept.name;
+                option.addEventListener('click', () => {
+                    const targetCell = currentDepartmentCell;
+                    if (!targetCell) return;
+                    const currentId = targetCell.dataset.departmentId || '';
+                    if (currentId === String(dept.id)) {
+                        closeDepartmentDropdown();
+                        return;
+                    }
+                    const row = targetCell.closest('tr');
+                    if (!row) return;
+                    const employeeId = row.dataset.employeeId;
+                    if (!employeeId) return;
+                    targetCell.dataset.originalValue = targetCell.dataset.departmentId || '';
+                    updateEmployeeCell(targetCell, employeeId, 'department_id', dept.id);
+                    closeDepartmentDropdown();
+                });
+                departmentDropdown.appendChild(option);
+            });
+        }
+
+        function positionDepartmentDropdown(cell) {
+            if (!cell || !departmentDropdown) return;
+            
+            const rect = cell.getBoundingClientRect();
+            const cellWidth = cell.offsetWidth;
+            const rectWidth = rect.width;
+            const finalWidth = Math.max(cellWidth, rectWidth);
+            const dropdownHeight = departmentDropdown.offsetHeight || 200;
+            const viewportHeight = window.innerHeight;
+            
+            const tableContainer = document.querySelector('.table-container');
+            let containerRect = null;
+            if (tableContainer) {
+                containerRect = tableContainer.getBoundingClientRect();
+            }
+            
+            const spaceBelow = viewportHeight - rect.bottom;
+            const spaceAbove = rect.top;
+            
+            let availableSpaceBelow = spaceBelow;
+            let availableSpaceAbove = spaceAbove;
+            
+            if (containerRect) {
+                const containerBottom = containerRect.bottom;
+                const containerTop = containerRect.top;
+                availableSpaceBelow = Math.min(spaceBelow, containerBottom - rect.bottom);
+                availableSpaceAbove = Math.min(spaceAbove, rect.top - containerTop);
+            }
+            
+            const openUpward = availableSpaceBelow < dropdownHeight && availableSpaceAbove > availableSpaceBelow;
+            
+            departmentDropdown.style.position = 'fixed';
+            if (openUpward) {
+                departmentDropdown.style.bottom = `${viewportHeight - rect.top + 6}px`;
+                departmentDropdown.style.top = 'auto';
+            } else {
+                departmentDropdown.style.top = `${rect.bottom + 6}px`;
+                departmentDropdown.style.bottom = 'auto';
+            }
+            departmentDropdown.style.left = `${rect.left}px`;
+            departmentDropdown.style.width = `${finalWidth}px`;
+            departmentDropdown.style.minWidth = `${finalWidth}px`;
+            departmentDropdown.style.maxWidth = `${finalWidth}px`;
+            departmentDropdown.style.boxSizing = 'border-box';
+            departmentDropdown.style.flexShrink = '0';
+            departmentDropdown.style.flexGrow = '0';
+            
+            const options = departmentDropdown.querySelectorAll('.role-dropdown-option');
+            options.forEach(opt => {
+                opt.style.width = '100%';
+                opt.style.minWidth = '100%';
+                opt.style.maxWidth = '100%';
+                opt.style.boxSizing = 'border-box';
+                opt.classList.toggle('selected', opt.dataset.value === cell.dataset.departmentId);
+            });
+        }
+
+        function openDepartmentDropdown(cell) {
+            currentDepartmentCell = cell;
+            cell.setAttribute('aria-expanded', 'true');
+            populateDepartmentDropdown(cell);
+            departmentDropdown.classList.add('visible');
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    positionDepartmentDropdown(cell);
+                    requestAnimationFrame(() => {
+                        positionDepartmentDropdown(cell);
+                    });
+                });
+            });
+        }
+
+        function closeDepartmentDropdown() {
+            if (currentDepartmentCell) {
+                currentDepartmentCell.setAttribute('aria-expanded', 'false');
+            }
+            currentDepartmentCell = null;
+            departmentDropdown.classList.remove('visible');
+        }
+
+        document.addEventListener('click', (event) => {
+            if (departmentDropdown.contains(event.target)) return;
+            if (event.target.closest('.department-cell')) return;
+            closeDepartmentDropdown();
+        });
+
+        window.addEventListener('resize', () => {
+            if (currentDepartmentCell) {
+                requestAnimationFrame(() => {
+                    positionDepartmentDropdown(currentDepartmentCell);
+                });
+            }
+        });
+
+        window.addEventListener('scroll', () => {
+            if (currentDepartmentCell && departmentDropdown.classList.contains('visible')) {
+                closeDepartmentDropdown();
+            }
+        }, true);
+
+        const tableContainerDepartment = document.querySelector('.table-container');
+        if (tableContainerDepartment) {
+            tableContainerDepartment.addEventListener('scroll', () => {
+                if (currentDepartmentCell && departmentDropdown.classList.contains('visible')) {
+                    closeDepartmentDropdown();
+                }
+            });
+        }
+
+        departmentCells.forEach(cell => {
+            cell.addEventListener('click', () => {
+                if (currentDepartmentCell === cell && departmentDropdown.classList.contains('visible')) {
+                    closeDepartmentDropdown();
+                } else {
+                    openDepartmentDropdown(cell);
+                }
+            });
+
+            cell.addEventListener('focus', () => {
+                cell.dataset.originalValue = cell.dataset.departmentId || '';
+            });
+
+            cell.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    openDepartmentDropdown(cell);
+                }
+                if (event.key === 'Escape') {
+                    closeDepartmentDropdown();
+                    cell.blur();
+                }
+            });
+        });
+
         filterSelectWrappers.forEach(wrapper => {
             const targetId = wrapper.dataset.target;
             const selectEl = document.getElementById(targetId);
@@ -1078,6 +2053,7 @@
             const button = wrapper.querySelector('.filter-select-btn');
             const labelEl = wrapper.querySelector('.filter-select-label');
             const optionButtons = wrapper.querySelectorAll('.filter-option');
+            const resetBtn = document.querySelector(`.filter-reset-btn[data-target="${targetId}"]`);
 
             const syncUI = () => {
                 const value = selectEl.value || '';
@@ -1087,6 +2063,10 @@
                 optionButtons.forEach(btn => {
                     btn.classList.toggle('selected', btn.dataset.value === value);
                 });
+                // Показываем/скрываем кнопку сброса
+                if (resetBtn) {
+                    resetBtn.style.display = value ? 'flex' : 'none';
+                }
             };
 
             optionButtons.forEach(btn => {
@@ -1119,6 +2099,18 @@
             }
 
             selectEl.addEventListener('change', syncUI);
+
+            // Обработчик клика по кнопке сброса
+            if (resetBtn) {
+                resetBtn.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    selectEl.value = '';
+                    selectEl.dispatchEvent(new Event('change'));
+                    syncUI();
+                    closeFilterSelectMenus();
+                });
+            }
 
             syncUI();
             filterSelectControllers.set(selectEl, { sync: syncUI });
@@ -1196,10 +2188,350 @@
 
         handleFacilityChange();
 
+        // Инициализация данных для dropdown'ов
+        const modalFacilitySelect = document.getElementById('employeeFacilitySelect');
+        const modalRoleSelect = document.getElementById('employeeRoleSelect');
+        
+        if (modalFacilitySelect) {
+            modalSelectData.facility = {};
+            // Получаем все option, даже если select скрыт
+            const facilityOptions = modalFacilitySelect.options || modalFacilitySelect.querySelectorAll('option');
+            Array.from(facilityOptions).forEach(opt => {
+                if (opt.value !== '') {
+                    modalSelectData.facility[opt.value] = opt.textContent.trim();
+                }
+            });
+        }
+
+        if (modalRoleSelect) {
+            modalSelectData.role = {};
+            const roleOptions = modalRoleSelect.options || modalRoleSelect.querySelectorAll('option');
+            Array.from(roleOptions).forEach(opt => {
+                if (opt.value !== '') {
+                    modalSelectData.role[opt.value] = opt.textContent.trim();
+                }
+            });
+        }
+
+        // Инициализация данных для отдела (будет обновляться при выборе предприятия)
+        modalSelectData.department = {};
+
+        function populateModalDropdown(field, options) {
+            if (!modalDropdown || !options || Object.keys(options).length === 0) {
+                return;
+            }
+            
+            modalDropdown.innerHTML = '';
+            Object.entries(options).forEach(([value, label]) => {
+                const option = document.createElement('button');
+                option.type = 'button';
+                option.className = 'role-dropdown-option';
+                option.dataset.value = value;
+                option.textContent = label || value || '—';
+                option.addEventListener('click', () => {
+                    if (!currentModalSelect) return;
+                    const btn = currentModalSelect;
+                    const select = btn.parentElement.querySelector('select');
+                    const labelSpan = btn.querySelector('.modal-select-label');
+                    
+                    if (select && labelSpan) {
+                        select.value = value;
+                        labelSpan.textContent = label;
+                        btn.setAttribute('aria-expanded', 'false');
+                        
+                        // Триггерим change событие для совместимости с существующим кодом
+                        select.dispatchEvent(new Event('change', { bubbles: true }));
+                        
+                        // Если выбрано предприятие, обновляем отделы
+                        const btnField = btn.dataset.field;
+                        if (btnField === 'facility_id') {
+                            handleFacilityChange();
+                        }
+                    }
+                    closeModalDropdown();
+                });
+                modalDropdown.appendChild(option);
+            });
+        }
+
+        function positionModalDropdown(btn) {
+            if (!btn || !modalDropdown) return;
+            const rect = btn.getBoundingClientRect();
+            const dropdownHeight = modalDropdown.offsetHeight || 200;
+            const viewportHeight = window.innerHeight;
+            const spaceBelow = viewportHeight - rect.bottom;
+            const spaceAbove = rect.top;
+            const openUpward = spaceBelow < dropdownHeight && spaceAbove > spaceBelow;
+            
+            modalDropdown.style.position = 'fixed';
+            if (openUpward) {
+                modalDropdown.style.bottom = `${viewportHeight - rect.top + 6}px`;
+                modalDropdown.style.top = 'auto';
+            } else {
+                modalDropdown.style.top = `${rect.bottom + 6}px`;
+                modalDropdown.style.bottom = 'auto';
+            }
+            modalDropdown.style.left = `${rect.left}px`;
+            modalDropdown.style.width = `${rect.width}px`;
+            modalDropdown.style.minWidth = `${rect.width}px`;
+            modalDropdown.style.maxWidth = `${rect.width}px`;
+        }
+
+        function openModalDropdown(btn) {
+            if (!btn || btn.disabled) return;
+            const field = btn.dataset.field;
+            if (!field) return;
+            
+            // Маппинг полей к ключам в modalSelectData
+            const fieldMap = {
+                'facility_id': 'facility',
+                'department_id': 'department',
+                'role': 'role'
+            };
+            
+            const dataKey = fieldMap[field] || field;
+            if (!dataKey || !modalSelectData || !modalSelectData[dataKey] || Object.keys(modalSelectData[dataKey]).length === 0) {
+                return;
+            }
+            
+            currentModalSelect = btn;
+            populateModalDropdown(field, modalSelectData[dataKey]);
+            
+            // Ждём, пока dropdown заполнится, затем позиционируем
+            requestAnimationFrame(() => {
+                positionModalDropdown(btn);
+                modalDropdown.classList.add('visible');
+                btn.setAttribute('aria-expanded', 'true');
+            });
+        }
+
+        function closeModalDropdown() {
+            if (!modalDropdown) return;
+            modalDropdown.classList.remove('visible');
+            if (currentModalSelect) {
+                currentModalSelect.setAttribute('aria-expanded', 'false');
+                currentModalSelect = null;
+            }
+        }
+
+        // Обработчики для кнопок dropdown'ов
+        const modalFacilityBtn = document.getElementById('modalFacilityBtn');
+        const modalDepartmentBtn = document.getElementById('modalDepartmentBtn');
+        const modalRoleBtn = document.getElementById('modalRoleBtn');
+
+        [modalFacilityBtn, modalDepartmentBtn, modalRoleBtn].forEach(btn => {
+            if (!btn) return;
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (btn.disabled) return;
+                
+                if (currentModalSelect === btn) {
+                    closeModalDropdown();
+                } else {
+                    closeModalDropdown();
+                    openModalDropdown(btn);
+                }
+            });
+        });
+
+        // Закрытие при клике вне dropdown'а
+        document.addEventListener('click', (e) => {
+            if (!modalDropdown.contains(e.target) && 
+                !e.target.closest('.modal-select-btn')) {
+                closeModalDropdown();
+            }
+        });
+
+        // Закрытие по Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modalDropdown.classList.contains('visible')) {
+                closeModalDropdown();
+            }
+        });
+
+        // Обработка удаления сотрудника
+        const deleteEmployeeModal = document.getElementById('deleteEmployeeModal');
+        const deleteEmployeeClose = document.getElementById('deleteEmployeeModalClose');
+        const deleteEmployeeCancel = document.getElementById('deleteEmployeeCancel');
+        const deleteEmployeeConfirm = document.getElementById('deleteEmployeeConfirm');
+        const deleteEmployeeMessage = document.getElementById('deleteEmployeeMessage');
+        let employeeToDelete = null;
+        let employeeToDeleteRow = null;
+
+        function openDeleteModal(employeeId, employeeRow) {
+            if (!deleteEmployeeModal) return;
+            
+            employeeToDelete = employeeId;
+            employeeToDeleteRow = employeeRow;
+            
+            // Получаем данные сотрудника для отображения в сообщении
+            const lastName = employeeRow.querySelector('td:nth-child(2)')?.textContent?.trim() || '';
+            const firstName = employeeRow.querySelector('td:nth-child(3)')?.textContent?.trim() || '';
+            const patronymic = employeeRow.querySelector('td:nth-child(4)')?.textContent?.trim() || '';
+            
+            const fullName = [lastName, firstName, patronymic].filter(Boolean).join(' ') || 'сотрудника';
+            if (deleteEmployeeMessage) {
+                deleteEmployeeMessage.innerHTML = `Вы уверены, что хотите удалить сотрудника "${fullName}"?<br>Это действие нельзя будет отменить.`;
+            }
+            
+            deleteEmployeeModal.setAttribute('aria-hidden', 'false');
+            deleteEmployeeModal.classList.add('visible');
+            document.body.classList.add('modal-open');
+        }
+
+        function closeDeleteModal() {
+            if (!deleteEmployeeModal) {
+                console.warn('deleteEmployeeModal не найден');
+                return;
+            }
+            
+            try {
+                deleteEmployeeModal.setAttribute('aria-hidden', 'true');
+                deleteEmployeeModal.classList.remove('visible');
+                if (document.body) {
+                    document.body.classList.remove('modal-open');
+                }
+                
+                // Сбрасываем состояние кнопки "Удалить"
+                if (deleteEmployeeConfirm) {
+                    deleteEmployeeConfirm.disabled = false;
+                    deleteEmployeeConfirm.textContent = 'Удалить';
+                }
+                
+                employeeToDelete = null;
+                employeeToDeleteRow = null;
+            } catch (error) {
+                console.error('Ошибка при закрытии модального окна:', error);
+            }
+        }
+
+        // Обработчики открытия модального окна (делегирование событий)
+        document.addEventListener('click', (event) => {
+            // Проверяем, был ли клик по кнопке удаления или её содержимому (SVG)
+            const deleteBtn = event.target.closest('.delete-employee-btn');
+            if (deleteBtn) {
+                event.preventDefault();
+                event.stopPropagation();
+                const employeeId = deleteBtn.getAttribute('data-employee-id');
+                if (!employeeId) return;
+                
+                const row = deleteBtn.closest('tr');
+                if (row && employeeId) {
+                    openDeleteModal(parseInt(employeeId), row);
+                }
+            }
+        });
+
+        // Обработчики закрытия модального окна
+        if (deleteEmployeeClose) {
+            deleteEmployeeClose.addEventListener('click', closeDeleteModal);
+        }
+        if (deleteEmployeeCancel) {
+            deleteEmployeeCancel.addEventListener('click', closeDeleteModal);
+        }
+
+        // Закрытие по клику на overlay
+        if (deleteEmployeeModal) {
+            deleteEmployeeModal.addEventListener('click', (event) => {
+                if (event.target === deleteEmployeeModal) {
+                    closeDeleteModal();
+                }
+            });
+        }
+
+        // Подтверждение удаления
+        if (deleteEmployeeConfirm) {
+            deleteEmployeeConfirm.addEventListener('click', async () => {
+                if (!employeeToDelete) return;
+                
+                deleteEmployeeConfirm.disabled = true;
+                deleteEmployeeConfirm.textContent = 'Удаление...';
+                
+                try {
+                    const response = await fetch(`/admin/employees/${employeeToDelete}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    let data;
+                    try {
+                        data = await response.json();
+                    } catch (parseError) {
+                        console.error('Ошибка парсинга ответа:', parseError);
+                        // Если запись уже удалена из таблицы, закрываем модальное окно
+                        if (!employeeToDeleteRow || !document.contains(employeeToDeleteRow)) {
+                            closeDeleteModal();
+                            return;
+                        }
+                        throw new Error('Не удалось обработать ответ сервера');
+                    }
+                    
+                    if (!response.ok) {
+                        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+                    }
+                    
+                    if (data.success) {
+                        // Удаляем строку из таблицы
+                        if (employeeToDeleteRow && document.contains(employeeToDeleteRow)) {
+                            employeeToDeleteRow.remove();
+                            
+                            // Обновляем нумерацию строк
+                            document.querySelectorAll('.data-table tbody tr').forEach((row, index) => {
+                                const numberCell = row.querySelector('.number-column');
+                                if (numberCell) {
+                                    numberCell.textContent = index + 1;
+                                }
+                            });
+                            
+                            // Показываем уведомление об успехе
+                            if (typeof showStatus === 'function') {
+                                showStatus('Изменения сохранены', 'success');
+                            }
+                        }
+                        // Закрываем модальное окно
+                        closeDeleteModal();
+                    } else {
+                        if (typeof showStatus === 'function') {
+                            showStatus(data.message || 'Не удалось удалить сотрудника', 'error');
+                        }
+                        deleteEmployeeConfirm.disabled = false;
+                        deleteEmployeeConfirm.textContent = 'Удалить';
+                    }
+                } catch (error) {
+                    console.error('Ошибка при удалении сотрудника:', error);
+                    // Если запись уже удалена из таблицы, закрываем модальное окно
+                    if (!employeeToDeleteRow || !document.contains(employeeToDeleteRow)) {
+                        closeDeleteModal();
+                        return;
+                    }
+                    if (typeof showStatus === 'function') {
+                        showStatus('Произошла ошибка при удалении сотрудника', 'error');
+                    }
+                    deleteEmployeeConfirm.disabled = false;
+                    deleteEmployeeConfirm.textContent = 'Удалить';
+                }
+            });
+        }
+
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Escape') {
                 if (roleDropdown.classList.contains('visible')) {
                     closeRoleDropdown();
+                    return;
+                }
+                if (facilityDropdown.classList.contains('visible')) {
+                    closeFacilityDropdown();
+                    return;
+                }
+                if (departmentDropdown.classList.contains('visible')) {
+                    closeDepartmentDropdown();
+                    return;
+                }
+                if (deleteEmployeeModal && deleteEmployeeModal.classList.contains('visible')) {
+                    closeDeleteModal();
                     return;
                 }
                 if (activeModal) {

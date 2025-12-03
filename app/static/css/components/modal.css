@@ -20,17 +20,47 @@
 }
 
 .modal-window {
-    width: min(1100px, 100%);
+    width: min(880px, 100%);
     background: #ffffff;
     border-radius: 16px;
     box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
-    padding: 32px 28px;
+    padding: 32px 20px;
     display: flex;
     flex-direction: column;
     gap: 20px;
     max-height: none;
     overflow: visible;
     margin: 32px 0;
+}
+
+/* Компактное модальное окно для подтверждения удаления */
+#deleteEmployeeModal .modal-window {
+    width: min(680px, 90%);
+    padding: 24px;
+    gap: 16px;
+    border: 1px solid rgba(245, 90, 100, 0.4);
+}
+
+/* Тускло-красная разделительная линия под заголовком в окне подтверждения удаления */
+#deleteEmployeeModal .modal-header {
+    padding-bottom: 16px;
+    border-bottom: 2px solid rgba(245, 90, 100, 0.4);
+    margin-left: -24px;
+    margin-right: -24px;
+    padding-left: 24px;
+    padding-right: 24px;
+    margin-bottom: 0;
+}
+
+/* Увеличенный отступ между строками в сообщении об удалении */
+#deleteEmployeeModal #deleteEmployeeMessage {
+    line-height: 1.8;
+}
+
+#deleteEmployeeModal #deleteEmployeeMessage br {
+    line-height: 1.8;
+    display: block;
+    margin-top: 6px;
 }
 
 .modal-header {
@@ -43,7 +73,37 @@
 .modal-header h3 {
     margin: 0;
     font-size: 20px;
-    color: #1f1f1f;
+    color: #1a1a1a;
+}
+
+/* Жёлтая разделительная линия под заголовком в окне добавления сотрудника */
+#employeeModal .modal-header {
+    padding-bottom: 16px;
+    border-bottom: 2px solid rgba(221, 158, 0, 0.4);
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom: 0;
+}
+
+/* Очень тонкая жёлтая граница для окна добавления сотрудника */
+#employeeModal .modal-window {
+    border: 1px solid rgba(221, 158, 0, 0.4);
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-right: 20px;
+    padding-left: 20px;
+}
+
+/* Уменьшаем расстояние между нижней разделительной линией и кнопками */
+#employeeModal .modal-form {
+    gap: 3px;
+}
+
+#employeeModal .modal-footer {
+    margin-top: 0;
+    padding-top: 0;
 }
 
 .modal-close-btn {
@@ -52,11 +112,23 @@
     cursor: pointer;
     padding: 6px;
     border-radius: 50%;
-    transition: background 0.2s ease;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
 .modal-close-btn:hover {
     background: rgba(0, 0, 0, 0.05);
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.modal-close-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(221, 158, 0, 0.5);
 }
 
 html.dark-theme .modal-close-btn svg {
@@ -65,6 +137,12 @@ html.dark-theme .modal-close-btn svg {
 
 html.dark-theme .modal-close-btn:hover {
     background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15);
+}
+
+html.dark-theme .modal-close-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(221, 158, 0, 0.6);
 }
 
 .modal-field {
@@ -73,8 +151,10 @@ html.dark-theme .modal-close-btn:hover {
     gap: 6px;
     font-size: 13px;
     color: #555;
-    min-width: 0;
-    flex: 0 0 300px;
+    position: relative;
+    box-sizing: border-box;
+    overflow: hidden;
+    max-width: 100%;
 }
 
 .modal-section {
@@ -84,32 +164,78 @@ html.dark-theme .modal-close-btn:hover {
     padding-bottom: 16px;
 }
 
-.modal-section:not(:last-of-type) {
+.modal-section {
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     margin-bottom: 12px;
 }
+
+.modal-section:last-of-type {
+    margin-bottom: 0;
+}
+
 
 .modal-section-title {
     margin: 0;
     font-size: 15px;
     font-weight: 700;
-    color: #1f1f1f;
+    color: #1a1a1a;
 }
 
 .modal-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 24px 32px;
     justify-content: flex-start;
+    align-items: flex-start;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 .modal-row--thirds .modal-field {
-    flex: 0 0 280px;
-    max-width: 280px;
+    flex: 0 0 280px !important;
+    max-width: 280px !important;
+    min-width: 280px !important;
+    width: 280px !important;
+    box-sizing: border-box !important;
+    margin-right: 16px !important;
+    margin-bottom: 0 !important;
+    margin-left: 0 !important;
+    margin-top: 0 !important;
+    overflow: hidden !important;
+}
+
+.modal-row--thirds .modal-field input,
+.modal-row--thirds .modal-field select {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.modal-row--thirds .modal-field:nth-child(3n) {
+    margin-right: 0 !important;
 }
 
 .modal-row--halves .modal-field {
-    flex: 0 0 340px;
+    flex: 0 0 340px !important;
+    max-width: 340px !important;
+    min-width: 340px !important;
+    width: 340px !important;
+    box-sizing: border-box !important;
+    margin-right: 16px !important;
+    margin-bottom: 0 !important;
+    margin-left: 0 !important;
+    margin-top: 0 !important;
+    overflow: hidden !important;
+}
+
+.modal-row--halves .modal-field input,
+.modal-row--halves .modal-field select {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.modal-row--halves .modal-field:nth-child(2n) {
+    margin-right: 0 !important;
 }
 
 @media (max-width: 1024px) {
@@ -135,7 +261,7 @@ html.dark-theme .modal-close-btn:hover {
 
 .modal-field span {
     font-weight: 600;
-    color: #333;
+    color: #666 !important;
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -155,18 +281,62 @@ html.dark-theme .modal-close-btn:hover {
 .modal-field input,
 .modal-field select {
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
     border: 1px solid #dcdcdc;
     border-radius: 10px;
     padding: 10px 12px;
     font-size: 14px;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* Стили только для input полей - без иконки выпадающего списка */
+.modal-field input {
+    padding-right: 12px;
+    background-image: none;
+}
+
+/* Стили только для select полей - с иконкой выпадающего списка */
+.modal-field select {
+    padding-right: 34px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px;
+}
+
+/* Попытка стилизовать выпадающий список через псевдоэлементы (ограниченная поддержка) */
+.modal-field select::-ms-expand {
+    display: none;
+}
+
+.modal-field select option {
+    border-radius: 0;
+}
+
+.modal-field select option:first-child {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.modal-field select option:last-child {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
 
 .modal-field input:focus,
-.modal-field select:focus {
-    outline: none;
-    border-color: #dd9e00;
-    box-shadow: 0 0 0 3px rgba(221, 158, 0, 0.15);
+.modal-field select:focus,
+.modal-form input:focus,
+.modal-form input[type="text"]:focus,
+.modal-form input[type="email"]:focus {
+    outline: none !important;
+    border-color: rgba(221, 158, 0, 0.4) !important;
+    box-shadow: none !important;
 }
 
 .modal-field input::placeholder {
@@ -177,15 +347,6 @@ html.dark-theme .modal-close-btn:hover {
     background: #f6f6f6;
     color: #777;
     cursor: not-allowed;
-}
-
-.modal-field select {
-    appearance: none;
-    padding-right: 34px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 14px;
 }
 
 .modal-field select:invalid {
@@ -215,6 +376,8 @@ html.dark-theme .modal-close-btn:hover {
     gap: 20px;
 }
 
+
+
 .modal-form input[type="text"],
 .modal-form input[type="email"],
 .modal-form select {
@@ -225,10 +388,30 @@ html.dark-theme .modal-close-btn:hover {
     display: none;
 }
 
+.modal-field select option,
 .modal-overlay .modal-form select option {
+    padding: 10px 16px;
+    font-size: 14px;
     color: #333;
+    background: white;
 }
 
+.modal-field select option:hover,
+.modal-field select option:focus,
+.modal-overlay .modal-form select option:hover,
+.modal-overlay .modal-form select option:focus {
+    background: #fff4e0;
+    outline: none;
+}
+
+.modal-field select option:checked,
+.modal-overlay .modal-form select option:checked {
+    color: #dd9e00;
+    font-weight: 600;
+    background: #fff4e0;
+}
+
+.modal-field select option[value=""],
 .modal-overlay .modal-form select option[value=""] {
     color: #888;
 }
@@ -236,19 +419,98 @@ html.dark-theme .modal-close-btn:hover {
 .password-field .password-input-wrapper {
     display: flex;
     gap: 10px;
-    align-items: stretch;
+    align-items: center;
     width: 100%;
 }
 
 .password-field {
-    flex: 0 0 420px !important;
-    max-width: 420px !important;
+    flex: 0 0 240px !important;
+    max-width: 240px !important;
 }
 
 .password-field .password-input-wrapper input {
-    flex: 0 0 280px;
-    max-width: 280px;
+    flex: 1;
     min-width: 0;
+}
+
+/* Стили для полей логина и пароля */
+.modal-row--credentials {
+    gap: 16px;
+}
+
+.modal-row--credentials .modal-field:first-child {
+    flex: 0 0 200px !important;
+    max-width: 200px !important;
+    min-width: 200px !important;
+    width: 200px !important;
+}
+
+.modal-row--credentials .login-field {
+    flex: 0 0 200px !important;
+    max-width: 200px !important;
+    min-width: 200px !important;
+    width: 200px !important;
+    margin-left: 24px;
+}
+
+.modal-row--credentials .password-field {
+    flex: 0 0 240px !important;
+    max-width: 240px !important;
+    min-width: 240px !important;
+    width: 240px !important;
+}
+
+.login-field {
+    flex: 0 0 200px !important;
+    max-width: 200px !important;
+    min-width: 200px !important;
+    width: 200px !important;
+}
+
+/* Квадратная кнопка с иконкой игральной кости */
+.dice-btn {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    padding: 0;
+    border: 1px solid #d0d0d0;
+    background: transparent;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+    flex-shrink: 0;
+    color: #666 !important;
+}
+
+.dice-btn:hover {
+    border-color: #dd9e00;
+    background: #fff8ec;
+    color: #dd9e00;
+}
+
+.dice-btn:focus-visible {
+    outline: 2px solid rgba(221, 158, 0, 0.4);
+    outline-offset: 2px;
+}
+
+.dice-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+html.dark-theme .dice-btn {
+    border-color: #3a3a3a;
+    color: #e8e8e8;
+    background: transparent;
+}
+
+html.dark-theme .dice-btn:hover {
+    border-color: #dd9e00;
+    background: rgba(221, 158, 0, 0.1);
+    color: #dd9e00;
 }
 
 .modal-form-grid label {
@@ -317,24 +579,45 @@ html.dark-theme .modal-section:not(:last-of-type) {
     border-bottom-color: rgba(255, 255, 255, 0.08);
 }
 
-html.dark-theme .modal-field span {
-    color: #f0f0f0;
+/* Для светлой темы: более толстая жёлтая граница окна и более тёмные разделительные линии */
+html:not(.dark-theme) #employeeModal .modal-window {
+    border-width: 2px;
 }
 
-html.dark-theme .modal-field input,
-html.dark-theme .modal-field select {
+html:not(.dark-theme) .modal-section:not(:last-of-type) {
+    border-bottom-color: rgba(0, 0, 0, 0.15);
+}
+
+html.dark-theme .modal-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+html.dark-theme .modal-field span {
+    color: #f5f5f5;
+}
+
+html.dark-theme .modal-field input {
     background: #1f1f1f;
     border-color: #3a3a3a;
     color: #f5f5f5;
+    background-image: none;
+}
+
+html.dark-theme .modal-field select {
+    background-color: #1f1f1f;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23ccc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px;
+    border-color: #3a3a3a;
+    color: #f5f5f5;
+    padding-right: 34px;
 }
 
 html.dark-theme .modal-field input[readonly] {
     background: #2a2a2a;
     color: #9a9a9a;
-}
-
-html.dark-theme .modal-field select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23ccc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
 }
 
 html.dark-theme .modal-form input[readonly] {
@@ -349,5 +632,114 @@ html.dark-theme .modal-overlay .modal-form select:focus {
 html.dark-theme .modal-form-grid label span {
     color: #f0f0f0;
 }
+
+/* Кастомные dropdown'ы для модального окна */
+.modal-select-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.modal-select-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 12px;
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    text-align: left;
+}
+
+.modal-select-btn:hover {
+    border-color: #dd9e00;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.modal-select-btn:focus {
+    outline: none;
+    border-color: #dd9e00;
+    box-shadow: 0 0 0 3px rgba(221, 158, 0, 0.15);
+}
+
+.modal-select-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: #f6f6f6;
+}
+
+.modal-select-label {
+    flex: 1;
+    color: #333;
+}
+
+.modal-select-btn svg {
+    flex-shrink: 0;
+    color: #999;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.modal-select-btn[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+    color: #dd9e00;
+}
+
+html.dark-theme .modal-select-btn {
+    background: #1f1f1f;
+    border-color: #3a3a3a;
+    color: #f5f5f5;
+}
+
+html.dark-theme .modal-select-btn:hover {
+    border-color: #dd9e00;
+}
+
+html.dark-theme .modal-select-btn:disabled {
+    background: #2a2a2a;
+    opacity: 0.6;
+}
+
+html.dark-theme .modal-select-label {
+    color: #f5f5f5;
+}
+
+html.dark-theme .modal-select-btn svg {
+    color: #ccc;
+}
+
+html.dark-theme .modal-select-btn[aria-expanded="true"] svg {
+    color: #dd9e00;
+}
+
+html.dark-theme .modal-field select option,
+html.dark-theme .modal-overlay .modal-form select option {
+    color: #f0f0f0;
+    background: #2a2a2a;
+    padding: 10px 16px;
+}
+
+html.dark-theme .modal-field select option:hover,
+html.dark-theme .modal-field select option:focus,
+html.dark-theme .modal-overlay .modal-form select option:hover,
+html.dark-theme .modal-overlay .modal-form select option:focus {
+    background: rgba(221, 158, 0, 0.15);
+    outline: none;
+}
+
+html.dark-theme .modal-field select option:checked,
+html.dark-theme .modal-overlay .modal-form select option:checked {
+    color: #f5b75e;
+    font-weight: 600;
+    background: rgba(221, 158, 0, 0.15);
+}
+
+
 
 

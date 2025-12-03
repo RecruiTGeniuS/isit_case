@@ -1,4 +1,28 @@
 /* Специфичные стили для страницы "Сотрудники" */
 /* Здесь можно добавлять стили, специфичные только для страницы сотрудников */
 
+/* Закреплённый заголовок таблицы */
+.table-container .data-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.table-container .data-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #f8f8f8;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+html.dark-theme .table-container .data-table thead th {
+    background: #2a2a2a;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Убеждаемся, что заголовок остаётся видимым при прокрутке */
+.table-container .data-table thead tr {
+    position: relative;
+}
 

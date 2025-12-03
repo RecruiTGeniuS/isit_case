@@ -109,10 +109,45 @@ def update_employee_field(employee_id):
         display_value = value or ''
         if field == 'phone' and display_value:
             display_value = format_phone(display_value)
+        elif field == 'facility':
+            # При обновлении предприятия возвращаем переданное значение
+            # (так как facility_name берется из JOIN и может быть NULL если отдел сброшен)
+            display_value = value or '—'
+            # Отдел всегда будет прочерк, так как при смене предприятия он сбрасывается
+            return jsonify({
+                'success': True, 
+                'value': display_value,
+                'department': '—'
+            })
+        elif field == 'department_id':
+            # При обновлении отдела получаем обновлённые данные для отображения
+            employee = service.get_by_id(employee_id)
+            if employee:
+                display_value = employee.get('department') or '—'
+                return jsonify({
+                    'success': True, 
+                    'value': display_value
+                })
         
         return jsonify({'success': True, 'value': display_value})
     except ValueError as e:
         return jsonify({'success': False, 'message': str(e)}), 400
     except Exception:
         return jsonify({'success': False, 'message': 'Не удалось сохранить изменения.'}), 500
+
+@bp.route('/<int:employee_id>', methods=['DELETE'])
+def delete_employee(employee_id):
+    """Удаление сотрудника"""
+    auth_check = check_auth()
+    if auth_check:
+        return auth_check
+    
+    try:
+        service = AdminEmployeeService()
+        service.delete(employee_id)
+        return jsonify({'success': True, 'message': 'Сотрудник успешно удалён'})
+    except ValueError as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
+    except Exception:
+        return jsonify({'success': False, 'message': 'Не удалось удалить сотрудника.'}), 500
 

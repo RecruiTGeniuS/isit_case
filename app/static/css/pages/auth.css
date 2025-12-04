@@ -386,3 +386,214 @@ html.dark-theme .moon-icon {
     display: none;
 }
 
+/* Стили для страницы "Забыл пароль" */
+.forgot-password-box {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    padding: 50px 40px;
+    width: 100%;
+    max-width: 500px;
+    border: 1px solid #e8e8e8;
+}
+
+.forgot-password-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.forgot-password-icon {
+    color: #dd9e00;
+    margin-bottom: 20px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.forgot-password-title {
+    color: #333;
+    margin: 0 0 12px 0;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.forgot-password-subtitle {
+    color: #666;
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.support-contacts-section {
+    margin-bottom: 30px;
+}
+
+.support-section-title {
+    color: #333;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 20px 0;
+    text-align: center;
+}
+
+.support-contacts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.support-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 20px;
+    background: #f8f8f8;
+    border-radius: 12px;
+    border: 2px solid #e8e8e8;
+    transition: all 0.3s ease;
+}
+
+.support-contact-item:hover {
+    background: #fff8ec;
+    border-color: #dd9e00;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(221, 158, 0, 0.15);
+}
+
+.support-contact-icon {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border-radius: 12px;
+    color: #dd9e00;
+    border: 2px solid #dd9e00;
+}
+
+.support-contact-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.support-contact-label {
+    font-size: 12px;
+    color: #999;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.support-contact-value {
+    font-size: 16px;
+    color: #333;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.support-contact-value:hover {
+    color: #dd9e00;
+}
+
+.forgot-password-footer {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid #e8e8e8;
+}
+
+.back-to-login-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: #dd9e00;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 2px solid #dd9e00;
+}
+
+.back-to-login-btn:hover {
+    background: #f5b010;
+    border-color: #f5b010;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(221, 158, 0, 0.4);
+}
+
+.back-to-login-btn:active {
+    transform: translateY(0);
+}
+
+.back-to-login-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Темная тема для страницы "Забыл пароль" */
+html.dark-theme .forgot-password-box {
+    background: #252525;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+html.dark-theme .forgot-password-title {
+    color: #e0e0e0;
+}
+
+html.dark-theme .forgot-password-subtitle {
+    color: #b0b0b0;
+}
+
+html.dark-theme .support-section-title {
+    color: #e0e0e0;
+}
+
+html.dark-theme .support-contact-item {
+    background: #1f1f1f;
+    border-color: #3a3a3a;
+}
+
+html.dark-theme .support-contact-item:hover {
+    background: #2a2a2a;
+    border-color: #dd9e00;
+}
+
+html.dark-theme .support-contact-icon {
+    background: #2a2a2a;
+    border-color: #dd9e00;
+}
+
+html.dark-theme .support-contact-label {
+    color: #888;
+}
+
+html.dark-theme .support-contact-value {
+    color: #e0e0e0;
+}
+
+html.dark-theme .support-contact-value:hover {
+    color: #dd9e00;
+}
+
+html.dark-theme .forgot-password-footer {
+    border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+html.dark-theme .back-to-login-btn {
+    background: #dd9e00;
+    border-color: #dd9e00;
+}
+
+html.dark-theme .back-to-login-btn:hover {
+    background: #f5b010;
+    border-color: #f5b010;
+}
+

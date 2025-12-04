@@ -31,3 +31,12 @@ def logout():
     session.clear()
     return redirect(url_for("auth.login"))
 
+@bp.route("/forgot-password")
+def forgot_password():
+    """Страница восстановления пароля"""
+    # Проверяем, не авторизован ли уже пользователь
+    if 'user_id' in session:
+        return redirect(url_for("admin.dashboard"))
+    
+    return render_template("forgot_password.html")
+

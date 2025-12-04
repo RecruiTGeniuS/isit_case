@@ -142,8 +142,422 @@ html.dark-theme .back-btn:hover {
     border-color: #555;
 }
 
+/* Контейнер паспорта оборудования */
+.equipment-passport-container {
+    padding: var(--spacing-xl);
+    max-width: 1800px;
+    margin: 0 auto;
+}
 
+.equipment-passport-window {
+    background: var(--bg-white);
+    border: 3px solid var(--color-primary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: calc(100vh - 100px);
+    min-height: 900px;
+    max-height: 1000px;
+}
 
+html.dark-theme .equipment-passport-window {
+    background: var(--bg-white);
+    border-color: var(--color-primary);
+}
 
+/* Вкладки паспорта */
+.passport-tabs {
+    display: flex;
+    background: var(--bg-light);
+    border-bottom: 2px solid var(--color-primary);
+    gap: 0;
+}
 
+html.dark-theme .passport-tabs {
+    background: var(--bg-dark-secondary);
+}
 
+.passport-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--text-medium);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    min-height: 60px;
+}
+
+.passport-tab:hover {
+    background: rgba(221, 158, 0, 0.05);
+    color: var(--text-dark);
+}
+
+html.dark-theme .passport-tab:hover {
+    background: rgba(221, 158, 0, 0.1);
+    color: var(--text-dark);
+}
+
+.passport-tab.active {
+    background: var(--bg-white);
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+    font-weight: 600;
+}
+
+html.dark-theme .passport-tab.active {
+    background: var(--bg-white);
+    color: var(--color-primary);
+}
+
+.passport-tab .tab-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.passport-tab .tab-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.passport-tab.active .tab-icon svg {
+    color: var(--color-primary);
+}
+
+/* Контент паспорта */
+.passport-content {
+    flex: 1;
+    padding: var(--spacing-xl);
+    background: var(--bg-white);
+    overflow-y: auto;
+    height: calc(100vh - 260px);
+    min-height: 750px;
+    max-height: 850px;
+}
+
+html.dark-theme .passport-content {
+    background: var(--bg-white);
+}
+
+.tab-panel {
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.tab-panel.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Основная информация */
+.equipment-main-info {
+    display: grid;
+    grid-template-columns: 500px 1fr;
+    gap: var(--spacing-xl);
+    align-items: start;
+    min-height: 750px;
+}
+
+@media (max-width: 1024px) {
+    .equipment-main-info {
+        grid-template-columns: 1fr;
+    }
+}
+
+.equipment-image-section {
+    position: sticky;
+    top: var(--spacing-xl);
+    height: fit-content;
+}
+
+.equipment-image-container {
+    position: relative;
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.equipment-image-container:hover {
+    box-shadow: 0 8px 24px rgba(221, 158, 0, 0.3);
+}
+
+.equipment-image-container:hover .equipment-image-overlay {
+    opacity: 1;
+}
+
+.equipment-image {
+    width: 100%;
+    height: auto;
+    min-height: 550px;
+    max-height: 750px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    object-fit: contain;
+    background: var(--bg-light);
+    display: block;
+}
+
+.equipment-image-placeholder {
+    width: 100%;
+    min-height: 550px;
+    max-height: 750px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-md);
+    background: var(--bg-light);
+    border-radius: var(--radius-md);
+    border: 2px dashed var(--border-medium);
+    color: var(--text-light);
+    transition: all 0.3s ease;
+}
+
+.equipment-image-container:hover .equipment-image-placeholder {
+    border-color: var(--color-primary);
+    background: var(--color-primary-light);
+}
+
+.equipment-image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    color: white;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: var(--radius-md);
+}
+
+.equipment-image-overlay svg {
+    width: 32px;
+    height: 32px;
+}
+
+.equipment-image-overlay span {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.equipment-image-placeholder svg {
+    opacity: 0.5;
+}
+
+.equipment-image-placeholder span {
+    font-size: 14px;
+    color: var(--text-medium);
+}
+
+html.dark-theme .equipment-image-placeholder {
+    background: var(--bg-dark-secondary);
+    border-color: var(--border-dark);
+}
+
+/* Детали оборудования */
+.equipment-details-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.detail-item {
+    display: flex;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-md) 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-item-full {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.detail-label {
+    font-weight: 600;
+    color: var(--text-dark);
+    min-width: 220px;
+    flex-shrink: 0;
+    font-size: 15px;
+}
+
+html.dark-theme .detail-label {
+    color: var(--text-dark);
+}
+
+.detail-value {
+    color: var(--text-medium);
+    font-size: 15px;
+    flex: 1;
+    word-break: break-word;
+}
+
+html.dark-theme .detail-value {
+    color: var(--text-medium);
+}
+
+.characteristics-text {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    line-height: 1.6;
+    padding: var(--spacing-md);
+    background: var(--bg-light);
+    border-radius: var(--radius-sm);
+    margin-top: var(--spacing-sm);
+}
+
+html.dark-theme .characteristics-text {
+    background: var(--bg-dark-secondary);
+}
+
+/* Заглушки для вкладок */
+.passport-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    padding: var(--spacing-xl);
+    text-align: center;
+}
+
+.passport-placeholder .placeholder-icon {
+    margin-bottom: var(--spacing-lg);
+    color: var(--text-light);
+}
+
+.passport-placeholder .placeholder-icon svg {
+    opacity: 0.5;
+}
+
+.passport-placeholder h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: var(--spacing-md);
+}
+
+html.dark-theme .passport-placeholder h3 {
+    color: var(--text-dark);
+}
+
+.passport-placeholder p {
+    font-size: 15px;
+    color: var(--text-medium);
+    max-width: 500px;
+}
+
+html.dark-theme .passport-placeholder p {
+    color: var(--text-medium);
+}
+
+/* История перемещений */
+.movement-history-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 750px;
+}
+
+.movement-history-container .table-controls {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    flex-wrap: wrap;
+}
+
+.movement-history-container .table-search {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+}
+
+.movement-history-container .search-input {
+    width: 100%;
+    padding: 10px 16px 10px 40px;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    background: var(--bg-white);
+    color: var(--text-dark);
+    transition: border-color 0.2s;
+}
+
+.movement-history-container .search-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.movement-history-container .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+    pointer-events: none;
+}
+
+.movement-history-container .filter-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: 10px 16px;
+    background: var(--bg-white);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-sm);
+    color: var(--text-dark);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.movement-history-container .filter-toggle-btn:hover {
+    background: var(--bg-light);
+    border-color: var(--color-primary);
+}
+
+html.dark-theme .movement-history-container .search-input,
+html.dark-theme .movement-history-container .filter-toggle-btn {
+    background: var(--bg-white);
+    border-color: var(--border-medium);
+    color: var(--text-dark);
+}
+
+.movement-history-container .table-container {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: var(--spacing-lg);
+}

@@ -1,0 +1,82 @@
+/* Стили для страницы задач */
+
+.task-row {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.task-row:hover {
+    background-color: rgba(221, 158, 0, 0.1);
+}
+
+html.dark-theme .task-row:hover {
+    background-color: rgba(221, 158, 0, 0.15);
+}
+
+/* Переключатель статуса */
+.status-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.status-toggle {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+}
+
+.status-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.status-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.3s;
+    border-radius: 30px;
+}
+
+.status-toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.status-toggle input:checked + .status-toggle-slider {
+    background-color: #dd9e00;
+}
+
+.status-toggle input:checked + .status-toggle-slider:before {
+    transform: translateX(30px);
+}
+
+.status-toggle-label {
+    margin-left: 12px;
+    font-weight: 500;
+    color: #333;
+}
+
+html.dark-theme .status-toggle-label {
+    color: #e0e0e0;
+}
+
+.status-toggle input:checked ~ .status-toggle-label {
+    color: #dd9e00;
+}
+
+

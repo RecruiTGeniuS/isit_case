@@ -146,6 +146,13 @@
                         </svg>
                         <span>ПТО</span>
                     </a>
+                    <a href="{{ url_for('admin_tasks.list_tasks') }}" class="nav-item {% if section == 'tasks' %}active{% endif %}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 11l3 3L22 4"></path>
+                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                        </svg>
+                        <span>Задачи</span>
+                    </a>
                     <a href="{{ url_for('admin_statistics.list_statistics') }}" class="nav-item {% if section == 'statistics' %}active{% endif %}">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="18" y1="20" x2="18" y2="10"></line>
@@ -531,14 +538,194 @@
                         </button>
                         <h2>Паспорт оборудования</h2>
                     </div>
-                    <div class="content-placeholder">
-                        <div class="placeholder-icon">
-                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
-                            </svg>
+                    <div class="equipment-passport-container">
+                        <div class="equipment-passport-window">
+                            <div class="passport-tabs">
+                                <button class="passport-tab active" data-tab="main-info" role="tab" aria-selected="true" aria-controls="tab-panel-main-info">
+                                    <span class="tab-icon">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                            <polyline points="14 2 14 8 20 8"></polyline>
+                                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                                            <polyline points="10 9 9 9 8 9"></polyline>
+                                        </svg>
+                                    </span>
+                                    <span class="tab-label">Основная информация</span>
+                                </button>
+                                <button class="passport-tab" data-tab="movement-history" role="tab" aria-selected="false" aria-controls="tab-panel-movement-history">
+                                    <span class="tab-icon">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                                        </svg>
+                                    </span>
+                                    <span class="tab-label">История перемещений</span>
+                                </button>
+                                <button class="passport-tab" data-tab="required-parts" role="tab" aria-selected="false" aria-controls="tab-panel-required-parts">
+                                    <span class="tab-icon">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="9" cy="21" r="1"></circle>
+                                            <circle cx="20" cy="21" r="1"></circle>
+                                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                        </svg>
+                                    </span>
+                                    <span class="tab-label">Список необходимых деталей</span>
+                                </button>
+                            </div>
+                            
+                            <div class="passport-content">
+                                <!-- Основная информация -->
+                                <div class="tab-panel active" id="tab-panel-main-info" role="tabpanel" aria-labelledby="tab-main-info">
+                                    <div class="equipment-main-info">
+                                        <div class="equipment-image-section">
+                                            <div class="equipment-image-container" id="equipmentImageContainer" onclick="document.getElementById('equipmentImageInput').click()">
+                                                {% if equipment.image_path %}
+                                                    <img src="{{ url_for('static', filename=equipment.image_path) }}" alt="{{ equipment.equipment_name }}" class="equipment-image" id="equipmentImage">
+                                                {% else %}
+                                                    <div class="equipment-image-placeholder" id="equipmentImagePlaceholder">
+                                                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                                            <polyline points="21 15 16 10 5 21"></polyline>
+                                                        </svg>
+                                                        <span>Нажмите для загрузки изображения</span>
+                                                    </div>
+                                                {% endif %}
+                                                <div class="equipment-image-overlay">
+                                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                                        <polyline points="17 8 12 3 7 8"></polyline>
+                                                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                                                    </svg>
+                                                    <span>Загрузить изображение</span>
+                                                </div>
+                                            </div>
+                                            <input type="file" id="equipmentImageInput" accept="image/*" style="display: none;" data-equipment-id="{{ equipment.id }}">
+                                        </div>
+                                        <div class="equipment-details-section">
+                                            <div class="detail-item">
+                                                <span class="detail-label">Полное именование:</span>
+                                                <span class="detail-value">{{ equipment.equipment_name or '—' }}</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Тип оборудования:</span>
+                                                <span class="detail-value">{{ equipment.equipment_type or '—' }}</span>
+                                            </div>
+                                            {% if equipment.acquisition_date %}
+                                            <div class="detail-item">
+                                                <span class="detail-label">Дата ввода в эксплуатацию:</span>
+                                                <span class="detail-value">{{ format_date(equipment.acquisition_date) or '—' }}</span>
+                                            </div>
+                                            {% endif %}
+                                            {% if equipment.warranty_expiration %}
+                                            <div class="detail-item">
+                                                <span class="detail-label">Истечение гарантии:</span>
+                                                <span class="detail-value">{{ format_date(equipment.warranty_expiration) or '—' }}</span>
+                                            </div>
+                                            {% endif %}
+                                            {% if equipment.maintenance_frequency_text %}
+                                            <div class="detail-item">
+                                                <span class="detail-label">Периодичность ТО:</span>
+                                                <span class="detail-value">{{ equipment.maintenance_frequency_text }}</span>
+                                            </div>
+                                            {% endif %}
+                                            {% if equipment.characteristics %}
+                                            <div class="detail-item detail-item-full">
+                                                <span class="detail-label">Характеристики:</span>
+                                                <div class="detail-value characteristics-text">{{ format_characteristics(equipment.characteristics)|safe }}</div>
+                                            </div>
+                                            {% endif %}
+                                            {% if equipment.location %}
+                                            <div class="detail-item">
+                                                <span class="detail-label">Текущее местоположение:</span>
+                                                <span class="detail-value">{{ equipment.location }}</span>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- История перемещений -->
+                                <div class="tab-panel" id="tab-panel-movement-history" role="tabpanel" aria-labelledby="tab-movement-history" hidden>
+                                    <div class="movement-history-container">
+                                        <div class="table-controls">
+                                            <div class="table-search">
+                                                <input type="text" id="movementHistorySearch" placeholder="Поиск..." class="search-input">
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon">
+                                                    <circle cx="11" cy="11" r="8"></circle>
+                                                    <path d="m21 21-4.35-4.35"></path>
+                                                </svg>
+                                            </div>
+                                            <button type="button" class="filter-toggle-btn" id="movementHistoryFilterToggle" aria-expanded="false" aria-haspopup="true">
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                                                </svg>
+                                                Фильтр
+                                            </button>
+                                        </div>
+                                        <div class="filter-dropdown" id="movementHistoryFilterDropdown" style="display: none;">
+                                            <div class="filter-row">
+                                                <label class="filter-label">Дата перемещения:</label>
+                                                <input type="text" id="movementDateFilter" placeholder="Дата" class="filter-input">
+                                            </div>
+                                            <div class="filter-actions">
+                                                <button type="button" class="secondary-btn" id="resetMovementHistoryFilters">Сбросить</button>
+                                            </div>
+                                        </div>
+                                        <div class="table-container">
+                                            <table class="data-table" id="movementHistoryTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="number-column">№</th>
+                                                        <th>Откуда перемещено</th>
+                                                        <th>Куда перемещено</th>
+                                                        <th>Дата перемещения</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for movement in movement_history %}
+                                                    <tr data-movement-id="{{ movement.id }}" data-from-location="{{ movement.from_location }}" data-to-location="{{ movement.to_location }}" data-move-date="{{ movement.move_date or '' }}">
+                                                        <td class="number-column">{{ loop.index }}</td>
+                                                        <td>{{ movement.from_location }}</td>
+                                                        <td>{{ movement.to_location }}</td>
+                                                        <td>{{ format_date(movement.move_date) or '—' }}</td>
+                                                    </tr>
+                                                    {% else %}
+                                                    <tr>
+                                                        <td colspan="4" style="text-align: center; padding: 20px; color: var(--text-medium);">Нет записей о перемещениях</td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="table-footer-actions">
+                                            <button type="button" class="add-employee-btn" id="addMovementBtn">
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                                </svg>
+                                                Добавить
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Список необходимых деталей -->
+                                <div class="tab-panel" id="tab-panel-required-parts" role="tabpanel" aria-labelledby="tab-required-parts" hidden>
+                                    <div class="passport-placeholder">
+                                        <div class="placeholder-icon">
+                                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <circle cx="9" cy="21" r="1"></circle>
+                                                <circle cx="20" cy="21" r="1"></circle>
+                                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                            </svg>
+                                        </div>
+                                        <h3>Раздел в разработке</h3>
+                                        <p>Список необходимых деталей находится в стадии разработки и будет доступен в ближайшее время.</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <h3>Раздел в разработке</h3>
-                        <p>Функционал паспорта оборудования находится в разработке и будет доступен в ближайшее время.</p>
                     </div>
                 {% elif section == 'warehouse' %}
                     <div class="content-header">
@@ -711,14 +898,112 @@
                     <div class="content-header">
                         <h2>ПТО</h2>
                     </div>
-                    <div class="content-placeholder">
-                        <div class="placeholder-icon">
-                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
-                            </svg>
+                    <div class="pto-container">
+                        <div class="pto-calendar-section">
+                            <div class="pto-calendar-header">
+                                <button type="button" class="pto-month-nav-btn" id="ptoPrevMonth" aria-label="Предыдущий месяц">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="15 18 9 12 15 6"></polyline>
+                                    </svg>
+                                </button>
+                                <div class="pto-month-selector">
+                                    <select id="ptoMonthSelect" class="pto-month-select">
+                                        <option value="1">Январь</option>
+                                        <option value="2">Февраль</option>
+                                        <option value="3">Март</option>
+                                        <option value="4">Апрель</option>
+                                        <option value="5">Май</option>
+                                        <option value="6">Июнь</option>
+                                        <option value="7">Июль</option>
+                                        <option value="8">Август</option>
+                                        <option value="9">Сентябрь</option>
+                                        <option value="10">Октябрь</option>
+                                        <option value="11">Ноябрь</option>
+                                        <option value="12">Декабрь</option>
+                                    </select>
+                                    <select id="ptoYearSelect" class="pto-year-select">
+                                    </select>
+                                </div>
+                                <button type="button" class="pto-month-nav-btn" id="ptoNextMonth" aria-label="Следующий месяц">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="9 18 15 12 9 6"></polyline>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="pto-calendar-wrapper">
+                                <div class="pto-calendar-weekdays">
+                                    <div class="pto-weekday">Пн</div>
+                                    <div class="pto-weekday">Вт</div>
+                                    <div class="pto-weekday">Ср</div>
+                                    <div class="pto-weekday">Чт</div>
+                                    <div class="pto-weekday">Пт</div>
+                                    <div class="pto-weekday">Сб</div>
+                                    <div class="pto-weekday">Вс</div>
+                                </div>
+                                <div class="pto-calendar-grid" id="ptoCalendarGrid">
+                                    <!-- Календарь будет заполнен через JavaScript -->
+                                </div>
+                            </div>
                         </div>
-                        <h3>Раздел в разработке</h3>
-                        <p>Функционал производственно-технического отдела находится в разработке и будет доступен в ближайшее время.</p>
+                        <div class="pto-table-section">
+                            <div class="pto-table-header">
+                                <h3 id="ptoTableDate">Сегодня</h3>
+                            </div>
+                            <div class="pto-table-container">
+                                <table class="data-table" id="ptoDataTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Оборудование</th>
+                                            <th>Отдел</th>
+                                            <th>Местоположение</th>
+                                            <th>Статус</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ptoTableBody">
+                                        <!-- Данные будут загружены через JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                {% elif section == 'tasks' %}
+                    <div class="content-header">
+                        <h2>Задачи на ремонт</h2>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="tasksTable">
+                            <thead>
+                                <tr>
+                                    <th class="number-column">№</th>
+                                    <th>Тема задачи</th>
+                                    <th>Номер задачи</th>
+                                    <th>Дедлайн</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for task in tasks %}
+                                <tr class="task-row" data-task-id="{{ task.id }}" style="cursor: pointer;">
+                                    <td class="number-column">{{ loop.index }}</td>
+                                    <td>{{ task.heading or '—' }}</td>
+                                    <td>{{ task.id }}</td>
+                                    <td>{{ task.end_date or '—' }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" style="text-align: center; padding: 20px; color: var(--text-medium);">Нет задач на ремонт</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-footer-actions">
+                        <button type="button" class="add-employee-btn" id="createTaskBtn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Создать задачу
+                        </button>
                     </div>
                 {% elif section == 'statistics' %}
                     <div class="content-header">
@@ -1044,77 +1329,233 @@
                 </svg>
             </button>
         </div>
-        <form class="modal-form" id="equipmentForm">
-            <div class="modal-section">
-                <h4 class="modal-section-title">Основная информация</h4>
-                <div class="modal-row modal-row--halves">
-                    <label class="modal-field">
+        <form class="modal-form" id="equipmentForm" enctype="multipart/form-data">
+            <!-- Режим: новое или существующее оборудование -->
+            <div class="modal-section" id="equipmentSearchSection">
+                <h4 class="modal-section-title">Поиск оборудования</h4>
+                <div class="modal-row" style="position: relative;">
+                    <label class="modal-field" style="width: 100%;">
                         <span data-required="*">Название оборудования</span>
-                        <input type="text" name="equipment_name" required>
+                        <input type="text" name="equipment_name" id="equipmentNameInput" required autocomplete="off" placeholder="Начните вводить название...">
+                        <div id="equipmentModeIndicator" style="margin-top: 8px; padding: 8px; border-radius: 6px; font-size: 13px; display: none;"></div>
                     </label>
-                    <label class="modal-field">
-                        <span data-required="">Тип</span>
-                        <div class="modal-select-wrapper">
-                            <button type="button" class="modal-select-btn" id="equipmentTypeBtn" data-field="equipment_type" aria-haspopup="listbox" aria-expanded="false">
-                                <span class="modal-select-label">Выберите тип</span>
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <polyline points="6 9 12 15 18 9"></polyline>
-                                </svg>
-                            </button>
-                            <select name="equipment_type" id="equipmentTypeSelect" style="display: none;">
-                                <option value="">Выберите тип</option>
-                                {% for eq_type in equipment_types %}
-                                <option value="{{ eq_type }}">{{ eq_type }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </label>
-                </div>
-                <div class="modal-row modal-row--halves">
-                    <label class="modal-field">
-                        <span data-required="">Изображение</span>
-                        <div class="modal-select-wrapper">
-                            <button type="button" class="modal-select-btn" id="equipmentImageBtn" data-field="image_path" aria-haspopup="listbox" aria-expanded="false">
-                                <span class="modal-select-label">Выберите изображение</span>
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <polyline points="6 9 12 15 18 9"></polyline>
-                                </svg>
-                            </button>
-                            <select name="image_path" id="equipmentImageSelect" style="display: none;">
-                                <option value="">Выберите изображение</option>
-                                {% for img_path in image_paths %}
-                                <option value="{{ img_path }}">{{ img_path }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </label>
-                    <label class="modal-field">
-                        <span data-required="">Периодичность ТО</span>
-                        <div class="modal-select-wrapper">
-                            <button type="button" class="modal-select-btn" id="equipmentMaintenanceBtn" data-field="maintenance_frequency" aria-haspopup="listbox" aria-expanded="false">
-                                <span class="modal-select-label">Выберите периодичность</span>
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <polyline points="6 9 12 15 18 9"></polyline>
-                                </svg>
-                            </button>
-                            <select name="maintenance_frequency" id="equipmentMaintenanceSelect" style="display: none;">
-                                <option value="">Выберите периодичность</option>
-                                {% for freq in maintenance_frequencies %}
-                                <option value="{{ freq }}">{{ freq }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </label>
+                    <div id="equipmentSearchResults" class="equipment-search-results" style="display: none;"></div>
                 </div>
             </div>
+            
+            <!-- Форма для нового оборудования -->
+            <div id="newEquipmentForm" style="display: none;">
+                <div class="modal-section">
+                    <h4 class="modal-section-title">Основная информация</h4>
+                    <div class="modal-row modal-row--halves">
+                        <label class="modal-field">
+                            <span data-required="">Тип</span>
+                            <div class="modal-select-wrapper">
+                                <button type="button" class="modal-select-btn" id="equipmentTypeBtn" data-field="equipment_type" aria-haspopup="listbox" aria-expanded="false">
+                                    <span class="modal-select-label">Выберите тип</span>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </button>
+                                <select name="equipment_type" id="equipmentTypeSelect" style="display: none;">
+                                    <option value="">Выберите тип</option>
+                                    {% for eq_type in equipment_types %}
+                                    <option value="{{ eq_type }}">{{ eq_type }}</option>
+                                    {% endfor %}
+                                    <option value="__custom__">Другое</option>
+                                </select>
+                            </div>
+                            <div id="customEquipmentTypeRow" style="display: none; margin-top: 8px;">
+                                <input type="text" name="custom_equipment_type" id="customEquipmentType" placeholder="Введите новый тип оборудования" style="width: 100%; padding: 10px; border: 1px solid var(--border-medium); border-radius: var(--radius-sm);">
+                            </div>
+                        </label>
+                        <label class="modal-field">
+                            <span data-required="">Периодичность ТО</span>
+                            <div class="modal-select-wrapper">
+                                <button type="button" class="modal-select-btn" id="equipmentMaintenanceBtn" data-field="maintenance_frequency" aria-haspopup="listbox" aria-expanded="false">
+                                    <span class="modal-select-label">Выберите периодичность</span>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </button>
+                                <select name="maintenance_frequency" id="equipmentMaintenanceSelect" style="display: none;">
+                                    <option value="">Выберите периодичность</option>
+                                    <option value="7">Раз в неделю (7 дней)</option>
+                                    <option value="30">Раз в месяц (30 дней)</option>
+                                    <option value="90">Раз в квартал (90 дней)</option>
+                                    <option value="365">Раз в год (365 дней)</option>
+                                    <option value="custom">Другое</option>
+                                </select>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="modal-row" id="customMaintenanceRow" style="display: none;">
+                        <label class="modal-field">
+                            <span data-required="">Количество дней периодичности</span>
+                            <input type="number" name="custom_maintenance_frequency" id="customMaintenanceFrequency" min="1" placeholder="Введите количество дней">
+                        </label>
+                    </div>
+                    <div class="modal-row">
+                        <label class="modal-field">
+                            <span data-required="">Изображение</span>
+                            <input type="file" name="equipment_image" id="equipmentImageInput" accept="image/*" style="padding: 8px; border: 1px solid #dcdcdc; border-radius: 10px; width: 100%;">
+                            <div id="equipmentImagePreview" style="margin-top: 8px; display: none; position: relative; width: fit-content;">
+                                <img id="equipmentImagePreviewImg" src="" alt="Превью" style="max-width: 200px; max-height: 200px; border-radius: 8px; display: block;">
+                                <button type="button" id="removeEquipmentImageBtn" style="position: absolute; top: 4px; right: 4px; background: rgba(0, 0, 0, 0.7); border: none; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; transition: background 0.2s;" aria-label="Удалить изображение">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                        </label>
+                    </div>
+                </div>
 
-            <div class="modal-section">
-                <h4 class="modal-section-title">Описание характеристик</h4>
-                <div class="modal-row">
-                    <label class="modal-field">
-                        <span data-required="">Описание характеристик</span>
-                        <textarea name="characteristics" rows="4" placeholder="Введите описание характеристик оборудования"></textarea>
-                    </label>
+                <div class="modal-section">
+                    <h4 class="modal-section-title">Описание характеристик</h4>
+                    <div class="modal-row">
+                        <label class="modal-field" style="width: 100%;">
+                            <span data-required="">Описание характеристик</span>
+                            <textarea name="characteristics" rows="8" placeholder="Введите описание характеристик оборудования" style="width: 100%; resize: vertical; min-height: 150px;"></textarea>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <h4 class="modal-section-title">Дополнительная информация</h4>
+                    <div class="modal-row modal-row--halves">
+                        <label class="modal-field">
+                            <span data-required="">Дата поступления на производство</span>
+                            <input type="date" name="acquisition_date">
+                        </label>
+                        <label class="modal-field">
+                            <span data-required="">Срок действия гарантии</span>
+                            <input type="date" name="guarantee_date">
+                        </label>
+                    </div>
+                    <div class="modal-row">
+                        <label class="modal-field">
+                            <span data-required="">Типы деталей</span>
+                            <div style="display: flex; gap: 8px; align-items: flex-start;">
+                                <div class="modal-select-wrapper" style="flex: 1;">
+                                    <button type="button" class="modal-select-btn" id="sparePartTypeBtn" data-field="spare_part_type" aria-haspopup="listbox" aria-expanded="false">
+                                        <span class="modal-select-label">Выберите тип детали</span>
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <polyline points="6 9 12 15 18 9"></polyline>
+                                        </svg>
+                                    </button>
+                                    <select name="spare_part_type" id="sparePartTypeSelect" style="display: none;">
+                                        <option value="">Выберите тип детали</option>
+                                        {% for spare_type in spare_part_types %}
+                                        <option value="{{ spare_type }}">{{ spare_type }}</option>
+                                        {% endfor %}
+                                        <option value="__custom__">Другое</option>
+                                    </select>
+                                </div>
+                                <button type="button" class="primary-btn" id="addSparePartTypeBtn" style="padding: 10px 16px; min-width: auto; white-space: nowrap;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;">
+                                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    </svg>
+                                    Добавить
+                                </button>
+                            </div>
+                            <div id="customSparePartTypeRow" style="display: none; margin-top: 8px;">
+                                <input type="text" name="custom_spare_part_type" id="customSparePartType" placeholder="Введите новый тип детали" style="width: 100%; padding: 10px; border: 1px solid var(--border-medium); border-radius: var(--radius-sm);">
+                            </div>
+                            <div id="sparePartTypesList" style="margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; max-height: 150px; overflow-y: auto; padding: 4px;"></div>
+                        </label>
+                    </div>
+                    <div class="modal-row modal-row--halves">
+                        <label class="modal-field">
+                            <span data-required="*">Предприятие</span>
+                            <div class="modal-select-wrapper">
+                                <button type="button" class="modal-select-btn" id="equipmentFacilityBtnNew" data-field="facility_id_new" aria-haspopup="listbox" aria-expanded="false">
+                                    <span class="modal-select-label">Выберите предприятие</span>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </button>
+                                <select name="facility_id_new" id="equipmentFacilitySelectNew" style="display: none;">
+                                    <option value="">Выберите предприятие</option>
+                                    {% for fac in facility_choices %}
+                                    <option value="{{ fac.id }}">{{ fac.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </label>
+                        <label class="modal-field">
+                            <span data-required="*">Отдел</span>
+                            <div class="modal-select-wrapper">
+                                <button type="button" class="modal-select-btn" id="equipmentDepartmentBtnNew" data-field="department_id_new" aria-haspopup="listbox" aria-expanded="false" disabled>
+                                    <span class="modal-select-label">Сначала выберите предприятие</span>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </button>
+                                <select name="department_id_new" id="equipmentDepartmentSelectNew" disabled style="display: none;">
+                                    <option value="">Сначала выберите предприятие</option>
+                                </select>
+                            </div>
+                        </label>
+                        <label class="modal-field">
+                            <span data-required="">Расположение</span>
+                            <input type="text" name="location" id="equipmentLocationInput" placeholder="Введите расположение оборудования">
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Форма для существующего оборудования -->
+            <div id="existingEquipmentForm" style="display: none;">
+                <div class="modal-section">
+                    <h4 class="modal-section-title">Информация о размещении</h4>
+                    <div class="modal-row modal-row--halves">
+                        <label class="modal-field">
+                            <span data-required="*">Предприятие</span>
+                            <div class="modal-select-wrapper">
+                                <button type="button" class="modal-select-btn" id="equipmentFacilityBtn" data-field="facility_id" aria-haspopup="listbox" aria-expanded="false">
+                                    <span class="modal-select-label">Выберите предприятие</span>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </button>
+                                <select name="facility_id" id="equipmentFacilitySelect" style="display: none;">
+                                    <option value="">Выберите предприятие</option>
+                                    {% for fac in facility_choices %}
+                                    <option value="{{ fac.id }}">{{ fac.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </label>
+                        <label class="modal-field">
+                            <span data-required="*">Отдел</span>
+                            <div class="modal-select-wrapper">
+                                <button type="button" class="modal-select-btn" id="equipmentDepartmentBtn" data-field="department_id" aria-haspopup="listbox" aria-expanded="false" disabled>
+                                    <span class="modal-select-label">Сначала выберите предприятие</span>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </button>
+                                <select name="department_id" id="equipmentDepartmentSelect" disabled style="display: none;">
+                                    <option value="">Сначала выберите предприятие</option>
+                                </select>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="modal-row modal-row--halves">
+                        <label class="modal-field">
+                            <span data-required="*">Дата поступления на производство</span>
+                            <input type="date" name="acquisition_date">
+                        </label>
+                        <label class="modal-field">
+                            <span data-required="">Локация</span>
+                            <input type="text" name="location" placeholder="Укажите местонахождение">
+                        </label>
+                    </div>
+                    <input type="hidden" name="existing_equipment_id" id="existingEquipmentId">
+                    <input type="hidden" name="equipment_status" value="В работе">
                 </div>
             </div>
 
@@ -1131,6 +1572,152 @@
     </div>
 </div>
 
+<!-- Модальное окно создания задачи -->
+<div class="modal-overlay" id="createTaskModal" aria-hidden="true">
+    <div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="createTaskModalTitle">
+        <div class="modal-header">
+            <h3 id="createTaskModalTitle">Создание задачи</h3>
+            <button type="button" class="modal-close-btn" id="createTaskModalClose" aria-label="Закрыть">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <form class="modal-form" id="createTaskForm">
+            <div class="modal-section">
+                <h4 class="modal-section-title">Данные задачи</h4>
+                <div class="modal-row modal-row--halves">
+                    <label class="modal-field">
+                        <span data-required="*">Назначить на Отдел</span>
+                        <div class="modal-select-wrapper">
+                            <button type="button" class="modal-select-btn" id="modalTaskDepartmentBtn" data-field="department_id" aria-haspopup="listbox" aria-expanded="false">
+                                <span class="modal-select-label">Выберите отдел</span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </button>
+                            <select name="department_id" id="taskDepartmentSelect" required style="display: none;">
+                                <option value="">Выберите отдел</option>
+                                {% for dept in department_choices %}
+                                <option value="{{ dept.id }}" data-facility-id="{{ dept.facility_id }}">{{ dept.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </label>
+                    <label class="modal-field">
+                        <span data-required="*">Предприятие</span>
+                        <div class="modal-select-wrapper">
+                            <button type="button" class="modal-select-btn" id="modalTaskFacilityBtn" data-field="facility_id" aria-haspopup="listbox" aria-expanded="false">
+                                <span class="modal-select-label">Выберите предприятие</span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </button>
+                            <select name="facility_id" id="taskFacilitySelect" required style="display: none;">
+                                <option value="">Выберите предприятие</option>
+                                {% for fac in facility_choices %}
+                                <option value="{{ fac.id }}">{{ fac.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </label>
+                </div>
+                <div class="modal-row">
+                    <label class="modal-field">
+                        <span data-required="*">Тема</span>
+                        <input type="text" name="heading" id="taskHeading" required>
+                    </label>
+                </div>
+                <div class="modal-row">
+                    <label class="modal-field">
+                        <span data-required="*">Сообщение</span>
+                        <textarea name="repair_task_description" id="taskDescription" rows="6" required></textarea>
+                    </label>
+                </div>
+                <div class="modal-row">
+                    <label class="modal-field">
+                        <span data-required="">Дедлайн</span>
+                        <input type="date" name="repair_task_end_date" id="taskEndDate">
+                    </label>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <div class="modal-error" id="createTaskFormError"></div>
+                <div class="modal-actions">
+                    <button type="button" class="secondary-btn" id="createTaskModalCancel">Отмена</button>
+                    <button type="submit" class="primary-btn" id="createTaskFormSubmit">Создать</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Модальное окно просмотра деталей задачи -->
+<div class="modal-overlay" id="taskDetailsModal" aria-hidden="true">
+    <div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="taskDetailsModalTitle">
+        <div class="modal-header">
+            <h3 id="taskDetailsModalTitle">Детали задачи</h3>
+            <button type="button" class="modal-close-btn" id="taskDetailsModalClose" aria-label="Закрыть">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-section">
+                <div class="modal-row">
+                    <label class="modal-field">
+                        <span>Номер задачи</span>
+                        <input type="text" id="taskDetailsId" readonly style="background: #f5f5f5;">
+                    </label>
+                </div>
+                <div class="modal-row">
+                    <label class="modal-field">
+                        <span>Тема задачи</span>
+                        <input type="text" id="taskDetailsHeading" readonly style="background: #f5f5f5;">
+                    </label>
+                </div>
+                <div class="modal-row">
+                    <label class="modal-field">
+                        <span>Сообщение</span>
+                        <textarea id="taskDetailsDescription" rows="6" readonly style="background: #f5f5f5;"></textarea>
+                    </label>
+                </div>
+                <div class="modal-row modal-row--halves">
+                    <label class="modal-field">
+                        <span>Дедлайн</span>
+                        <input type="text" id="taskDetailsEndDate" readonly style="background: #f5f5f5;">
+                    </label>
+                    <label class="modal-field">
+                        <span>Предприятие</span>
+                        <input type="text" id="taskDetailsFacility" readonly style="background: #f5f5f5;">
+                    </label>
+                </div>
+                <div class="modal-row">
+                    <label class="modal-field">
+                        <span>Статус задачи</span>
+                        <div class="status-toggle-wrapper">
+                            <label class="status-toggle">
+                                <input type="checkbox" id="taskStatusToggle">
+                                <span class="status-toggle-slider"></span>
+                                <span class="status-toggle-label" id="taskStatusLabel">В процессе</span>
+                            </label>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="modal-error" id="taskDetailsFormError"></div>
+            <div class="modal-actions">
+                <button type="button" class="secondary-btn" id="taskDetailsModalCancel">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
 
     <script>
         // Переключение меню пользователя
@@ -2884,12 +3471,20 @@
 
         // Закрытие при клике вне dropdown'а
         document.addEventListener('click', (e) => {
+            // Проверяем, что клик не внутри dropdown'а сотрудников
             if (!modalDropdown.contains(e.target) && 
                 !e.target.closest('.modal-select-btn')) {
                 closeModalDropdown();
-                // Закрываем также dropdown оборудования, если открыт
-                if (typeof closeEquipmentModalDropdown === 'function') {
-                    closeEquipmentModalDropdown();
+            }
+            // Закрываем также dropdown оборудования, если открыт и клик не внутри него
+            if (typeof closeEquipmentModalDropdown === 'function') {
+                const equipmentModalDropdown = document.getElementById('modalDropdown');
+                if (equipmentModalDropdown && equipmentModalDropdown.classList.contains('visible')) {
+                    if (!equipmentModalDropdown.contains(e.target) && 
+                        !e.target.closest('.modal-select-btn') &&
+                        !e.target.closest('#equipmentModal')) {
+                        closeEquipmentModalDropdown();
+                    }
                 }
             }
         });
@@ -5973,40 +6568,66 @@
 
             // Определяем переменные для кнопок выпадающих списков ДО их использования
             const equipmentTypeBtn = document.getElementById('equipmentTypeBtn');
-            const equipmentImageBtn = document.getElementById('equipmentImageBtn');
             const equipmentMaintenanceBtn = document.getElementById('equipmentMaintenanceBtn');
             const equipmentDepartmentBtn = document.getElementById('equipmentDepartmentBtn');
+            const equipmentDepartmentBtnNew = document.getElementById('equipmentDepartmentBtnNew');
             const sparePartTypeBtn = document.getElementById('sparePartTypeBtn');
 
+            // Элементы для поиска и режимов
+            const equipmentNameInput = document.getElementById('equipmentNameInput');
+            const equipmentSearchResults = document.getElementById('equipmentSearchResults');
+            const equipmentModeIndicator = document.getElementById('equipmentModeIndicator');
+            const newEquipmentForm = document.getElementById('newEquipmentForm');
+            const existingEquipmentForm = document.getElementById('existingEquipmentForm');
+            const existingEquipmentId = document.getElementById('existingEquipmentId');
+            let searchTimeout = null;
+            let selectedExistingEquipment = null;
+            
             function openEquipmentModal() {
                 if (!equipmentModal) return;
+                // Инициализируем данные выпадающих списков при открытии модального окна
+                initializeEquipmentModalSelectData();
                 // Закрываем dropdown сотрудников, если открыт
                 if (typeof closeModalDropdown === 'function') {
                     closeModalDropdown();
                 }
                 equipmentModal.classList.add('visible');
-                equipmentModal.setAttribute('aria-hidden', 'false');
                 document.body.classList.add('modal-open');
+                // Убираем aria-hidden после небольшой задержки, чтобы избежать предупреждения
+                setTimeout(() => {
+                    equipmentModal.setAttribute('aria-hidden', 'false');
+                }, 100);
                 // Сброс формы
                 if (equipmentForm) {
                     equipmentForm.reset();
                     selectedSparePartTypes = [];
+                    selectedExistingEquipment = null;
                     if (sparePartTypesList) {
                         sparePartTypesList.innerHTML = '';
                     }
+                    // Сброс режимов
+                    if (newEquipmentForm) newEquipmentForm.style.display = 'none';
+                    if (existingEquipmentForm) existingEquipmentForm.style.display = 'none';
+                    if (equipmentModeIndicator) equipmentModeIndicator.style.display = 'none';
+                    if (equipmentSearchResults) equipmentSearchResults.style.display = 'none';
+                    if (equipmentNameInput) equipmentNameInput.value = '';
+                    if (existingEquipmentId) existingEquipmentId.value = '';
                 }
                 // Сброс выпадающих списков
                 closeEquipmentModalDropdown();
-                const equipmentBtns = [equipmentTypeBtn, equipmentImageBtn, equipmentMaintenanceBtn, equipmentDepartmentBtn, sparePartTypeBtn];
+                const equipmentFacilityBtn = document.getElementById('equipmentFacilityBtn');
+                const equipmentFacilityBtnNew = document.getElementById('equipmentFacilityBtnNew');
+                const equipmentBtns = [equipmentTypeBtn, equipmentMaintenanceBtn, equipmentFacilityBtn, equipmentFacilityBtnNew, equipmentDepartmentBtn, equipmentDepartmentBtnNew, sparePartTypeBtn];
                 equipmentBtns.forEach(btn => {
                     if (btn) {
                         const label = btn.querySelector('.modal-select-label');
                         if (label) {
                             const defaultTexts = {
                                 'equipmentTypeBtn': 'Выберите тип',
-                                'equipmentImageBtn': 'Выберите изображение',
                                 'equipmentMaintenanceBtn': 'Выберите периодичность',
-                                'equipmentDepartmentBtn': 'Выберите отдел',
+                                'equipmentFacilityBtn': 'Выберите предприятие',
+                                'equipmentDepartmentBtn': 'Сначала выберите предприятие',
+                                'equipmentDepartmentBtnNew': 'Выберите отдел',
                                 'sparePartTypeBtn': 'Выберите тип детали'
                             };
                             label.textContent = defaultTexts[btn.id] || 'Выберите...';
@@ -6014,8 +6635,405 @@
                         btn.setAttribute('aria-expanded', 'false');
                     }
                 });
+                // Сброс выбора предприятия и отдела для существующего оборудования
+                const equipmentFacilitySelect = document.getElementById('equipmentFacilitySelect');
+                const equipmentDepartmentSelect = document.getElementById('equipmentDepartmentSelect');
+                const acquisitionDateInput = existingEquipmentForm ? existingEquipmentForm.querySelector('input[name="acquisition_date"]') : null;
+                
+                // Убираем required с полей существующего оборудования при открытии
+                if (equipmentFacilitySelect) {
+                    equipmentFacilitySelect.value = '';
+                    equipmentFacilitySelect.removeAttribute('required');
+                    handleEquipmentFacilityChange();
+                }
+                if (equipmentDepartmentSelect) {
+                    equipmentDepartmentSelect.removeAttribute('required');
+                }
+                if (acquisitionDateInput) {
+                    acquisitionDateInput.removeAttribute('required');
+                }
+                
                 if (equipmentFormError) {
                     equipmentFormError.textContent = '';
+                }
+                // Фокус на поле ввода названия
+                if (equipmentNameInput) {
+                    setTimeout(() => equipmentNameInput.focus(), 100);
+                }
+            }
+            
+            // Поиск оборудования при вводе названия
+            if (equipmentNameInput) {
+                // Предотвращаем отправку формы при нажатии Enter в поле поиска
+                equipmentNameInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        // Если есть результаты поиска, не отправляем форму
+                        if (equipmentSearchResults && equipmentSearchResults.style.display !== 'none') {
+                            return;
+                        }
+                        // Если форма не видна, не отправляем
+                        const isNewFormVisible = newEquipmentForm && newEquipmentForm.style.display !== 'none';
+                        const isExistingFormVisible = existingEquipmentForm && existingEquipmentForm.style.display !== 'none';
+                        if (!isNewFormVisible && !isExistingFormVisible) {
+                            return;
+                        }
+                    }
+                });
+                
+                equipmentNameInput.addEventListener('input', (e) => {
+                    const query = e.target.value.trim();
+                    
+                    // Очищаем предыдущий таймаут
+                    if (searchTimeout) {
+                        clearTimeout(searchTimeout);
+                    }
+                    
+                    // Скрываем формы, но не результаты поиска (они будут обновлены)
+                    if (equipmentModeIndicator) equipmentModeIndicator.style.display = 'none';
+                    if (newEquipmentForm) newEquipmentForm.style.display = 'none';
+                    if (existingEquipmentForm) existingEquipmentForm.style.display = 'none';
+                    selectedExistingEquipment = null;
+                    if (existingEquipmentId) existingEquipmentId.value = '';
+                    
+                    // Убираем required с полей существующего оборудования при скрытии
+                    const equipmentFacilitySelect = document.getElementById('equipmentFacilitySelect');
+                    const equipmentDepartmentSelect = document.getElementById('equipmentDepartmentSelect');
+                    const acquisitionDateInput = existingEquipmentForm ? existingEquipmentForm.querySelector('input[name="acquisition_date"]') : null;
+                    if (equipmentFacilitySelect) equipmentFacilitySelect.removeAttribute('required');
+                    if (equipmentDepartmentSelect) equipmentDepartmentSelect.removeAttribute('required');
+                    if (acquisitionDateInput) acquisitionDateInput.removeAttribute('required');
+                    
+                    if (query.length < 2) {
+                        // Скрываем результаты, если запрос слишком короткий
+                        if (equipmentSearchResults) equipmentSearchResults.style.display = 'none';
+                        return;
+                    }
+                    
+                    // Задержка перед поиском
+                    searchTimeout = setTimeout(() => {
+                        console.log('Выполняю поиск для:', query);
+                        fetch(`/admin/equipment/search?q=${encodeURIComponent(query)}`)
+                            .then(response => {
+                                console.log('Ответ получен, status:', response.status);
+                                return response.json();
+                            })
+                            .then(data => {
+                                console.log('Данные поиска:', data);
+                                if (data.success && data.results !== undefined) {
+                                    displaySearchResults(data.results, query);
+                                } else {
+                                    console.warn('Неожиданный формат ответа:', data);
+                                }
+                            })
+                            .catch(err => {
+                                console.error('Ошибка поиска:', err);
+                            });
+                    }, 300);
+                });
+                
+                // Закрытие результатов при клике вне
+                document.addEventListener('click', (e) => {
+                    const searchRow = equipmentNameInput ? equipmentNameInput.closest('.modal-row') : null;
+                    if (equipmentSearchResults && 
+                        !equipmentNameInput.contains(e.target) && 
+                        !equipmentSearchResults.contains(e.target) &&
+                        !(searchRow && searchRow.contains(e.target) && e.target !== equipmentNameInput)) {
+                        equipmentSearchResults.style.display = 'none';
+                    }
+                });
+            }
+            
+            function displaySearchResults(results, query) {
+                console.log('displaySearchResults called with:', results.length, 'results, query:', query);
+                if (!equipmentSearchResults) {
+                    console.error('equipmentSearchResults element not found!');
+                    return;
+                }
+                
+                // Получаем позицию input поля для правильного позиционирования результатов
+                const inputRect = equipmentNameInput ? equipmentNameInput.getBoundingClientRect() : null;
+                const searchRow = equipmentNameInput ? equipmentNameInput.closest('.modal-row') : null;
+                const rowRect = searchRow ? searchRow.getBoundingClientRect() : null;
+                
+                console.log('equipmentSearchResults found, clearing innerHTML');
+                equipmentSearchResults.innerHTML = '';
+                
+                // Позиционируем результаты относительно input поля
+                if (inputRect && rowRect) {
+                    equipmentSearchResults.style.top = `${inputRect.bottom - rowRect.top + 4}px`;
+                    equipmentSearchResults.style.left = `${inputRect.left - rowRect.left}px`;
+                    equipmentSearchResults.style.width = `${inputRect.width}px`;
+                }
+                
+                if (results.length === 0) {
+                    console.log('No results, showing "add new" message');
+                    // Нет результатов - показываем предложение добавить новое
+                    const noResultsContainer = document.createElement('div');
+                    noResultsContainer.className = 'equipment-search-no-results';
+                    
+                    const message = document.createElement('div');
+                    message.className = 'equipment-search-no-results-message';
+                    message.textContent = `Оборудование "${query}" не найдено в базе данных.`;
+                    
+                    const actionButton = document.createElement('button');
+                    actionButton.type = 'button';
+                    actionButton.className = 'primary-btn';
+                    actionButton.style.cssText = 'width: 100%; padding: 10px 16px; font-size: 14px;';
+                    actionButton.textContent = 'Добавить новое оборудование';
+                    actionButton.addEventListener('click', () => {
+                        setEquipmentMode('new', null);
+                        if (equipmentNameInput) equipmentNameInput.value = query;
+                        if (equipmentSearchResults) equipmentSearchResults.style.display = 'none';
+                    });
+                    
+                    noResultsContainer.appendChild(message);
+                    noResultsContainer.appendChild(actionButton);
+                    equipmentSearchResults.appendChild(noResultsContainer);
+                    equipmentSearchResults.style.display = 'block';
+                    
+                    const rect = equipmentSearchResults.getBoundingClientRect();
+                    const computed = window.getComputedStyle(equipmentSearchResults);
+                    console.log('No results container displayed');
+                    console.log('  display:', computed.display);
+                    console.log('  visibility:', computed.visibility);
+                    console.log('  opacity:', computed.opacity);
+                    console.log('  z-index:', computed.zIndex);
+                    console.log('  position:', computed.position);
+                    console.log('  top:', computed.top, 'left:', computed.left);
+                    console.log('  width:', rect.width, 'height:', rect.height);
+                    console.log('  boundingRect:', rect);
+                    console.log('  children count:', equipmentSearchResults.children.length);
+                    console.log('  parent overflow:', window.getComputedStyle(equipmentSearchResults.parentElement).overflow);
+                    return;
+                }
+                
+                // Есть результаты - показываем предложение добавить размещение
+                console.log('Has results, showing results container');
+                const queryLower = query.toLowerCase().trim();
+                const exactMatch = results.find(eq => 
+                    eq.equipment_name.toLowerCase().trim() === queryLower || eq.is_exact_match
+                );
+                const bestMatch = exactMatch || results[0];
+                const hasMultipleResults = results.length > 1;
+                
+                // Выбранное оборудование (по умолчанию - лучшее совпадение)
+                let selectedEquipment = bestMatch;
+                
+                const resultsContainer = document.createElement('div');
+                resultsContainer.className = 'equipment-search-results-container';
+                if (exactMatch) {
+                    resultsContainer.classList.add('exact-match');
+                }
+                
+                // Заголовок с предложением
+                const header = document.createElement('div');
+                header.className = 'equipment-search-header';
+                if (exactMatch) {
+                    header.classList.add('exact-match');
+                }
+                
+                const headerText = document.createElement('div');
+                headerText.className = 'equipment-search-header-text';
+                
+                if (exactMatch) {
+                    headerText.textContent = `Найдено оборудование "${bestMatch.equipment_name}" в базе данных.`;
+                } else if (hasMultipleResults) {
+                    headerText.textContent = `Найдено ${results.length} похожих. Выберите из списка:`;
+                } else {
+                    headerText.textContent = `Найдено похожее оборудование "${bestMatch.equipment_name}".`;
+                }
+                
+                const headerSubtext = document.createElement('div');
+                headerSubtext.className = 'equipment-search-header-subtext';
+                headerSubtext.textContent = exactMatch ? 'Добавить размещение в отдел?' : 'Выберите нужное оборудование из списка ниже:';
+                
+                header.appendChild(headerText);
+                header.appendChild(headerSubtext);
+                resultsContainer.appendChild(header);
+                
+                // Список результатов (показываем всегда, если несколько результатов или нет точного совпадения)
+                if (hasMultipleResults || !exactMatch) {
+                    const resultsList = document.createElement('div');
+                    resultsList.className = 'equipment-search-list';
+                    
+                    results.forEach((equipment) => {
+                        const item = document.createElement('div');
+                        const isBest = equipment.id === bestMatch.id;
+                        const isExact = equipment.equipment_name.toLowerCase().trim() === queryLower || equipment.is_exact_match;
+                        const isSelected = equipment.id === selectedEquipment.id;
+                        
+                        item.className = 'equipment-search-item';
+                        if (isExact) {
+                            item.classList.add('exact-match-item');
+                        }
+                        if (isSelected) {
+                            item.classList.add('selected');
+                        }
+                        item.dataset.equipmentId = equipment.id;
+                        
+                        const itemName = document.createElement('div');
+                        itemName.className = 'equipment-search-item-name';
+                        itemName.textContent = equipment.equipment_name;
+                        
+                        item.appendChild(itemName);
+                        
+                        if (equipment.equipment_type) {
+                            const itemType = document.createElement('div');
+                            itemType.className = 'equipment-search-item-type';
+                            itemType.textContent = equipment.equipment_type;
+                            item.appendChild(itemType);
+                        }
+                        
+                        // При клике только выделяем элемент и обновляем выбранное оборудование
+                        item.addEventListener('click', () => {
+                            // Убираем выделение со всех элементов
+                            resultsList.querySelectorAll('.equipment-search-item').forEach(el => {
+                                el.classList.remove('selected');
+                            });
+                            // Выделяем текущий элемент
+                            item.classList.add('selected');
+                            // Обновляем выбранное оборудование
+                            selectedEquipment = equipment;
+                            // Обновляем текст кнопки
+                            addPlacementBtn.textContent = `Добавить размещение "${equipment.equipment_name}"`;
+                        });
+                        resultsList.appendChild(item);
+                    });
+                    resultsContainer.appendChild(resultsList);
+                }
+                
+                // Кнопка действия
+                const actionContainer = document.createElement('div');
+                actionContainer.className = 'equipment-search-actions';
+                
+                const addPlacementBtn = document.createElement('button');
+                addPlacementBtn.type = 'button';
+                addPlacementBtn.className = 'primary-btn';
+                addPlacementBtn.style.cssText = 'flex: 1; padding: 10px 16px; font-size: 14px;';
+                addPlacementBtn.textContent = exactMatch ? `Добавить размещение "${bestMatch.equipment_name}"` : `Добавить размещение "${selectedEquipment.equipment_name}"`;
+                // Только при нажатии на кнопку добавляем оборудование
+                addPlacementBtn.addEventListener('click', () => {
+                    selectExistingEquipment(selectedEquipment);
+                });
+                
+                const addNewBtn = document.createElement('button');
+                addNewBtn.type = 'button';
+                addNewBtn.className = 'secondary-btn';
+                addNewBtn.style.cssText = 'flex: 1; padding: 10px 16px; font-size: 14px;';
+                addNewBtn.textContent = 'Добавить новое';
+                addNewBtn.addEventListener('click', () => {
+                    setEquipmentMode('new', null);
+                    if (equipmentNameInput) equipmentNameInput.value = query;
+                    if (equipmentSearchResults) equipmentSearchResults.style.display = 'none';
+                });
+                
+                actionContainer.appendChild(addPlacementBtn);
+                actionContainer.appendChild(addNewBtn);
+                resultsContainer.appendChild(actionContainer);
+                
+                equipmentSearchResults.appendChild(resultsContainer);
+                equipmentSearchResults.style.display = 'block';
+                
+                const rect = equipmentSearchResults.getBoundingClientRect();
+                const computed = window.getComputedStyle(equipmentSearchResults);
+                console.log('Results container displayed');
+                console.log('  display:', computed.display);
+                console.log('  visibility:', computed.visibility);
+                console.log('  opacity:', computed.opacity);
+                console.log('  z-index:', computed.zIndex);
+                console.log('  position:', computed.position);
+                console.log('  top:', computed.top, 'left:', computed.left);
+                console.log('  width:', rect.width, 'height:', rect.height);
+                console.log('  boundingRect:', rect);
+                console.log('  children count:', equipmentSearchResults.children.length);
+                console.log('  parent:', equipmentSearchResults.parentElement);
+                console.log('  parent overflow:', window.getComputedStyle(equipmentSearchResults.parentElement).overflow);
+            }
+            
+            function selectExistingEquipment(equipment) {
+                selectedExistingEquipment = equipment;
+                if (existingEquipmentId) existingEquipmentId.value = equipment.id;
+                if (equipmentNameInput) equipmentNameInput.value = equipment.equipment_name;
+                if (equipmentSearchResults) equipmentSearchResults.style.display = 'none';
+                setEquipmentMode('existing', equipment);
+            }
+            
+            function setEquipmentMode(mode, equipment) {
+                // Плавное переключение с анимацией
+                const transitionDuration = 300;
+                
+                // Управление required атрибутами
+                const equipmentFacilitySelect = document.getElementById('equipmentFacilitySelect');
+                const equipmentDepartmentSelect = document.getElementById('equipmentDepartmentSelect');
+                const acquisitionDateInput = existingEquipmentForm ? existingEquipmentForm.querySelector('input[name="acquisition_date"]') : null;
+                
+                if (mode === 'new') {
+                    // Убираем required с полей существующего оборудования
+                    if (equipmentFacilitySelect) equipmentFacilitySelect.removeAttribute('required');
+                    if (equipmentDepartmentSelect) equipmentDepartmentSelect.removeAttribute('required');
+                    if (acquisitionDateInput) acquisitionDateInput.removeAttribute('required');
+                    
+                    if (existingEquipmentForm) {
+                        existingEquipmentForm.style.transition = `opacity ${transitionDuration}ms ease-out`;
+                        existingEquipmentForm.style.opacity = '0';
+                        setTimeout(() => {
+                            existingEquipmentForm.style.display = 'none';
+                        }, transitionDuration);
+                    }
+                    if (newEquipmentForm) {
+                        newEquipmentForm.style.display = 'block';
+                        newEquipmentForm.style.opacity = '0';
+                        newEquipmentForm.style.transition = `opacity ${transitionDuration}ms ease-in`;
+                        requestAnimationFrame(() => {
+                            newEquipmentForm.style.opacity = '1';
+                        });
+                    }
+                    if (equipmentModeIndicator) {
+                        equipmentModeIndicator.style.display = 'block';
+                        equipmentModeIndicator.style.background = '#e3f2fd';
+                        equipmentModeIndicator.style.color = '#1976d2';
+                        equipmentModeIndicator.style.border = '1px solid #90caf9';
+                        equipmentModeIndicator.style.transition = `opacity ${transitionDuration}ms ease-in`;
+                        equipmentModeIndicator.style.opacity = '0';
+                        equipmentModeIndicator.textContent = '✓ Режим: Добавление нового оборудования';
+                        requestAnimationFrame(() => {
+                            equipmentModeIndicator.style.opacity = '1';
+                        });
+                    }
+                } else if (mode === 'existing' && equipment) {
+                    // Добавляем required к полям существующего оборудования
+                    if (equipmentFacilitySelect) equipmentFacilitySelect.setAttribute('required', 'required');
+                    if (equipmentDepartmentSelect) equipmentDepartmentSelect.setAttribute('required', 'required');
+                    if (acquisitionDateInput) acquisitionDateInput.setAttribute('required', 'required');
+                    
+                    if (newEquipmentForm) {
+                        newEquipmentForm.style.transition = `opacity ${transitionDuration}ms ease-out`;
+                        newEquipmentForm.style.opacity = '0';
+                        setTimeout(() => {
+                            newEquipmentForm.style.display = 'none';
+                        }, transitionDuration);
+                    }
+                    if (existingEquipmentForm) {
+                        existingEquipmentForm.style.display = 'block';
+                        existingEquipmentForm.style.opacity = '0';
+                        existingEquipmentForm.style.transition = `opacity ${transitionDuration}ms ease-in`;
+                        requestAnimationFrame(() => {
+                            existingEquipmentForm.style.opacity = '1';
+                        });
+                    }
+                    if (equipmentModeIndicator) {
+                        equipmentModeIndicator.style.display = 'block';
+                        equipmentModeIndicator.style.background = '#fff3e0';
+                        equipmentModeIndicator.style.color = '#f57c00';
+                        equipmentModeIndicator.style.border = '1px solid #ffb74d';
+                        equipmentModeIndicator.style.transition = `opacity ${transitionDuration}ms ease-in`;
+                        equipmentModeIndicator.style.opacity = '0';
+                        equipmentModeIndicator.innerHTML = `✓ Режим: Добавление размещения оборудования<br><small>Оборудование: ${equipment.equipment_name}${equipment.equipment_type ? ` (${equipment.equipment_type})` : ''}</small>`;
+                        requestAnimationFrame(() => {
+                            equipmentModeIndicator.style.opacity = '1';
+                        });
+                    }
                 }
             }
 
@@ -6040,10 +7058,27 @@
 
             // Добавление типа детали
             if (addSparePartTypeBtn && sparePartTypeSelect) {
-                addSparePartTypeBtn.addEventListener('click', () => {
+                addSparePartTypeBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     const selectedType = sparePartTypeSelect.value;
-                    if (selectedType && !selectedSparePartTypes.includes(selectedType)) {
-                        selectedSparePartTypes.push(selectedType);
+                    let typeToAdd = null;
+                    
+                    // Если выбрано "Другое", берем значение из поля ввода
+                    if (selectedType === '__custom__') {
+                        const customInput = document.getElementById('customSparePartType');
+                        if (customInput && customInput.value.trim()) {
+                            typeToAdd = customInput.value.trim();
+                            customInput.value = '';
+                            const customRow = document.getElementById('customSparePartTypeRow');
+                            if (customRow) customRow.style.display = 'none';
+                        }
+                    } else if (selectedType && selectedType.trim()) {
+                        typeToAdd = selectedType.trim();
+                    }
+                    
+                    if (typeToAdd && !selectedSparePartTypes.includes(typeToAdd)) {
+                        selectedSparePartTypes.push(typeToAdd);
                         updateSparePartTypesList();
                         sparePartTypeSelect.value = '';
                         // Обновляем кнопку выпадающего списка
@@ -6052,9 +7087,11 @@
                             const label = btn.querySelector('.modal-select-label');
                             if (label) label.textContent = 'Выберите тип детали';
                         }
+                        closeEquipmentModalDropdown();
                     }
                 });
             }
+            
 
             function updateSparePartTypesList() {
                 if (!sparePartTypesList) return;
@@ -6062,10 +7099,9 @@
                 selectedSparePartTypes.forEach((type, index) => {
                     const tag = document.createElement('div');
                     tag.className = 'spare-part-type-tag';
-                    tag.style.cssText = 'display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: #f0f0f0; border-radius: 6px; font-size: 14px;';
                     tag.innerHTML = `
                         <span>${type}</span>
-                        <button type="button" class="remove-tag-btn" data-index="${index}" style="background: none; border: none; cursor: pointer; padding: 0; display: flex; align-items: center;">
+                        <button type="button" class="remove-tag-btn" data-index="${index}">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="18" y1="6" x2="6" y2="18"></line>
                                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -6074,7 +7110,9 @@
                     `;
                     const removeBtn = tag.querySelector('.remove-tag-btn');
                     if (removeBtn) {
-                        removeBtn.addEventListener('click', () => {
+                        removeBtn.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
                             selectedSparePartTypes.splice(index, 1);
                             updateSparePartTypesList();
                         });
@@ -6086,65 +7124,350 @@
             // Инициализация данных для выпадающих списков оборудования
             const equipmentModalSelectData = {};
             
-            // Типы оборудования
-            const equipmentTypeSelect = document.getElementById('equipmentTypeSelect');
-            if (equipmentTypeSelect) {
-                equipmentModalSelectData.equipment_type = {};
-                Array.from(equipmentTypeSelect.options).forEach(opt => {
-                    if (opt.value !== '') {
-                        equipmentModalSelectData.equipment_type[opt.value] = opt.textContent.trim();
+            function initializeEquipmentModalSelectData() {
+                // Типы оборудования
+                const equipmentTypeSelect = document.getElementById('equipmentTypeSelect');
+                if (equipmentTypeSelect) {
+                    equipmentModalSelectData.equipment_type = {};
+                    Array.from(equipmentTypeSelect.options).forEach(opt => {
+                        if (opt.value !== '') {
+                            equipmentModalSelectData.equipment_type[opt.value] = opt.textContent.trim();
+                        }
+                    });
+                    console.log('Initialized equipment_type:', Object.keys(equipmentModalSelectData.equipment_type).length, 'options');
+                }
+                
+                // Изображения
+                const equipmentImageSelect = document.getElementById('equipmentImageSelect');
+                if (equipmentImageSelect) {
+                    equipmentModalSelectData.image_path = {};
+                    Array.from(equipmentImageSelect.options).forEach(opt => {
+                        if (opt.value !== '') {
+                            equipmentModalSelectData.image_path[opt.value] = opt.textContent.trim();
+                        }
+                    });
+                    console.log('Initialized image_path:', Object.keys(equipmentModalSelectData.image_path).length, 'options');
+                }
+                
+                // Периодичность ТО (предустановленные значения)
+                const equipmentMaintenanceSelect = document.getElementById('equipmentMaintenanceSelect');
+                if (equipmentMaintenanceSelect) {
+                    equipmentModalSelectData.maintenance_frequency = {
+                        '7': 'Раз в неделю (7 дней)',
+                        '30': 'Раз в месяц (30 дней)',
+                        '90': 'Раз в квартал (90 дней)',
+                        '365': 'Раз в год (365 дней)',
+                        'custom': 'Другое'
+                    };
+                    console.log('Initialized maintenance_frequency:', Object.keys(equipmentModalSelectData.maintenance_frequency).length, 'options');
+                }
+                
+                // Предприятия (для существующего оборудования)
+                const equipmentFacilitySelect = document.getElementById('equipmentFacilitySelect');
+                if (equipmentFacilitySelect) {
+                    equipmentModalSelectData.facility_id = {};
+                    Array.from(equipmentFacilitySelect.options).forEach(opt => {
+                        if (opt.value !== '') {
+                            equipmentModalSelectData.facility_id[opt.value] = opt.textContent.trim();
+                        }
+                    });
+                    console.log('Initialized facility_id:', Object.keys(equipmentModalSelectData.facility_id).length, 'options');
+                }
+                
+                // Предприятия (для нового оборудования) - используем те же данные
+                const equipmentFacilitySelectNew = document.getElementById('equipmentFacilitySelectNew');
+                if (equipmentFacilitySelectNew) {
+                    if (!equipmentModalSelectData.facility_id) {
+                        equipmentModalSelectData.facility_id = {};
                     }
-                });
-            }
-            
-            // Изображения
-            const equipmentImageSelect = document.getElementById('equipmentImageSelect');
-            if (equipmentImageSelect) {
-                equipmentModalSelectData.image_path = {};
-                Array.from(equipmentImageSelect.options).forEach(opt => {
-                    if (opt.value !== '') {
-                        equipmentModalSelectData.image_path[opt.value] = opt.textContent.trim();
-                    }
-                });
-            }
-            
-            // Периодичность ТО
-            const equipmentMaintenanceSelect = document.getElementById('equipmentMaintenanceSelect');
-            if (equipmentMaintenanceSelect) {
-                equipmentModalSelectData.maintenance_frequency = {};
-                Array.from(equipmentMaintenanceSelect.options).forEach(opt => {
-                    if (opt.value !== '') {
-                        equipmentModalSelectData.maintenance_frequency[opt.value] = opt.textContent.trim();
-                    }
-                });
-            }
-            
-            // Отделы
-            const equipmentDepartmentSelect = document.getElementById('equipmentDepartmentSelect');
-            if (equipmentDepartmentSelect) {
+                    Array.from(equipmentFacilitySelectNew.options).forEach(opt => {
+                        if (opt.value !== '') {
+                            equipmentModalSelectData.facility_id[opt.value] = opt.textContent.trim();
+                        }
+                    });
+                    console.log('Initialized facility_id (new):', Object.keys(equipmentModalSelectData.facility_id).length, 'options');
+                }
+                
+                // Отделы (для существующего оборудования) - будет заполняться динамически
                 equipmentModalSelectData.department_id = {};
-                Array.from(equipmentDepartmentSelect.options).forEach(opt => {
-                    if (opt.value !== '') {
-                        const deptName = opt.textContent.trim();
-                        equipmentModalSelectData.department_id[opt.value] = deptName;
+                
+                // Отделы (для нового оборудования)
+                const equipmentDepartmentSelectNew = document.getElementById('equipmentDepartmentSelectNew');
+                if (equipmentDepartmentSelectNew) {
+                    if (!equipmentModalSelectData.department_id_new) {
+                        equipmentModalSelectData.department_id_new = {};
                     }
-                });
+                    Array.from(equipmentDepartmentSelectNew.options).forEach(opt => {
+                        if (opt.value !== '') {
+                            const deptName = opt.textContent.trim();
+                            equipmentModalSelectData.department_id_new[opt.value] = deptName;
+                        }
+                    });
+                }
+                
+                // Типы деталей (переменная уже объявлена выше)
+                if (sparePartTypeSelect) {
+                    equipmentModalSelectData.spare_part_type = {};
+                    Array.from(sparePartTypeSelect.options).forEach(opt => {
+                        if (opt.value !== '') {
+                            equipmentModalSelectData.spare_part_type[opt.value] = opt.textContent.trim();
+                        }
+                    });
+                    console.log('Initialized spare_part_type:', Object.keys(equipmentModalSelectData.spare_part_type).length, 'options');
+                }
             }
             
-            // Типы деталей (переменная уже объявлена выше)
-            if (sparePartTypeSelect) {
-                equipmentModalSelectData.spare_part_type = {};
-                Array.from(sparePartTypeSelect.options).forEach(opt => {
-                    if (opt.value !== '') {
-                        equipmentModalSelectData.spare_part_type[opt.value] = opt.textContent.trim();
-                    }
-                });
-            }
+            // Инициализируем данные сразу
+            initializeEquipmentModalSelectData();
 
             // Используем тот же modalDropdown, что и для формы сотрудников
-            const equipmentModalDropdown = document.getElementById('modalDropdown');
+            let equipmentModalDropdown = document.getElementById('modalDropdown');
+            // Если dropdown не существует, создаем его
+            if (!equipmentModalDropdown) {
+                equipmentModalDropdown = document.createElement('div');
+                equipmentModalDropdown.className = 'role-dropdown';
+                equipmentModalDropdown.id = 'modalDropdown';
+                document.body.appendChild(equipmentModalDropdown);
+            }
             let currentEquipmentModalSelect = null;
-
+            
+            // Создаём карту отделов по предприятиям для формы оборудования
+            const equipmentFacilityDeptMap = {};
+            const equipmentDepartmentsData = {{ department_choices|tojson }};
+            if (equipmentDepartmentsData && Array.isArray(equipmentDepartmentsData)) {
+                equipmentDepartmentsData.forEach(dept => {
+                    const facilityId = dept.facility_id ? String(dept.facility_id) : '';
+                    if (!facilityId) return;
+                    if (!equipmentFacilityDeptMap[facilityId]) {
+                        equipmentFacilityDeptMap[facilityId] = [];
+                    }
+                    equipmentFacilityDeptMap[facilityId].push({
+                        id: String(dept.id),
+                        name: dept.name
+                    });
+                });
+                Object.keys(equipmentFacilityDeptMap).forEach(key => {
+                    equipmentFacilityDeptMap[key].sort((a, b) => a.name.localeCompare(b.name, 'ru', { sensitivity: 'base' }));
+                });
+                console.log('equipmentFacilityDeptMap created:', Object.keys(equipmentFacilityDeptMap).length, 'facilities');
+                Object.keys(equipmentFacilityDeptMap).forEach(facilityId => {
+                    console.log(`Facility ${facilityId}: ${equipmentFacilityDeptMap[facilityId].length} departments`);
+                });
+            } else {
+                console.warn('equipmentDepartmentsData is not available or not an array');
+            }
+            
+            function populateEquipmentDepartmentOptions(facilityId) {
+                const equipmentDepartmentSelect = document.getElementById('equipmentDepartmentSelect');
+                if (!equipmentDepartmentSelect) return;
+                
+                const equipmentDepartmentBtn = document.getElementById('equipmentDepartmentBtn');
+                const equipmentDepartmentLabel = equipmentDepartmentBtn?.querySelector('.modal-select-label');
+                
+                equipmentDepartmentSelect.innerHTML = '';
+                const placeholder = document.createElement('option');
+                placeholder.value = '';
+                placeholder.textContent = facilityId ? 'Выберите отдел' : 'Сначала выберите предприятие';
+                placeholder.disabled = !facilityId;
+                placeholder.selected = true;
+                equipmentDepartmentSelect.appendChild(placeholder);
+                
+                if (!facilityId) {
+                    equipmentDepartmentSelect.disabled = true;
+                    if (equipmentDepartmentBtn) {
+                        equipmentDepartmentBtn.disabled = true;
+                        if (equipmentDepartmentLabel) {
+                            equipmentDepartmentLabel.textContent = 'Сначала выберите предприятие';
+                        }
+                    }
+                    // Обновляем данные для dropdown
+                    if (equipmentModalSelectData) {
+                        equipmentModalSelectData.department_id = {};
+                    }
+                    return;
+                }
+                
+                const departments = equipmentFacilityDeptMap[facilityId] || [];
+                console.log('populateEquipmentDepartmentOptions - facilityId:', facilityId, 'departments:', departments.length);
+                console.log('equipmentFacilityDeptMap keys:', Object.keys(equipmentFacilityDeptMap));
+                if (departments.length === 0) {
+                    console.warn('No departments found for facilityId:', facilityId);
+                    placeholder.textContent = 'Для выбранного предприятия нет отделов';
+                    equipmentDepartmentSelect.disabled = true;
+                    if (equipmentDepartmentBtn) {
+                        equipmentDepartmentBtn.disabled = true;
+                        if (equipmentDepartmentLabel) {
+                            equipmentDepartmentLabel.textContent = 'Для выбранного предприятия нет отделов';
+                        }
+                    }
+                    // Обновляем данные для dropdown
+                    if (equipmentModalSelectData) {
+                        equipmentModalSelectData.department_id = {};
+                    }
+                    return;
+                }
+                
+                // Обновляем данные для dropdown
+                if (equipmentModalSelectData) {
+                    equipmentModalSelectData.department_id = {};
+                    departments.forEach(dept => {
+                        equipmentModalSelectData.department_id[dept.id] = dept.name;
+                    });
+                }
+                
+                departments.forEach(dept => {
+                    const option = document.createElement('option');
+                    option.value = dept.id;
+                    option.textContent = dept.name;
+                    equipmentDepartmentSelect.appendChild(option);
+                });
+                equipmentDepartmentSelect.disabled = false;
+                if (equipmentDepartmentBtn) {
+                    equipmentDepartmentBtn.disabled = false;
+                    if (equipmentDepartmentLabel) {
+                        equipmentDepartmentLabel.textContent = 'Выберите отдел';
+                    }
+                    console.log('Department button enabled, departments count:', departments.length);
+                    console.log('Department data updated:', equipmentModalSelectData.department_id);
+                }
+            }
+            
+            function handleEquipmentFacilityChange() {
+                const equipmentFacilitySelect = document.getElementById('equipmentFacilitySelect');
+                if (!equipmentFacilitySelect) return;
+                const facilityId = equipmentFacilitySelect.value;
+                console.log('handleEquipmentFacilityChange called with facilityId:', facilityId);
+                
+                // Сначала обновляем опции отделов
+                populateEquipmentDepartmentOptions(facilityId);
+                
+                // Затем обновляем состояние кнопки и select
+                const equipmentDepartmentSelect = document.getElementById('equipmentDepartmentSelect');
+                if (equipmentDepartmentSelect) {
+                    equipmentDepartmentSelect.value = '';
+                }
+                
+                // Обновляем кастомную кнопку отдела
+                const equipmentDepartmentBtn = document.getElementById('equipmentDepartmentBtn');
+                if (equipmentDepartmentBtn) {
+                    const label = equipmentDepartmentBtn.querySelector('.modal-select-label');
+                    if (label) {
+                        label.textContent = facilityId ? 'Выберите отдел' : 'Сначала выберите предприятие';
+                    }
+                    // Убеждаемся, что кнопка разблокирована, если выбрано предприятие и есть отделы
+                    if (facilityId) {
+                        const departments = equipmentFacilityDeptMap[facilityId] || [];
+                        if (departments.length > 0) {
+                            equipmentDepartmentBtn.disabled = false;
+                            console.log('Department button enabled, facilityId:', facilityId, 'departments:', departments.length);
+                        } else {
+                            equipmentDepartmentBtn.disabled = true;
+                            console.log('Department button disabled, no departments for facilityId:', facilityId);
+                        }
+                    } else {
+                        equipmentDepartmentBtn.disabled = true;
+                    }
+                }
+            }
+            
+            function populateEquipmentDepartmentOptionsNew(facilityId) {
+                const equipmentDepartmentSelectNew = document.getElementById('equipmentDepartmentSelectNew');
+                if (!equipmentDepartmentSelectNew) return;
+                
+                const equipmentDepartmentBtnNew = document.getElementById('equipmentDepartmentBtnNew');
+                const equipmentDepartmentLabelNew = equipmentDepartmentBtnNew?.querySelector('.modal-select-label');
+                
+                equipmentDepartmentSelectNew.innerHTML = '';
+                const placeholder = document.createElement('option');
+                placeholder.value = '';
+                placeholder.textContent = facilityId ? 'Выберите отдел' : 'Сначала выберите предприятие';
+                placeholder.disabled = !facilityId;
+                placeholder.selected = true;
+                equipmentDepartmentSelectNew.appendChild(placeholder);
+                
+                if (!facilityId) {
+                    equipmentDepartmentSelectNew.disabled = true;
+                    if (equipmentDepartmentBtnNew) {
+                        equipmentDepartmentBtnNew.disabled = true;
+                        if (equipmentDepartmentLabelNew) {
+                            equipmentDepartmentLabelNew.textContent = 'Сначала выберите предприятие';
+                        }
+                    }
+                    if (equipmentModalSelectData) {
+                        equipmentModalSelectData.department_id_new = {};
+                    }
+                    return;
+                }
+                
+                const departments = equipmentFacilityDeptMap[facilityId] || [];
+                if (departments.length === 0) {
+                    placeholder.textContent = 'Для выбранного предприятия нет отделов';
+                    equipmentDepartmentSelectNew.disabled = true;
+                    if (equipmentDepartmentBtnNew) {
+                        equipmentDepartmentBtnNew.disabled = true;
+                        if (equipmentDepartmentLabelNew) {
+                            equipmentDepartmentLabelNew.textContent = 'Для выбранного предприятия нет отделов';
+                        }
+                    }
+                    if (equipmentModalSelectData) {
+                        equipmentModalSelectData.department_id_new = {};
+                    }
+                    return;
+                }
+                
+                if (equipmentModalSelectData) {
+                    equipmentModalSelectData.department_id_new = {};
+                    departments.forEach(dept => {
+                        equipmentModalSelectData.department_id_new[dept.id] = dept.name;
+                    });
+                }
+                
+                departments.forEach(dept => {
+                    const option = document.createElement('option');
+                    option.value = dept.id;
+                    option.textContent = dept.name;
+                    equipmentDepartmentSelectNew.appendChild(option);
+                });
+                equipmentDepartmentSelectNew.disabled = false;
+                if (equipmentDepartmentBtnNew) {
+                    equipmentDepartmentBtnNew.disabled = false;
+                    if (equipmentDepartmentLabelNew) {
+                        equipmentDepartmentLabelNew.textContent = 'Выберите отдел';
+                    }
+                }
+            }
+            
+            function handleEquipmentFacilityChangeNew() {
+                const equipmentFacilitySelectNew = document.getElementById('equipmentFacilitySelectNew');
+                if (!equipmentFacilitySelectNew) return;
+                const facilityId = equipmentFacilitySelectNew.value;
+                
+                populateEquipmentDepartmentOptionsNew(facilityId);
+                
+                const equipmentDepartmentSelectNew = document.getElementById('equipmentDepartmentSelectNew');
+                if (equipmentDepartmentSelectNew) {
+                    equipmentDepartmentSelectNew.value = '';
+                }
+                
+                const equipmentDepartmentBtnNew = document.getElementById('equipmentDepartmentBtnNew');
+                if (equipmentDepartmentBtnNew) {
+                    const label = equipmentDepartmentBtnNew.querySelector('.modal-select-label');
+                    if (label) {
+                        label.textContent = facilityId ? 'Выберите отдел' : 'Сначала выберите предприятие';
+                    }
+                    if (facilityId) {
+                        const departments = equipmentFacilityDeptMap[facilityId] || [];
+                        if (departments.length > 0) {
+                            equipmentDepartmentBtnNew.disabled = false;
+                        } else {
+                            equipmentDepartmentBtnNew.disabled = true;
+                        }
+                    } else {
+                        equipmentDepartmentBtnNew.disabled = true;
+                    }
+                }
+            }
+            
             function populateEquipmentModalDropdown(field, options) {
                 if (!equipmentModalDropdown || !options || Object.keys(options).length === 0) {
                     return;
@@ -6165,9 +7488,80 @@
                         
                         if (select && labelSpan) {
                             select.value = value;
-                            labelSpan.textContent = label;
+                            
+                            // Обработка "Другое" для типа оборудования
+                            if (field === 'equipment_type' && value === '__custom__') {
+                                const customRow = document.getElementById('customEquipmentTypeRow');
+                                if (customRow) {
+                                    customRow.style.display = 'block';
+                                    const customInput = document.getElementById('customEquipmentType');
+                                    if (customInput) {
+                                        customInput.focus();
+                                        customInput.setAttribute('required', 'required');
+                                    }
+                                }
+                                labelSpan.textContent = 'Другое';
+                            } else if (field === 'equipment_type') {
+                                const customRow = document.getElementById('customEquipmentTypeRow');
+                                if (customRow) {
+                                    customRow.style.display = 'none';
+                                    const customInput = document.getElementById('customEquipmentType');
+                                    if (customInput) {
+                                        customInput.removeAttribute('required');
+                                        customInput.value = '';
+                                    }
+                                }
+                                labelSpan.textContent = label;
+                            }
+                            // Обработка "Другое" для типов деталей
+                            else if (field === 'spare_part_type' && value === '__custom__') {
+                                const customRow = document.getElementById('customSparePartTypeRow');
+                                if (customRow) {
+                                    customRow.style.display = 'block';
+                                    const customInput = document.getElementById('customSparePartType');
+                                    if (customInput) {
+                                        customInput.focus();
+                                        customInput.value = '';
+                                    }
+                                }
+                                labelSpan.textContent = 'Другое';
+                                // Не закрываем dropdown и не добавляем автоматически
+                                closeEquipmentModalDropdown();
+                                return;
+                            } else if (field === 'spare_part_type' && value && value !== '__custom__') {
+                                const customRow = document.getElementById('customSparePartTypeRow');
+                                if (customRow) {
+                                    customRow.style.display = 'none';
+                                    const customInput = document.getElementById('customSparePartType');
+                                    if (customInput) {
+                                        customInput.value = '';
+                                    }
+                                }
+                                // Автоматически добавляем выбранный тип
+                                if (!selectedSparePartTypes.includes(value)) {
+                                    selectedSparePartTypes.push(value);
+                                    updateSparePartTypesList();
+                                    select.value = '';
+                                    labelSpan.textContent = 'Выберите тип детали';
+                                }
+                            } else {
+                                labelSpan.textContent = label;
+                            }
+                            
                             btn.setAttribute('aria-expanded', 'false');
-                            select.dispatchEvent(new Event('change', { bubbles: true }));
+                            
+                            // Для предприятия вызываем специальную обработку
+                            if (field === 'facility_id' || field === 'facility_id_new') {
+                                requestAnimationFrame(() => {
+                                    if (field === 'facility_id') {
+                                        handleEquipmentFacilityChange();
+                                    } else if (field === 'facility_id_new') {
+                                        handleEquipmentFacilityChangeNew();
+                                    }
+                                });
+                            } else if (field !== 'spare_part_type' || value === '__custom__') {
+                                select.dispatchEvent(new Event('change', { bubbles: true }));
+                            }
                         }
                         closeEquipmentModalDropdown();
                     });
@@ -6203,17 +7597,96 @@
                 const field = btn.dataset.field;
                 if (!field) return;
                 
-                const dataKey = field;
-                if (!dataKey || !equipmentModalSelectData || !equipmentModalSelectData[dataKey] || Object.keys(equipmentModalSelectData[dataKey]).length === 0) {
+                // Маппинг полей к ключам в equipmentModalSelectData
+                const fieldMap = {
+                    'equipment_type': 'equipment_type',
+                    'maintenance_frequency': 'maintenance_frequency',
+                    'facility_id': 'facility_id',
+                    'facility_id_new': 'facility_id',
+                    'department_id': 'department_id',
+                    'department_id_new': 'department_id_new',
+                    'spare_part_type': 'spare_part_type'
+                };
+                
+                const dataKey = fieldMap[field] || field;
+                
+                // Специальная обработка для facility_id_new - используем facility_id
+                if (field === 'facility_id_new') {
+                    const actualDataKey = 'facility_id';
+                    if (!equipmentModalSelectData || !equipmentModalSelectData[actualDataKey] || Object.keys(equipmentModalSelectData[actualDataKey]).length === 0) {
+                        console.warn('No facility_id data found, re-initializing...');
+                        initializeEquipmentModalSelectData();
+                        if (!equipmentModalSelectData || !equipmentModalSelectData[actualDataKey] || Object.keys(equipmentModalSelectData[actualDataKey]).length === 0) {
+                            console.warn('Still no facility_id data after re-initialization');
+                            return;
+                        }
+                    }
+                    const options = equipmentModalSelectData[actualDataKey];
+                    currentEquipmentModalSelect = btn;
+                    populateEquipmentModalDropdown(field, options);
+                    requestAnimationFrame(() => {
+                        positionEquipmentModalDropdown(btn);
+                        if (equipmentModalDropdown) {
+                            equipmentModalDropdown.classList.add('visible');
+                        }
+                        btn.setAttribute('aria-expanded', 'true');
+                    });
+                    return;
+                }
+                
+                if (!equipmentModalSelectData || !equipmentModalSelectData[dataKey]) {
+                    console.warn('No data key found:', dataKey, 'Available keys:', Object.keys(equipmentModalSelectData || {}));
+                    // Для отдела, если данных нет, но выбрано предприятие, попробуем обновить данные
+                    if (field === 'department_id') {
+                        const equipmentFacilitySelect = document.getElementById('equipmentFacilitySelect');
+                        if (equipmentFacilitySelect && equipmentFacilitySelect.value) {
+                            console.log('Trying to refresh department data for facility:', equipmentFacilitySelect.value);
+                            populateEquipmentDepartmentOptions(equipmentFacilitySelect.value);
+                            // Повторно проверяем данные
+                            if (!equipmentModalSelectData || !equipmentModalSelectData[dataKey] || Object.keys(equipmentModalSelectData[dataKey]).length === 0) {
+                                console.warn('Still no department data after refresh');
+                                return;
+                            }
+                        } else {
+                            console.warn('No facility selected for department dropdown');
+                            return;
+                        }
+                    } else if (field === 'department_id_new') {
+                        const equipmentFacilitySelectNew = document.getElementById('equipmentFacilitySelectNew');
+                        if (equipmentFacilitySelectNew && equipmentFacilitySelectNew.value) {
+                            console.log('Trying to refresh department data for facility (new):', equipmentFacilitySelectNew.value);
+                            populateEquipmentDepartmentOptionsNew(equipmentFacilitySelectNew.value);
+                            // Повторно проверяем данные
+                            if (!equipmentModalSelectData || !equipmentModalSelectData[dataKey] || Object.keys(equipmentModalSelectData[dataKey]).length === 0) {
+                                console.warn('Still no department data after refresh (new)');
+                                return;
+                            }
+                        } else {
+                            console.warn('No facility selected for department dropdown (new)');
+                            return;
+                        }
+                    } else {
+                        return;
+                    }
+                }
+                
+                const options = equipmentModalSelectData[dataKey];
+                if (!options || Object.keys(options).length === 0) {
+                    console.warn('No options for field:', field, 'dataKey:', dataKey);
                     return;
                 }
                 
                 currentEquipmentModalSelect = btn;
-                populateEquipmentModalDropdown(field, equipmentModalSelectData[dataKey]);
+                populateEquipmentModalDropdown(field, options);
                 
                 requestAnimationFrame(() => {
                     positionEquipmentModalDropdown(btn);
-                    equipmentModalDropdown.classList.add('visible');
+                    if (equipmentModalDropdown) {
+                        equipmentModalDropdown.classList.add('visible');
+                        console.log('Dropdown opened, classes:', equipmentModalDropdown.className, 'visible:', equipmentModalDropdown.classList.contains('visible'));
+                    } else {
+                        console.error('equipmentModalDropdown is null!');
+                    }
                     btn.setAttribute('aria-expanded', 'true');
                 });
             }
@@ -6228,8 +7701,10 @@
             }
 
             // Обработчики для кнопок выпадающих списков (переменные уже определены выше)
-            [equipmentTypeBtn, equipmentImageBtn, equipmentMaintenanceBtn, equipmentDepartmentBtn, sparePartTypeBtn].forEach(btn => {
-                if (!btn) return;
+            const equipmentFacilityBtn = document.getElementById('equipmentFacilityBtn');
+            const equipmentFacilityBtnNew = document.getElementById('equipmentFacilityBtnNew');
+            const allEquipmentBtns = [equipmentTypeBtn, equipmentMaintenanceBtn, equipmentFacilityBtn, equipmentFacilityBtnNew, equipmentDepartmentBtn, equipmentDepartmentBtnNew, sparePartTypeBtn].filter(btn => btn !== null);
+            allEquipmentBtns.forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -6243,22 +7718,146 @@
                     }
                 });
             });
+            
+            // Обработчик изменения предприятия
+            const equipmentFacilitySelect = document.getElementById('equipmentFacilitySelect');
+            if (equipmentFacilitySelect) {
+                equipmentFacilitySelect.addEventListener('change', handleEquipmentFacilityChange);
+            }
+            
+            // Обработчик изменения предприятия для нового оборудования
+            const equipmentFacilitySelectNew = document.getElementById('equipmentFacilitySelectNew');
+            if (equipmentFacilitySelectNew) {
+                equipmentFacilitySelectNew.addEventListener('change', handleEquipmentFacilityChangeNew);
+            }
 
-            // Закрытие при клике вне dropdown'а обрабатывается в общем обработчике выше
-            // Но нужно убедиться, что при открытии модального окна сотрудников закрывается dropdown оборудования
+            // Сворачивание при клике в сторону (вне dropdown)
+            document.addEventListener('click', (e) => {
+                if (equipmentModalDropdown && equipmentModalDropdown.classList.contains('visible')) {
+                    // Проверяем, что клик не по кнопке и не по dropdown
+                    const clickedBtn = e.target.closest('.modal-select-btn');
+                    const clickedDropdown = e.target.closest('.role-dropdown');
+                    if (!clickedBtn && !clickedDropdown) {
+                        closeEquipmentModalDropdown();
+                    }
+                }
+            });
 
             // Закрытие по Escape
             document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && equipmentModalDropdown.classList.contains('visible') && 
+                if (e.key === 'Escape' && equipmentModalDropdown && equipmentModalDropdown.classList.contains('visible') && 
                     equipmentModal && equipmentModal.classList.contains('visible')) {
                     closeEquipmentModalDropdown();
                 }
             });
+            
+            // Стилизация календарей
+            if (equipmentForm) {
+                const dateInputs = equipmentForm.querySelectorAll('input[type="date"]');
+                dateInputs.forEach(input => {
+                    // Добавляем класс для стилизации
+                    input.classList.add('styled-date-input');
+                    
+                    // Обработка изменения даты
+                    input.addEventListener('change', function() {
+                        if (this.value) {
+                            this.classList.add('has-value');
+                        } else {
+                            this.classList.remove('has-value');
+                        }
+                    });
+                    
+                    // Проверяем начальное значение
+                    if (input.value) {
+                        input.classList.add('has-value');
+                    }
+                });
+            }
 
+            // Обработка выбора "Другое" для периодичности ТО
+            const equipmentMaintenanceSelect = document.getElementById('equipmentMaintenanceSelect');
+            const customMaintenanceRow = document.getElementById('customMaintenanceRow');
+            const customMaintenanceFrequency = document.getElementById('customMaintenanceFrequency');
+            
+            if (equipmentMaintenanceSelect) {
+                equipmentMaintenanceSelect.addEventListener('change', (e) => {
+                    if (e.target.value === 'custom') {
+                        if (customMaintenanceRow) customMaintenanceRow.style.display = 'block';
+                        if (customMaintenanceFrequency) customMaintenanceFrequency.required = true;
+                    } else {
+                        if (customMaintenanceRow) customMaintenanceRow.style.display = 'none';
+                        if (customMaintenanceFrequency) {
+                            customMaintenanceFrequency.required = false;
+                            customMaintenanceFrequency.value = '';
+                        }
+                    }
+                });
+            }
+            
+            // Обработка загрузки изображения
+            const equipmentImageInput = document.getElementById('equipmentImageInput');
+            const equipmentImagePreview = document.getElementById('equipmentImagePreview');
+            const equipmentImagePreviewImg = document.getElementById('equipmentImagePreviewImg');
+            
+            if (equipmentImageInput) {
+                equipmentImageInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        if (file.size > 5 * 1024 * 1024) {
+                            alert('Размер файла не должен превышать 5 МБ');
+                            e.target.value = '';
+                            return;
+                        }
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            if (equipmentImagePreviewImg) {
+                                equipmentImagePreviewImg.src = event.target.result;
+                            }
+                            if (equipmentImagePreview) {
+                                equipmentImagePreview.style.display = 'block';
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        if (equipmentImagePreview) equipmentImagePreview.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Удаление изображения
+            const removeEquipmentImageBtn = document.getElementById('removeEquipmentImageBtn');
+            if (removeEquipmentImageBtn) {
+                removeEquipmentImageBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (equipmentImagePreview) {
+                        equipmentImagePreview.style.display = 'none';
+                    }
+                    if (equipmentImagePreviewImg) {
+                        equipmentImagePreviewImg.src = '';
+                    }
+                    if (equipmentImageInput) {
+                        equipmentImageInput.value = '';
+                    }
+                });
+            }
+            
             // Обработка отправки формы
             if (equipmentForm) {
                 equipmentForm.addEventListener('submit', (event) => {
                     event.preventDefault();
+                    
+                    // Проверяем, что выбран режим (новая или существующая форма видна)
+                    const isNewFormVisible = newEquipmentForm && newEquipmentForm.style.display !== 'none';
+                    const isExistingFormVisible = existingEquipmentForm && existingEquipmentForm.style.display !== 'none';
+                    
+                    if (!isNewFormVisible && !isExistingFormVisible) {
+                        if (equipmentFormError) {
+                            equipmentFormError.textContent = 'Сначала выберите режим добавления оборудования.';
+                        }
+                        return;
+                    }
+                    
                     if (equipmentFormSubmit) {
                         equipmentFormSubmit.disabled = true;
                         equipmentFormSubmit.textContent = 'Сохранение...';
@@ -6268,53 +7867,154 @@
                     }
 
                     const formData = new FormData(equipmentForm);
-                    const payload = {
-                        equipment_name: formData.get('equipment_name')?.trim(),
-                        equipment_type: formData.get('equipment_type')?.trim() || null,
-                        image_path: formData.get('image_path')?.trim() || null,
-                        characteristics: formData.get('characteristics')?.trim() || null,
-                        acquisition_date: formData.get('acquisition_date') || null,
-                        guarantee_date: formData.get('guarantee_date') || null,
-                        maintenance_frequency: formData.get('maintenance_frequency') || null,
-                        department_id: formData.get('department_id') || null,
-                        spare_part_types: selectedSparePartTypes
-                    };
-
-                    fetch('/admin/equipment', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(payload)
-                    })
-                    .then(async response => {
-                        const data = await response.json();
-                        return { ok: response.ok, data };
-                    })
-                    .then(({ ok, data }) => {
-                        if (ok && data.success) {
-                            closeEquipmentModal();
-                            showEquipmentStatus('Оборудование добавлено', 'success');
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 600);
-                        } else {
-                            if (equipmentFormError) {
-                                equipmentFormError.textContent = data.message || 'Ошибка сохранения.';
+                    const isExisting = selectedExistingEquipment !== null;
+                    
+                    if (isExisting) {
+                        // Режим существующего оборудования
+                        const payload = {
+                            existing_equipment_id: formData.get('existing_equipment_id'),
+                            acquisition_date: formData.get('acquisition_date') || null,
+                            location: formData.get('location')?.trim() || null,
+                            department_id: formData.get('department_id') || null,
+                            equipment_status: formData.get('equipment_status') || 'В работе'
+                        };
+                        
+                        fetch('/admin/equipment', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(payload)
+                        })
+                        .then(async response => {
+                            const data = await response.json();
+                            return { ok: response.ok, data };
+                        })
+                        .then(({ ok, data }) => {
+                            if (ok && data.success) {
+                                closeEquipmentModal();
+                                showEquipmentStatus('Оборудование добавлено', 'success');
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 600);
+                            } else {
+                                if (equipmentFormError) {
+                                    equipmentFormError.textContent = data.message || 'Ошибка сохранения.';
+                                }
                             }
+                        })
+                        .catch(() => {
+                            if (equipmentFormError) {
+                                equipmentFormError.textContent = 'Сеть недоступна. Попробуйте позже.';
+                            }
+                        })
+                        .finally(() => {
+                            if (equipmentFormSubmit) {
+                                equipmentFormSubmit.disabled = false;
+                                equipmentFormSubmit.textContent = 'Сохранить';
+                            }
+                        });
+                    } else {
+                        // Режим нового оборудования - сначала загружаем изображение, если есть
+                        const imageFile = formData.get('equipment_image');
+                        let imagePath = null;
+                        
+                        if (imageFile && imageFile.size > 0) {
+                            // Загружаем изображение
+                            const imageFormData = new FormData();
+                            imageFormData.append('equipment_image', imageFile);
+                            
+                            fetch('/admin/equipment/upload-image', {
+                                method: 'POST',
+                                body: imageFormData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    imagePath = data.image_path;
+                                    submitNewEquipment(formData, imagePath);
+                                } else {
+                                    if (equipmentFormError) {
+                                        equipmentFormError.textContent = data.message || 'Ошибка загрузки изображения.';
+                                    }
+                                    if (equipmentFormSubmit) {
+                                        equipmentFormSubmit.disabled = false;
+                                        equipmentFormSubmit.textContent = 'Сохранить';
+                                    }
+                                }
+                            })
+                            .catch(() => {
+                                if (equipmentFormError) {
+                                    equipmentFormError.textContent = 'Ошибка загрузки изображения.';
+                                }
+                                if (equipmentFormSubmit) {
+                                    equipmentFormSubmit.disabled = false;
+                                    equipmentFormSubmit.textContent = 'Сохранить';
+                                }
+                            });
+                        } else {
+                            submitNewEquipment(formData, null);
                         }
-                    })
-                    .catch(() => {
+                    }
+                });
+            }
+            
+            function submitNewEquipment(formData, imagePath) {
+                // Определяем периодичность ТО
+                let maintenanceFrequency = formData.get('maintenance_frequency');
+                if (maintenanceFrequency === 'custom') {
+                    maintenanceFrequency = formData.get('custom_maintenance_frequency');
+                }
+                
+                const payload = {
+                    equipment_name: formData.get('equipment_name')?.trim(),
+                    equipment_type: (formData.get('equipment_type') === '__custom__' 
+                        ? formData.get('custom_equipment_type')?.trim() 
+                        : formData.get('equipment_type')?.trim()) || null,
+                    image_path: imagePath,
+                    characteristics: formData.get('characteristics')?.trim() || null,
+                    acquisition_date: formData.get('acquisition_date') || null,
+                    guarantee_date: formData.get('guarantee_date') || null,
+                    maintenance_frequency: maintenanceFrequency || null,
+                    department_id: formData.get('department_id_new') || formData.get('department_id') || null,
+                    location: formData.get('location')?.trim() || null,
+                    spare_part_types: selectedSparePartTypes
+                };
+
+                fetch('/admin/equipment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                })
+                .then(async response => {
+                    const data = await response.json();
+                    return { ok: response.ok, data };
+                })
+                .then(({ ok, data }) => {
+                    if (ok && data.success) {
+                        closeEquipmentModal();
+                        showEquipmentStatus('Оборудование добавлено', 'success');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 600);
+                    } else {
                         if (equipmentFormError) {
-                            equipmentFormError.textContent = 'Сеть недоступна. Попробуйте позже.';
+                            equipmentFormError.textContent = data.message || 'Ошибка сохранения.';
                         }
-                    })
-                    .finally(() => {
-                        if (equipmentFormSubmit) {
-                            equipmentFormSubmit.disabled = false;
-                            equipmentFormSubmit.textContent = 'Сохранить';
-                        }
-                    });
+                    }
+                })
+                .catch(() => {
+                    if (equipmentFormError) {
+                        equipmentFormError.textContent = 'Сеть недоступна. Попробуйте позже.';
+                    }
+                })
+                .finally(() => {
+                    if (equipmentFormSubmit) {
+                        equipmentFormSubmit.disabled = false;
+                        equipmentFormSubmit.textContent = 'Сохранить';
+                    }
                 });
             }
 
@@ -6463,6 +8163,740 @@
             } catch (error) {
                 console.error('Ошибка при инициализации скрипта оборудования:', error);
             }
+        })();
+    </script>
+    {% endif %}
+
+    {% if section == 'equipment_passport' %}
+    <script>
+        // JavaScript для работы с паспортом оборудования
+        (function() {
+            'use strict';
+            
+            try {
+                const passportTabs = document.querySelectorAll('.passport-tab');
+                const tabPanels = document.querySelectorAll('.tab-panel');
+                
+                // Обработчик переключения вкладок
+                passportTabs.forEach(tab => {
+                    tab.addEventListener('click', function() {
+                        const targetTab = this.getAttribute('data-tab');
+                        
+                        // Убираем активное состояние со всех вкладок
+                        passportTabs.forEach(t => {
+                            t.classList.remove('active');
+                            t.setAttribute('aria-selected', 'false');
+                        });
+                        
+                        // Добавляем активное состояние к выбранной вкладке
+                        this.classList.add('active');
+                        this.setAttribute('aria-selected', 'true');
+                        
+                        // Скрываем все панели
+                        tabPanels.forEach(panel => {
+                            panel.classList.remove('active');
+                            panel.hidden = true;
+                        });
+                        
+                        // Показываем выбранную панель
+                        const targetPanel = document.getElementById(`tab-panel-${targetTab}`);
+                        if (targetPanel) {
+                            targetPanel.classList.add('active');
+                            targetPanel.hidden = false;
+                        }
+                    });
+                });
+                
+                // Инициализация - активируем первую вкладку, если она еще не активна
+                const activeTab = document.querySelector('.passport-tab.active');
+                if (activeTab) {
+                    const targetTab = activeTab.getAttribute('data-tab');
+                    const targetPanel = document.getElementById(`tab-panel-${targetTab}`);
+                    if (targetPanel) {
+                        targetPanel.classList.add('active');
+                        targetPanel.hidden = false;
+                    }
+                }
+                
+                // Обработка загрузки изображения
+                const equipmentImageInput = document.getElementById('equipmentImageInput');
+                const equipmentImageContainer = document.getElementById('equipmentImageContainer');
+                
+                if (equipmentImageInput) {
+                    equipmentImageInput.addEventListener('change', function(e) {
+                        const file = e.target.files[0];
+                        if (!file) return;
+                        
+                        // Проверяем тип файла
+                        if (!file.type.match('image.*')) {
+                            alert('Пожалуйста, выберите изображение');
+                            return;
+                        }
+                        
+                        // Проверяем размер файла (макс. 16MB)
+                        if (file.size > 16 * 1024 * 1024) {
+                            alert('Размер файла не должен превышать 16MB');
+                            return;
+                        }
+                        
+                        const equipmentId = equipmentImageInput.getAttribute('data-equipment-id');
+                        if (!equipmentId) return;
+                        
+                        // Создаем FormData для отправки
+                        const formData = new FormData();
+                        formData.append('image', file);
+                        
+                        // Показываем индикатор загрузки
+                        const container = equipmentImageContainer;
+                        const originalContent = container.innerHTML;
+                        container.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; min-height: 400px; color: var(--text-medium);">Загрузка...</div>';
+                        container.style.pointerEvents = 'none';
+                        
+                        // Отправляем файл на сервер
+                        fetch(`/admin/equipment/passport/${equipmentId}/upload-image`, {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Обновляем изображение
+                                const imageUrl = `/static/${data.image_path}?t=${new Date().getTime()}`;
+                                const placeholder = document.getElementById('equipmentImagePlaceholder');
+                                const existingImage = document.getElementById('equipmentImage');
+                                
+                                if (placeholder) {
+                                    placeholder.remove();
+                                }
+                                
+                                if (existingImage) {
+                                    existingImage.src = imageUrl;
+                                } else {
+                                    const img = document.createElement('img');
+                                    img.src = imageUrl;
+                                    img.alt = 'Изображение оборудования';
+                                    img.className = 'equipment-image';
+                                    img.id = 'equipmentImage';
+                                    container.innerHTML = '';
+                                    container.appendChild(img);
+                                    container.innerHTML += '<div class="equipment-image-overlay"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg><span>Загрузить изображение</span></div>';
+                                }
+                                
+                                // Обновляем страницу через небольшую задержку для обновления кэша
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 500);
+                            } else {
+                                alert(data.message || 'Ошибка при загрузке изображения');
+                                container.innerHTML = originalContent;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Ошибка при загрузке изображения:', error);
+                            alert('Ошибка при загрузке изображения');
+                            container.innerHTML = originalContent;
+                        })
+                        .finally(() => {
+                            container.style.pointerEvents = '';
+                            equipmentImageInput.value = ''; // Сбрасываем input
+                        });
+                    });
+                }
+                
+                // Работа с таблицей истории перемещений
+                const movementHistorySearch = document.getElementById('movementHistorySearch');
+                const movementHistoryFilterToggle = document.getElementById('movementHistoryFilterToggle');
+                const movementHistoryFilterDropdown = document.getElementById('movementHistoryFilterDropdown');
+                const movementHistoryTable = document.getElementById('movementHistoryTable');
+                const resetMovementHistoryFilters = document.getElementById('resetMovementHistoryFilters');
+                const addMovementBtn = document.getElementById('addMovementBtn');
+                
+                // Функция фильтрации таблицы истории перемещений
+                function applyMovementHistoryFilters() {
+                    if (!movementHistoryTable) return;
+                    
+                    const searchTerm = (movementHistorySearch?.value || '').toLowerCase();
+                    const rows = movementHistoryTable.querySelectorAll('tbody tr');
+                    
+                    rows.forEach(row => {
+                        if (row.querySelector('td[colspan]')) {
+                            return; // Пропускаем строку с сообщением "Нет записей"
+                        }
+                        
+                        const fromLocation = (row.dataset.fromLocation || '').toLowerCase();
+                        const toLocation = (row.dataset.toLocation || '').toLowerCase();
+                        const moveDate = (row.dataset.moveDate || '').toLowerCase();
+                        
+                        const matchesSearch = !searchTerm || 
+                            fromLocation.includes(searchTerm) || 
+                            toLocation.includes(searchTerm) || 
+                            moveDate.includes(searchTerm);
+                        
+                        row.style.display = matchesSearch ? '' : 'none';
+                    });
+                    
+                    // Обновляем нумерацию
+                    let visibleIndex = 0;
+                    rows.forEach(row => {
+                        if (row.style.display !== 'none' && !row.querySelector('td[colspan]')) {
+                            const numberCell = row.querySelector('.number-column');
+                            if (numberCell) {
+                                numberCell.textContent = visibleIndex + 1;
+                            }
+                            visibleIndex++;
+                        }
+                    });
+                }
+                
+                // Обработчики для поиска и фильтров
+                if (movementHistorySearch) {
+                    movementHistorySearch.addEventListener('input', applyMovementHistoryFilters);
+                }
+                
+                if (movementHistoryFilterToggle && movementHistoryFilterDropdown) {
+                    movementHistoryFilterToggle.addEventListener('click', () => {
+                        const isExpanded = movementHistoryFilterToggle.getAttribute('aria-expanded') === 'true';
+                        movementHistoryFilterDropdown.style.display = isExpanded ? 'none' : 'block';
+                        movementHistoryFilterToggle.setAttribute('aria-expanded', !isExpanded);
+                    });
+                }
+                
+                if (resetMovementHistoryFilters) {
+                    resetMovementHistoryFilters.addEventListener('click', () => {
+                        if (movementHistorySearch) movementHistorySearch.value = '';
+                        applyMovementHistoryFilters();
+                    });
+                }
+                
+                if (addMovementBtn) {
+                    addMovementBtn.addEventListener('click', () => {
+                        // TODO: Открыть модальное окно для добавления перемещения
+                        alert('Функция добавления перемещения будет реализована');
+                    });
+                }
+            } catch (error) {
+                console.error('Ошибка при инициализации скрипта паспорта оборудования:', error);
+            }
+        })();
+    </script>
+    {% endif %}
+
+    {% if section == 'pto' %}
+    <script>
+        // JavaScript для работы с календарем ПТО
+        (function() {
+            'use strict';
+            
+            try {
+                const calendarGrid = document.getElementById('ptoCalendarGrid');
+                const monthSelect = document.getElementById('ptoMonthSelect');
+                const yearSelect = document.getElementById('ptoYearSelect');
+                const prevMonthBtn = document.getElementById('ptoPrevMonth');
+                const nextMonthBtn = document.getElementById('ptoNextMonth');
+                const tableBody = document.getElementById('ptoTableBody');
+                const tableDateHeader = document.getElementById('ptoTableDate');
+                
+                let currentDate = new Date();
+                let selectedDate = new Date();
+                let maintenanceData = {};
+                
+                // Инициализация года в селекте
+                function initYearSelect() {
+                    const currentYear = currentDate.getFullYear();
+                    yearSelect.innerHTML = '';
+                    for (let year = currentYear - 5; year <= currentYear + 5; year++) {
+                        const option = document.createElement('option');
+                        option.value = year;
+                        option.textContent = year;
+                        if (year === currentYear) {
+                            option.selected = true;
+                        }
+                        yearSelect.appendChild(option);
+                    }
+                }
+                
+                // Форматирование даты для отображения
+                function formatDate(date) {
+                    const months = ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня',
+                                   'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'];
+                    return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+                }
+                
+                // Форматирование даты для API
+                function formatDateForAPI(date) {
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                }
+                
+                // Загрузка данных календаря
+                async function loadCalendarData() {
+                    const year = currentDate.getFullYear();
+                    const month = currentDate.getMonth() + 1;
+                    
+                    try {
+                        const response = await fetch(`/admin/pto/api/calendar?year=${year}&month=${month}`);
+                        if (!response.ok) {
+                            throw new Error('Ошибка загрузки данных');
+                        }
+                        maintenanceData = await response.json();
+                        renderCalendar();
+                    } catch (error) {
+                        console.error('Ошибка при загрузке данных календаря:', error);
+                    }
+                }
+                
+                // Загрузка данных для таблицы
+                async function loadTableData(date) {
+                    const dateStr = formatDateForAPI(date);
+                    
+                    try {
+                        const response = await fetch(`/admin/pto/api/date?date=${dateStr}`);
+                        if (!response.ok) {
+                            throw new Error('Ошибка загрузки данных');
+                        }
+                        const data = await response.json();
+                        renderTable(data);
+                        tableDateHeader.textContent = formatDate(date);
+                    } catch (error) {
+                        console.error('Ошибка при загрузке данных таблицы:', error);
+                        tableBody.innerHTML = '<tr><td colspan="4" class="pto-table-empty">Ошибка загрузки данных</td></tr>';
+                    }
+                }
+                
+                // Отрисовка календаря
+                function renderCalendar() {
+                    if (!calendarGrid) return;
+                    
+                    calendarGrid.innerHTML = '';
+                    
+                    const year = currentDate.getFullYear();
+                    const month = currentDate.getMonth();
+                    
+                    // Первый день месяца
+                    const firstDay = new Date(year, month, 1);
+                    const lastDay = new Date(year, month + 1, 0);
+                    
+                    // День недели первого дня (0 = воскресенье, нужно преобразовать к 0 = понедельник)
+                    let startDay = firstDay.getDay();
+                    startDay = startDay === 0 ? 6 : startDay - 1;
+                    
+                    // Количество дней в месяце
+                    const daysInMonth = lastDay.getDate();
+                    
+                    // Дни предыдущего месяца
+                    const prevMonthLastDay = new Date(year, month, 0).getDate();
+                    for (let i = startDay - 1; i >= 0; i--) {
+                        const day = prevMonthLastDay - i;
+                        const date = new Date(year, month - 1, day);
+                        const dayElement = createDayElement(date, true);
+                        calendarGrid.appendChild(dayElement);
+                    }
+                    
+                    // Дни текущего месяца
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    
+                    for (let day = 1; day <= daysInMonth; day++) {
+                        const date = new Date(year, month, day);
+                        const isToday = date.getTime() === today.getTime();
+                        const isSelected = date.getTime() === selectedDate.getTime();
+                        const dayElement = createDayElement(date, false, isToday, isSelected);
+                        calendarGrid.appendChild(dayElement);
+                    }
+                    
+                    // Дни следующего месяца для заполнения сетки
+                    const totalCells = calendarGrid.children.length;
+                    const remainingCells = 42 - totalCells; // 6 недель * 7 дней
+                    for (let day = 1; day <= remainingCells; day++) {
+                        const date = new Date(year, month + 1, day);
+                        const dayElement = createDayElement(date, true);
+                        calendarGrid.appendChild(dayElement);
+                    }
+                }
+                
+                // Создание элемента дня
+                function createDayElement(date, isOtherMonth, isToday = false, isSelected = false) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'pto-calendar-day';
+                    
+                    if (isOtherMonth) {
+                        dayElement.classList.add('other-month');
+                    }
+                    if (isToday) {
+                        dayElement.classList.add('today');
+                    }
+                    if (isSelected) {
+                        dayElement.classList.add('selected');
+                    }
+                    
+                    const dateStr = formatDateForAPI(date);
+                    const dayNumber = document.createElement('div');
+                    dayNumber.className = 'pto-day-number';
+                    dayNumber.textContent = date.getDate();
+                    dayElement.appendChild(dayNumber);
+                    
+                    // Индикаторы ПТО
+                    if (maintenanceData[dateStr] && maintenanceData[dateStr].length > 0) {
+                        const indicators = document.createElement('div');
+                        indicators.className = 'pto-day-indicators';
+                        
+                        // Группируем по цветам
+                        const grouped = {
+                            green: [],
+                            red: [],
+                            yellow: []
+                        };
+                        
+                        maintenanceData[dateStr].forEach(item => {
+                            grouped[item.indicator_color].push(item);
+                        });
+                        
+                        // Создаем индикаторы
+                        Object.keys(grouped).forEach(color => {
+                            if (grouped[color].length > 0) {
+                                const indicator = document.createElement('div');
+                                indicator.className = `pto-indicator ${color}`;
+                                if (grouped[color].length > 1) {
+                                    indicator.classList.add('multiple');
+                                    indicator.textContent = grouped[color].length;
+                                }
+                                indicators.appendChild(indicator);
+                            }
+                        });
+                        
+                        dayElement.appendChild(indicators);
+                    }
+                    
+                    // Обработчик двойного клика
+                    dayElement.addEventListener('dblclick', () => {
+                        if (!isOtherMonth) {
+                            selectedDate = new Date(date);
+                            loadTableData(selectedDate);
+                            renderCalendar(); // Перерисовываем для обновления выделения
+                        }
+                    });
+                    
+                    return dayElement;
+                }
+                
+                // Отрисовка таблицы
+                function renderTable(data) {
+                    if (!tableBody) return;
+                    
+                    if (data.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="4" class="pto-table-empty">На эту дату ПТО не запланировано</td></tr>';
+                        return;
+                    }
+                    
+                    tableBody.innerHTML = data.map(item => `
+                        <tr>
+                            <td>${escapeHtml(item.equipment_name)}</td>
+                            <td>${escapeHtml(item.department_name)}</td>
+                            <td>${escapeHtml(item.location)}</td>
+                            <td>${escapeHtml(item.status)}</td>
+                        </tr>
+                    `).join('');
+                }
+                
+                // Экранирование HTML
+                function escapeHtml(text) {
+                    const div = document.createElement('div');
+                    div.textContent = text;
+                    return div.innerHTML;
+                }
+                
+                // Изменение месяца
+                function changeMonth(delta) {
+                    currentDate.setMonth(currentDate.getMonth() + delta);
+                    monthSelect.value = currentDate.getMonth() + 1;
+                    yearSelect.value = currentDate.getFullYear();
+                    loadCalendarData();
+                }
+                
+                // Обработчики событий
+                if (prevMonthBtn) {
+                    prevMonthBtn.addEventListener('click', () => changeMonth(-1));
+                }
+                
+                if (nextMonthBtn) {
+                    nextMonthBtn.addEventListener('click', () => changeMonth(1));
+                }
+                
+                if (monthSelect) {
+                    monthSelect.addEventListener('change', () => {
+                        currentDate.setMonth(parseInt(monthSelect.value) - 1);
+                        loadCalendarData();
+                    });
+                }
+                
+                if (yearSelect) {
+                    yearSelect.addEventListener('change', () => {
+                        currentDate.setFullYear(parseInt(yearSelect.value));
+                        loadCalendarData();
+                    });
+                }
+                
+                // Инициализация
+                initYearSelect();
+                monthSelect.value = currentDate.getMonth() + 1;
+                yearSelect.value = currentDate.getFullYear();
+                
+                // Загружаем данные для текущего месяца
+                loadCalendarData();
+                
+                // Загружаем данные для сегодняшней даты
+                loadTableData(selectedDate);
+                
+            } catch (error) {
+                console.error('Ошибка при инициализации скрипта ПТО:', error);
+            }
+        })();
+    </script>
+    {% endif %}
+
+    {% if section == 'tasks' %}
+    <script>
+        (function() {
+            const createTaskBtn = document.getElementById('createTaskBtn');
+            const createTaskModal = document.getElementById('createTaskModal');
+            const createTaskModalClose = document.getElementById('createTaskModalClose');
+            const createTaskModalCancel = document.getElementById('createTaskModalCancel');
+            const createTaskForm = document.getElementById('createTaskForm');
+            const createTaskFormError = document.getElementById('createTaskFormError');
+            const taskRows = document.querySelectorAll('.task-row');
+            const taskDetailsModal = document.getElementById('taskDetailsModal');
+            const taskDetailsModalClose = document.getElementById('taskDetailsModalClose');
+            const taskDetailsModalCancel = document.getElementById('taskDetailsModalCancel');
+            const taskStatusToggle = document.getElementById('taskStatusToggle');
+            const taskStatusLabel = document.getElementById('taskStatusLabel');
+            let currentTaskId = null;
+
+            // Открытие модального окна создания задачи
+            if (createTaskBtn) {
+                createTaskBtn.addEventListener('click', () => {
+                    if (createTaskModal) {
+                        createTaskModal.classList.add('visible');
+                        createTaskModal.setAttribute('aria-hidden', 'false');
+                        document.body.classList.add('modal-open');
+                        if (createTaskForm) {
+                            createTaskForm.reset();
+                        }
+                        if (createTaskFormError) {
+                            createTaskFormError.textContent = '';
+                        }
+                    }
+                });
+            }
+
+            // Закрытие модального окна создания задачи
+            [createTaskModalClose, createTaskModalCancel].forEach(btn => {
+                if (btn) {
+                    btn.addEventListener('click', () => {
+                        if (createTaskModal) {
+                            createTaskModal.classList.remove('visible');
+                            createTaskModal.setAttribute('aria-hidden', 'true');
+                            document.body.classList.remove('modal-open');
+                        }
+                    });
+                }
+            });
+
+            // Синхронизация отдела и предприятия
+            const taskDepartmentSelect = document.getElementById('taskDepartmentSelect');
+            const taskFacilitySelect = document.getElementById('taskFacilitySelect');
+            
+            if (taskDepartmentSelect && taskFacilitySelect) {
+                taskDepartmentSelect.addEventListener('change', () => {
+                    const selectedOption = taskDepartmentSelect.options[taskDepartmentSelect.selectedIndex];
+                    const facilityId = selectedOption.dataset.facilityId;
+                    if (facilityId) {
+                        taskFacilitySelect.value = facilityId;
+                        // Обновляем кастомную кнопку предприятия
+                        const modalTaskFacilityBtn = document.getElementById('modalTaskFacilityBtn');
+                        if (modalTaskFacilityBtn) {
+                            const label = modalTaskFacilityBtn.querySelector('.modal-select-label');
+                            if (label) {
+                                label.textContent = taskFacilitySelect.options[taskFacilitySelect.selectedIndex].text;
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Обработка отправки формы создания задачи
+            if (createTaskForm) {
+                createTaskForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    if (createTaskFormError) {
+                        createTaskFormError.textContent = '';
+                    }
+
+                    const formData = new FormData(createTaskForm);
+                    const departmentId = formData.get('department_id');
+                    
+                    if (!departmentId) {
+                        if (createTaskFormError) {
+                            createTaskFormError.textContent = 'Выберите отдел';
+                        }
+                        return;
+                    }
+                    
+                    const data = {
+                        department_id: departmentId,
+                        heading: formData.get('heading'),
+                        repair_task_description: formData.get('repair_task_description'),
+                        repair_task_end_date: formData.get('repair_task_end_date') || null
+                    };
+
+                    try {
+                        const response = await fetch('{{ url_for("admin_tasks.create_task") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(data)
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            location.reload();
+                        } else {
+                            if (createTaskFormError) {
+                                createTaskFormError.textContent = result.message || 'Ошибка при создании задачи';
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Ошибка:', error);
+                        if (createTaskFormError) {
+                            createTaskFormError.textContent = 'Ошибка при создании задачи';
+                        }
+                    }
+                });
+            }
+
+            // Двойной клик на задачу для просмотра деталей
+            taskRows.forEach(row => {
+                row.addEventListener('dblclick', async () => {
+                    const taskId = row.dataset.taskId;
+                    if (!taskId) return;
+
+                    try {
+                        const response = await fetch(`{{ url_for("admin_tasks.get_task", task_id=0) }}`.replace('0', taskId));
+                        const result = await response.json();
+
+                        if (result.success && result.task) {
+                            const task = result.task;
+                            currentTaskId = task.id;
+
+                            // Заполняем поля модального окна
+                            document.getElementById('taskDetailsId').value = task.id || '';
+                            document.getElementById('taskDetailsHeading').value = task.heading || '';
+                            document.getElementById('taskDetailsDescription').value = task.description || '';
+                            document.getElementById('taskDetailsEndDate').value = task.end_date || '—';
+                            document.getElementById('taskDetailsFacility').value = task.facility_name || '—';
+
+                            // Устанавливаем статус
+                            const isCompleted = task.status === 'Завершено';
+                            if (taskStatusToggle) {
+                                taskStatusToggle.checked = isCompleted;
+                            }
+                            if (taskStatusLabel) {
+                                taskStatusLabel.textContent = isCompleted ? 'Завершено' : 'В процессе';
+                            }
+
+                            // Открываем модальное окно
+                            if (taskDetailsModal) {
+                                taskDetailsModal.classList.add('visible');
+                                taskDetailsModal.setAttribute('aria-hidden', 'false');
+                                document.body.classList.add('modal-open');
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Ошибка при загрузке задачи:', error);
+                    }
+                });
+            });
+
+            // Закрытие модального окна деталей задачи
+            [taskDetailsModalClose, taskDetailsModalCancel].forEach(btn => {
+                if (btn) {
+                    btn.addEventListener('click', () => {
+                        if (taskDetailsModal) {
+                            taskDetailsModal.classList.remove('visible');
+                            taskDetailsModal.setAttribute('aria-hidden', 'true');
+                            document.body.classList.remove('modal-open');
+                        }
+                        currentTaskId = null;
+                    });
+                }
+            });
+
+            // Обработка переключения статуса
+            if (taskStatusToggle) {
+                taskStatusToggle.addEventListener('change', async () => {
+                    if (!currentTaskId) return;
+
+                    const newStatus = taskStatusToggle.checked ? 'Завершено' : 'В процессе';
+                    
+                    try {
+                        const response = await fetch(`{{ url_for("admin_tasks.update_task_status", task_id=0) }}`.replace('0', currentTaskId), {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ status: newStatus })
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            if (taskStatusLabel) {
+                                taskStatusLabel.textContent = newStatus;
+                            }
+                            // Если статус "Завершено", перезагружаем страницу, чтобы убрать задачу из списка
+                            if (newStatus === 'Завершено') {
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 500);
+                            }
+                        } else {
+                            // Откатываем изменение, если произошла ошибка
+                            taskStatusToggle.checked = !taskStatusToggle.checked;
+                            if (taskStatusLabel) {
+                                taskStatusLabel.textContent = taskStatusToggle.checked ? 'Завершено' : 'В процессе';
+                            }
+                            alert(result.message || 'Ошибка при обновлении статуса');
+                        }
+                    } catch (error) {
+                        console.error('Ошибка:', error);
+                        // Откатываем изменение
+                        taskStatusToggle.checked = !taskStatusToggle.checked;
+                        if (taskStatusLabel) {
+                            taskStatusLabel.textContent = taskStatusToggle.checked ? 'Завершено' : 'В процессе';
+                        }
+                        alert('Ошибка при обновлении статуса');
+                    }
+                });
+            }
+
+            // Закрытие модальных окон при клике вне их
+            [createTaskModal, taskDetailsModal].forEach(modal => {
+                if (modal) {
+                    modal.addEventListener('click', (e) => {
+                        if (e.target === modal) {
+                            modal.classList.remove('visible');
+                            modal.setAttribute('aria-hidden', 'true');
+                            document.body.classList.remove('modal-open');
+                            if (modal === taskDetailsModal) {
+                                currentTaskId = null;
+                            }
+                        }
+                    });
+                }
+            });
         })();
     </script>
     {% endif %}

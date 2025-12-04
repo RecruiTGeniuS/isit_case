@@ -21,7 +21,7 @@ def create_app():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     
     # Регистрация blueprints
-    from routes import auth, admin_employees, admin_equipment, admin_warehouse, admin_pto, admin_statistics, admin, main
+    from routes import auth, admin_employees, admin_equipment, admin_warehouse, admin_pto, admin_statistics, admin_tasks, admin, main
     
     app.register_blueprint(auth.bp)
     app.register_blueprint(admin_employees.bp)
@@ -29,6 +29,7 @@ def create_app():
     app.register_blueprint(admin_warehouse.bp)
     app.register_blueprint(admin_pto.bp)
     app.register_blueprint(admin_statistics.bp)
+    app.register_blueprint(admin_tasks.bp)
     app.register_blueprint(admin.bp)
     app.register_blueprint(main.bp)
     

@@ -45,9 +45,14 @@ class AdminEquipmentService:
                     e.equipment_id,
                     e.equipment_name,
                     e.equipment_type,
+                    e.characteristics,
+                    e.image_path,
+                    e.warranty_period,
+                    e.maintenance_frequency,
                     ea.equipment_assignment_id,
                     ea.location,
                     ea.equipment_status,
+                    ea.acquisition_date,
                     ea.department_id,
                     d.department_name,
                     f.facility_name
@@ -59,7 +64,7 @@ class AdminEquipmentService:
                 LIMIT 1
             """, (equipment_id,))
             row = cur.fetchone()
-            return self._row_to_dict(row) if row else None
+            return self._row_to_dict_passport(row) if row else None
     
     def update_field(self, equipment_id, field, value):
         """Обновить поле оборудования"""
@@ -192,6 +197,92 @@ class AdminEquipmentService:
             """)
             return [row[0] for row in cur.fetchall()]
     
+    def search_equipment_by_name(self, name_query, limit=10):
+        """Поиск оборудования по названию"""
+        if not name_query or len(name_query.strip()) < 2:
+            return []
+        
+        query_trimmed = name_query.strip()
+        query_lower = query_trimmed.lower()
+        # Ищем только те, которые начинаются с запроса
+        search_pattern_start = f'{query_lower}%'
+        # Ищем как отдельное слово (с пробелами или дефисами перед/после)
+        search_pattern_word = f'% {query_lower} %'
+        search_pattern_word_start = f'{query_lower} %'
+        search_pattern_word_end = f'% {query_lower}'
+        search_pattern_hyphen = f'%-{query_lower}%'
+        
+        with get_db_cursor() as cur:
+            cur.execute("""
+                SELECT DISTINCT 
+                    e.equipment_id,
+                    e.equipment_name,
+                    e.equipment_type,
+                    e.characteristics,
+                    e.image_path,
+                    CASE 
+                        WHEN LOWER(TRIM(e.equipment_name)) = LOWER(TRIM(%s)) THEN 1
+                        WHEN LOWER(TRIM(e.equipment_name)) LIKE %s THEN 2
+                        WHEN LOWER(e.equipment_name) LIKE %s THEN 3
+                        WHEN LOWER(e.equipment_name) LIKE %s THEN 3
+                        WHEN LOWER(e.equipment_name) LIKE %s THEN 3
+                        WHEN LOWER(e.equipment_name) LIKE %s THEN 3
+                        ELSE 4
+                    END as match_priority
+                FROM equipment e
+                WHERE LOWER(TRIM(e.equipment_name)) = LOWER(TRIM(%s))
+                   OR LOWER(e.equipment_name) LIKE %s
+                   OR LOWER(e.equipment_name) LIKE %s
+                   OR LOWER(e.equipment_name) LIKE %s
+                   OR LOWER(e.equipment_name) LIKE %s
+                   OR LOWER(e.equipment_name) LIKE %s
+                ORDER BY match_priority, e.equipment_name
+                LIMIT %s
+            """, (query_trimmed, search_pattern_start, search_pattern_word, 
+                  search_pattern_word_start, search_pattern_word_end, search_pattern_hyphen,
+                  query_trimmed, search_pattern_start, search_pattern_word,
+                  search_pattern_word_start, search_pattern_word_end, search_pattern_hyphen, limit))
+            return [
+                {
+                    'id': row[0],
+                    'equipment_name': row[1],
+                    'equipment_type': row[2] or '',
+                    'characteristics': row[3] or '',
+                    'image_path': row[4],
+                    'is_exact_match': row[5] == 1
+                }
+                for row in cur.fetchall()
+            ]
+    
+    def get_equipment_by_name(self, name):
+        """Получить оборудование по точному названию"""
+        with get_db_cursor() as cur:
+            cur.execute("""
+                SELECT 
+                    e.equipment_id,
+                    e.equipment_name,
+                    e.equipment_type,
+                    e.characteristics,
+                    e.image_path,
+                    e.guarantee_date,
+                    e.maintenance_frequency
+                FROM equipment e
+                WHERE LOWER(TRIM(e.equipment_name)) = LOWER(TRIM(%s))
+                LIMIT 1
+            """, (name,))
+            row = cur.fetchone()
+            if row:
+                return {
+                    'id': row[0],
+                    'equipment_name': row[1],
+                    'equipment_type': row[2] or '',
+                    'characteristics': row[3] or '',
+                    'image_path': row[4],
+                    'guarantee_date': row[5],
+                    'maintenance_frequency': row[6]
+                }
+            return None
+    
     def get_image_paths(self):
         """Получить список путей к изображениям"""
         with get_db_cursor() as cur:
@@ -218,6 +309,8 @@ class AdminEquipmentService:
         """Создать новое оборудование"""
         with get_db_cursor(commit=True) as cur:
             # Создаем запись в equipment
+            # Примечание: если поле guarantee_date не существует в таблице equipment,
+            # нужно добавить его через ALTER TABLE equipment ADD COLUMN guarantee_date DATE;
             cur.execute("""
                 INSERT INTO equipment (
                     equipment_name, equipment_type, image_path, 
@@ -267,6 +360,42 @@ class AdminEquipmentService:
             
             return self.get_by_id(equipment_id)
     
+    def create_assignment(self, data):
+        """Создать assignment для существующего оборудования"""
+        equipment_id = data.get('existing_equipment_id')
+        if not equipment_id:
+            raise ValueError('Не указан ID оборудования')
+        
+        with get_db_cursor(commit=True) as cur:
+            # Проверяем, что оборудование существует
+            cur.execute("SELECT equipment_id FROM equipment WHERE equipment_id = %s", (equipment_id,))
+            if not cur.fetchone():
+                raise ValueError('Оборудование не найдено')
+            
+            # Создаем запись в equipment_assignment
+            department_id = data.get('department_id')
+            if department_id:
+                try:
+                    department_id = int(department_id)
+                except (TypeError, ValueError):
+                    department_id = None
+            
+            cur.execute("""
+                INSERT INTO equipment_assignment (
+                    equipment_id, department_id, acquisition_date, location, equipment_status
+                )
+                VALUES (%s, %s, %s, %s, %s)
+                RETURNING equipment_assignment_id
+            """, (
+                equipment_id,
+                department_id,
+                data.get('acquisition_date') or None,
+                data.get('location', '').strip() or None,
+                data.get('equipment_status', 'В работе') or 'В работе'
+            ))
+            
+            return self.get_by_id(equipment_id)
+    
     def _parse_int(self, value):
         """Преобразовать значение в int или вернуть None"""
         if value is None or value == '':
@@ -289,4 +418,136 @@ class AdminEquipmentService:
             'department': row[7] or '',
             'facility': row[8] or '',
         }
+    
+    def _row_to_dict_passport(self, row):
+        """Преобразование строки БД в словарь для паспорта оборудования"""
+        from datetime import datetime, timedelta
+        
+        equipment_id = row[0]
+        equipment_name = row[1] or ''
+        equipment_type = row[2] or ''
+        characteristics = row[3] or ''
+        image_path = row[4]
+        warranty_period = row[5]  # в днях
+        maintenance_frequency = row[6]  # в днях
+        equipment_assignment_id = row[7]
+        location = row[8] or ''
+        equipment_status = row[9] or ''
+        acquisition_date = row[10]  # дата приобретения/ввода в эксплуатацию
+        department_id = row[11]
+        department_name = row[12] or ''
+        facility_name = row[13] or ''
+        
+        # Вычисляем дату истечения гарантии (warranty_period в днях)
+        warranty_expiration = None
+        if acquisition_date and warranty_period:
+            try:
+                if isinstance(acquisition_date, str):
+                    acquisition_date_obj = datetime.strptime(acquisition_date, '%Y-%m-%d').date()
+                else:
+                    acquisition_date_obj = acquisition_date
+                
+                # Добавляем дни гарантии
+                warranty_expiration = acquisition_date_obj + timedelta(days=warranty_period)
+            except (ValueError, TypeError, AttributeError):
+                warranty_expiration = None
+        
+        # Форматируем периодичность ТО (в днях) - "раз в X мес." или "раз в X дн."
+        maintenance_frequency_text = None
+        if maintenance_frequency:
+            try:
+                freq_days = int(maintenance_frequency)
+                
+                # Переводим дни в месяцы и дни
+                if freq_days >= 30:
+                    months = freq_days // 30
+                    days = freq_days % 30
+                    
+                    if days == 0:
+                        if months == 1:
+                            maintenance_frequency_text = 'раз в 1 мес.'
+                        elif months < 12:
+                            maintenance_frequency_text = f'раз в {months} мес.'
+                        else:
+                            years = months // 12
+                            remaining_months = months % 12
+                            if remaining_months == 0:
+                                if years == 1:
+                                    maintenance_frequency_text = 'раз в 1 год'
+                                else:
+                                    maintenance_frequency_text = f'раз в {years} лет'
+                            else:
+                                if years == 1:
+                                    maintenance_frequency_text = f'раз в 1 год {remaining_months} мес.'
+                                else:
+                                    maintenance_frequency_text = f'раз в {years} лет {remaining_months} мес.'
+                    else:
+                        if months == 1:
+                            maintenance_frequency_text = f'раз в 1 мес. {days} дн.'
+                        else:
+                            maintenance_frequency_text = f'раз в {months} мес. {days} дн.'
+                else:
+                    if freq_days == 1:
+                        maintenance_frequency_text = 'раз в 1 день'
+                    else:
+                        maintenance_frequency_text = f'раз в {freq_days} дн.'
+            except (ValueError, TypeError):
+                maintenance_frequency_text = str(maintenance_frequency) if maintenance_frequency else None
+        
+        return {
+            'id': equipment_id,
+            'equipment_name': equipment_name,
+            'equipment_type': equipment_type,
+            'characteristics': characteristics,
+            'image_path': image_path,
+            'warranty_period': warranty_period,
+            'warranty_expiration': warranty_expiration,
+            'maintenance_frequency': maintenance_frequency,
+            'maintenance_frequency_text': maintenance_frequency_text,
+            'acquisition_date': acquisition_date,
+            'equipment_assignment_id': equipment_assignment_id,
+            'location': location,
+            'equipment_status': equipment_status,
+            'department_id': department_id,
+            'department': department_name,
+            'facility': facility_name,
+        }
+    
+    def get_movement_history(self, equipment_assignment_id):
+        """Получить историю перемещений оборудования"""
+        with get_db_cursor() as cur:
+            cur.execute("""
+                SELECT 
+                    em.equipment_movement_id,
+                    em.move_date,
+                    em.from_department_id,
+                    em.to_department_id,
+                    from_dept.department_name as from_department_name,
+                    from_fac.facility_name as from_facility_name,
+                    to_dept.department_name as to_department_name,
+                    to_fac.facility_name as to_facility_name
+                FROM equipment_movement em
+                LEFT JOIN department from_dept ON em.from_department_id = from_dept.department_id
+                LEFT JOIN facility from_fac ON from_dept.facility_id = from_fac.facility_id
+                LEFT JOIN department to_dept ON em.to_department_id = to_dept.department_id
+                LEFT JOIN facility to_fac ON to_dept.facility_id = to_fac.facility_id
+                WHERE em.equipment_assignment_id = %s
+                ORDER BY em.move_date DESC
+            """, (equipment_assignment_id,))
+            rows = cur.fetchall()
+            return [
+                {
+                    'id': row[0],
+                    'move_date': row[1],
+                    'from_department_id': row[2],
+                    'to_department_id': row[3],
+                    'from_department': row[4] or '—',
+                    'from_facility': row[5] or '',
+                    'to_department': row[6] or '—',
+                    'to_facility': row[7] or '',
+                    'from_location': f"{row[5] or ''} - {row[4] or '—'}" if row[5] else (row[4] or '—'),
+                    'to_location': f"{row[7] or ''} - {row[6] or '—'}" if row[7] else (row[6] or '—'),
+                }
+                for row in rows
+            ]
 

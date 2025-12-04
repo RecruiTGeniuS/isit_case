@@ -26,6 +26,8 @@ def dashboard():
         return redirect(url_for('admin_pto.list_pto'))
     elif section == 'statistics':
         return redirect(url_for('admin_statistics.list_statistics'))
+    elif section == 'tasks':
+        return redirect(url_for('admin_tasks.list_tasks'))
     else:
         return redirect(url_for('admin_employees.list_employees'))
 

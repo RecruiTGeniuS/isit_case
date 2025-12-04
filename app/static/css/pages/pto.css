@@ -1,8 +1,345 @@
-/* Специфичные стили для страницы "ПТО" */
-/* Здесь можно добавлять стили, специфичные только для страницы ПТО */
+/* Стили для страницы ПТО */
 
+.pto-container {
+    display: flex;
+    gap: var(--spacing-lg);
+    height: calc(100vh - 200px);
+    min-height: 600px;
+}
 
+.pto-calendar-section {
+    flex: 0 0 60%;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: var(--spacing-lg);
+    overflow: hidden;
+}
 
+html.dark-theme .pto-calendar-section {
+    background: var(--bg-dark-secondary);
+}
 
+.pto-calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-lg);
+    gap: var(--spacing-md);
+}
 
+.pto-month-nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--border-medium);
+    background: var(--bg-white);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    color: var(--text-dark);
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
 
+.pto-month-nav-btn:hover {
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+html.dark-theme .pto-month-nav-btn {
+    background: var(--bg-dark);
+    border-color: var(--border-medium);
+    color: var(--text-dark);
+}
+
+html.dark-theme .pto-month-nav-btn:hover {
+    background: var(--bg-dark-secondary);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.pto-month-selector {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex: 1;
+    justify-content: center;
+}
+
+.pto-month-select,
+.pto-year-select {
+    padding: 8px 12px;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-sm);
+    background: var(--bg-white);
+    color: var(--text-dark);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 120px;
+}
+
+.pto-month-select:hover,
+.pto-year-select:hover {
+    border-color: var(--color-primary);
+}
+
+.pto-month-select:focus,
+.pto-year-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+html.dark-theme .pto-month-select,
+html.dark-theme .pto-year-select {
+    background: var(--bg-dark);
+    border-color: var(--border-medium);
+    color: var(--text-dark);
+}
+
+.pto-calendar-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.pto-calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-sm);
+}
+
+.pto-weekday {
+    text-align: center;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-medium);
+    padding: var(--spacing-sm);
+    text-transform: uppercase;
+}
+
+html.dark-theme .pto-weekday {
+    color: var(--text-medium);
+}
+
+.pto-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: var(--spacing-xs);
+    flex: 1;
+    overflow-y: auto;
+}
+
+.pto-calendar-day {
+    aspect-ratio: 1;
+    min-height: 80px;
+    background: var(--bg-light);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-xs);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.pto-calendar-day:hover {
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+html.dark-theme .pto-calendar-day {
+    background: var(--bg-dark);
+    border-color: var(--border-medium);
+}
+
+html.dark-theme .pto-calendar-day:hover {
+    background: var(--bg-dark-secondary);
+    border-color: var(--color-primary);
+}
+
+.pto-calendar-day.other-month {
+    opacity: 0.4;
+    background: transparent;
+}
+
+.pto-calendar-day.today {
+    border: 2px solid var(--color-primary);
+    background: var(--color-primary-light);
+    font-weight: 600;
+}
+
+html.dark-theme .pto-calendar-day.today {
+    background: rgba(221, 158, 0, 0.15);
+}
+
+.pto-calendar-day.selected {
+    background: var(--color-primary);
+    color: var(--text-white);
+    border-color: var(--color-primary);
+}
+
+html.dark-theme .pto-calendar-day.selected {
+    background: var(--color-primary);
+    color: var(--text-white);
+}
+
+.pto-day-number {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: var(--spacing-xs);
+    color: var(--text-dark);
+}
+
+.pto-calendar-day.selected .pto-day-number {
+    color: var(--text-white);
+}
+
+html.dark-theme .pto-day-number {
+    color: var(--text-dark);
+}
+
+.pto-day-indicators {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    width: 100%;
+    margin-top: auto;
+}
+
+.pto-indicator {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+    color: white;
+    flex-shrink: 0;
+}
+
+.pto-indicator.green {
+    background: #22c55e;
+}
+
+.pto-indicator.red {
+    background: #ef4444;
+}
+
+.pto-indicator.yellow {
+    background: #eab308;
+}
+
+.pto-indicator.multiple {
+    width: 24px;
+    height: 24px;
+    font-size: 11px;
+}
+
+/* Секция с таблицей */
+.pto-table-section {
+    flex: 0 0 40%;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+}
+
+html.dark-theme .pto-table-section {
+    background: var(--bg-dark-secondary);
+}
+
+.pto-table-header {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--border-light);
+    background: var(--bg-light);
+}
+
+html.dark-theme .pto-table-header {
+    background: var(--bg-dark);
+    border-bottom-color: var(--border-medium);
+}
+
+.pto-table-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+html.dark-theme .pto-table-header h3 {
+    color: var(--text-dark);
+}
+
+.pto-table-container {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
+.pto-table-container .data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.pto-table-container .data-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.pto-table-container .data-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.pto-table-container .data-table tbody tr:hover {
+    background: var(--color-primary-light);
+}
+
+html.dark-theme .pto-table-container .data-table tbody tr:hover {
+    background: rgba(221, 158, 0, 0.1);
+}
+
+.pto-table-empty {
+    padding: var(--spacing-xl);
+    text-align: center;
+    color: var(--text-light);
+    font-size: 14px;
+}
+
+html.dark-theme .pto-table-empty {
+    color: var(--text-light);
+}
+
+/* Адаптивность */
+@media (max-width: 1200px) {
+    .pto-container {
+        flex-direction: column;
+        height: auto;
+    }
+    
+    .pto-calendar-section {
+        flex: 1;
+    }
+    
+    .pto-table-section {
+        flex: 1;
+        min-height: 400px;
+    }
+}

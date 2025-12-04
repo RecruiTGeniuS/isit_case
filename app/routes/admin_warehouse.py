@@ -104,3 +104,75 @@ def create_part():
     except Exception as e:
         return jsonify({'success': False, 'message': f'Не удалось добавить деталь: {str(e)}'}), 500
 
+@bp.route('/<int:part_id>', methods=['PATCH'])
+def update_part_field(part_id):
+    """Обновление поля записи склада"""
+    auth_check = check_auth()
+    if auth_check:
+        return auth_check
+    
+    payload = request.get_json(silent=True) or {}
+    field = payload.get('field')
+    value = payload.get('value', '')
+    
+    try:
+        service = AdminWarehouseService()
+        service.update_field(part_id, field, value)
+        
+        display_value = value or ''
+        if field == 'facility':
+            # При обновлении предприятия возвращаем переданное значение
+            display_value = value or '—'
+            # Склад всегда будет прочерк, так как при смене предприятия он сбрасывается
+            return jsonify({
+                'success': True, 
+                'value': display_value,
+                'warehouse': '—'
+            })
+        elif field == 'warehouse_id':
+            # При обновлении склада получаем обновлённые данные для отображения
+            part = service.get_by_id(part_id)
+            if part:
+                display_value = part.get('department_name') or '—'
+                # Также возвращаем предприятие, если оно изменилось
+                facility_name = part.get('facility_name') or '—'
+                return jsonify({
+                    'success': True, 
+                    'value': display_value,
+                    'facility': facility_name
+                })
+        elif field == 'spare_part_name':
+            # При обновлении названия детали возвращаем обновлённое значение
+            part = service.get_by_id(part_id)
+            if part:
+                display_value = part.get('spare_part_name') or '—'
+                return jsonify({'success': True, 'value': display_value})
+        elif field == 'quantity':
+            # При обновлении количества возвращаем число
+            part = service.get_by_id(part_id)
+            if part:
+                quantity = part.get('quantity')
+                display_value = str(quantity) if quantity is not None else '—'
+                return jsonify({'success': True, 'value': display_value})
+        
+        return jsonify({'success': True, 'value': display_value})
+    except ValueError as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
+    except Exception:
+        return jsonify({'success': False, 'message': 'Не удалось сохранить изменения.'}), 500
+
+@bp.route('/<int:part_id>', methods=['DELETE'])
+def delete_part(part_id):
+    """Удаление записи со склада"""
+    auth_check = check_auth()
+    if auth_check:
+        return auth_check
+    
+    try:
+        service = AdminWarehouseService()
+        service.delete(part_id)
+        return jsonify({'success': True, 'message': 'Запись успешно удалена'})
+    except ValueError as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
+    except Exception:
+        return jsonify({'success': False, 'message': 'Не удалось удалить запись.'}), 500

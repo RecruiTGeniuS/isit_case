@@ -39,6 +39,7 @@
     padding: 24px;
     gap: 16px;
     border: 1px solid rgba(245, 90, 100, 0.4);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 /* Тускло-красная разделительная линия под заголовком в окне подтверждения удаления */
@@ -58,6 +59,68 @@
 }
 
 #deleteEmployeeModal #deleteEmployeeMessage br {
+    line-height: 1.8;
+    display: block;
+    margin-top: 6px;
+}
+
+/* Компактное модальное окно для подтверждения удаления оборудования */
+#deleteEquipmentModal .modal-window {
+    width: min(680px, 90%);
+    padding: 24px;
+    gap: 16px;
+    border: 1px solid rgba(245, 90, 100, 0.4);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Тускло-красная разделительная линия под заголовком в окне подтверждения удаления оборудования */
+#deleteEquipmentModal .modal-header {
+    padding-bottom: 16px;
+    border-bottom: 2px solid rgba(245, 90, 100, 0.4);
+    margin-left: -24px;
+    margin-right: -24px;
+    padding-left: 24px;
+    padding-right: 24px;
+    margin-bottom: 0;
+}
+
+/* Увеличенный отступ между строками в сообщении об удалении оборудования */
+#deleteEquipmentModal #deleteEquipmentMessage {
+    line-height: 1.8;
+}
+
+#deleteEquipmentModal #deleteEquipmentMessage br {
+    line-height: 1.8;
+    display: block;
+    margin-top: 6px;
+}
+
+/* Компактное модальное окно для подтверждения удаления записи со склада */
+#deleteWarehouseModal .modal-window {
+    width: min(680px, 90%);
+    padding: 24px;
+    gap: 16px;
+    border: 1px solid rgba(245, 90, 100, 0.4);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Тускло-красная разделительная линия под заголовком в окне подтверждения удаления записи со склада */
+#deleteWarehouseModal .modal-header {
+    padding-bottom: 16px;
+    border-bottom: 2px solid rgba(245, 90, 100, 0.4);
+    margin-left: -24px;
+    margin-right: -24px;
+    padding-left: 24px;
+    padding-right: 24px;
+    margin-bottom: 0;
+}
+
+/* Увеличенный отступ между строками в сообщении об удалении записи со склада */
+#deleteWarehouseModal #deleteWarehouseMessage {
+    line-height: 1.8;
+}
+
+#deleteWarehouseModal #deleteWarehouseMessage br {
     line-height: 1.8;
     display: block;
     margin-top: 6px;
@@ -116,6 +179,26 @@
     padding-left: 20px;
 }
 
+/* Жёлтая разделительная линия под заголовком в окне добавления детали на складе */
+#partModal .modal-header {
+    padding-bottom: 16px;
+    border-bottom: 2px solid rgba(221, 158, 0, 0.4);
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom: 0;
+}
+
+/* Очень тонкая жёлтая граница для окна добавления детали на складе */
+#partModal .modal-window {
+    border: 1px solid rgba(221, 158, 0, 0.4);
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-right: 20px;
+    padding-left: 20px;
+}
+
 /* Уменьшаем расстояние между нижней разделительной линией и кнопками */
 #equipmentModal .modal-form {
     gap: 3px;
@@ -132,6 +215,16 @@
 }
 
 #employeeModal .modal-footer {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+/* Уменьшаем расстояние между нижней разделительной линией и кнопками */
+#partModal .modal-form {
+    gap: 3px;
+}
+
+#partModal .modal-footer {
     margin-top: 0;
     padding-top: 0;
 }
@@ -335,9 +428,99 @@ html.dark-theme .modal-close-btn:focus-visible {
 }
 
 /* Стили только для input полей - без иконки выпадающего списка */
-.modal-field input {
+.modal-field input:not([type="number"]) {
     padding-right: 12px;
     background-image: none;
+}
+
+/* Обёртка для number input с кастомными стрелками */
+.number-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+/* Стили для number input - скрываем стандартные стрелки */
+.modal-field input[type="number"] {
+    padding-right: 32px;
+    width: 100%;
+    /* Для Firefox - скрываем стандартные стрелки */
+    -moz-appearance: textfield;
+}
+
+/* Скрываем стандартные стрелки для WebKit браузеров */
+.modal-field input[type="number"]::-webkit-outer-spin-button,
+.modal-field input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Кастомные кнопки-стрелки */
+.number-input-buttons {
+    position: absolute;
+    right: 0px;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    width: 20px;
+    pointer-events: none;
+    z-index: 1;
+    border-left: 1px solid transparent;
+}
+
+.number-input-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 2px;
+    margin: 0;
+    pointer-events: auto;
+    color: #999;
+    transition: color 0.2s ease, background 0.2s ease;
+    min-height: 0;
+    border-radius: 2px;
+}
+
+.number-input-btn:hover {
+    color: #dd9e00;
+    background: rgba(221, 158, 0, 0.1);
+}
+
+.number-input-btn:active {
+    background: rgba(221, 158, 0, 0.2);
+}
+
+.number-input-btn svg {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+}
+
+/* Для тёмной темы */
+html.dark-theme .number-input-buttons {
+    border-left-color: rgba(255, 255, 255, 0.1);
+}
+
+html.dark-theme .number-input-btn {
+    color: #bbb;
+    background: #1f1f1f;
+}
+
+html.dark-theme .number-input-btn:hover {
+    color: #dd9e00;
+    background: rgba(221, 158, 0, 0.15);
+}
+
+html.dark-theme .number-input-btn:active {
+    background: rgba(221, 158, 0, 0.25);
 }
 
 /* Стили только для select полей - с иконкой выпадающего списка */
@@ -608,6 +791,18 @@ html.dark-theme .modal-window {
     box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
 }
 
+html.dark-theme #deleteEmployeeModal .modal-window {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+html.dark-theme #deleteEquipmentModal .modal-window {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+html.dark-theme #deleteWarehouseModal .modal-window {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
 html.dark-theme .modal-header h3 {
     color: #f5f5f5;
 }
@@ -661,6 +856,7 @@ html.dark-theme .modal-field select {
     padding-right: 34px;
 }
 
+
 html.dark-theme .modal-field input[readonly] {
     background: #2a2a2a;
     color: #9a9a9a;
@@ -712,7 +908,7 @@ html.dark-theme .modal-form-grid label span {
 .modal-select-btn:focus {
     outline: none;
     border-color: #dd9e00;
-    box-shadow: 0 0 0 3px rgba(221, 158, 0, 0.15);
+    box-shadow: none;
 }
 
 .modal-select-btn:disabled {

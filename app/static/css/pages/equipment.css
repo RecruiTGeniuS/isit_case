@@ -82,6 +82,35 @@ html.dark-theme .context-menu-item.danger:hover {
     flex-shrink: 0;
 }
 
+/* Стили для ячейки статуса в таблице оборудования */
+/* Переопределяем правила из table.css для столбца статуса */
+#equipmentTable th:last-child,
+#equipmentTable td:last-child {
+    width: 140px !important;
+    min-width: 140px !important;
+    max-width: 140px !important;
+    text-align: center;
+    padding: 0 !important;
+}
+
+/* Убираем display: flex из общего правила */
+#equipmentTable td:last-child {
+    display: table-cell !important;
+    vertical-align: middle !important;
+    border-right: none !important;
+}
+
+/* Бейдж статуса должен занимать всю ширину ячейки со скруглёнными границами */
+#equipmentTable td:last-child .status-badge {
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 8px 12px !important;
+    border-radius: 12px !important;
+    text-align: center !important;
+}
+
 /* Кнопка "Назад" на странице паспорта */
 .back-btn {
     display: inline-flex;

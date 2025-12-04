@@ -294,12 +294,6 @@
                                     <th>Права доступа</th>
                                     <th>Логин</th>
                                     <th>Пароль</th>
-                                    <th class="actions-column">
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="Корзина">
-                                            <polyline points="3 6 5 6 21 6"></polyline>
-                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                        </svg>
-                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -338,14 +332,6 @@
                                     </td>
                                     <td class="editable-cell" contenteditable="false" spellcheck="false" data-field="login">{{ emp.login or '' }}</td>
                                     <td class="editable-cell" contenteditable="false" spellcheck="false" data-field="password">{{ emp.password or '' }}</td>
-                                    <td class="actions-column">
-                                        <button type="button" class="delete-employee-btn" data-employee-id="{{ emp.id }}" aria-label="Удалить сотрудника" title="Удалить сотрудника">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                                            </svg>
-                                        </button>
-                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -496,9 +482,30 @@
                                 <tr data-equipment-id="{{ eq.id }}" data-type="{{ eq.equipment_type or '' }}" data-status="{{ eq.equipment_status or '' }}" data-location="{{ eq.location or '' }}">
                                     <td class="number-column">{{ loop.index }}</td>
                                     <td class="editable-cell" contenteditable="false" spellcheck="false" data-field="equipment_name">{{ eq.equipment_name or '' }}</td>
-                                    <td class="editable-cell" contenteditable="false" spellcheck="false" data-field="equipment_type">{{ eq.equipment_type or '' }}</td>
+                                    <td class="role-cell" tabindex="0" data-field="equipment_type" data-type-value="{{ eq.equipment_type or '' }}" aria-haspopup="listbox" aria-expanded="false">
+                                        <div class="role-cell-content">
+                                            <span class="role-cell-label">{{ eq.equipment_type or '—' }}</span>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        </div>
+                                    </td>
                                     <td class="editable-cell" contenteditable="false" spellcheck="false" data-field="location">{{ eq.location or '' }}</td>
-                                    <td class="editable-cell" contenteditable="false" spellcheck="false" data-field="equipment_status">{{ eq.equipment_status or '' }}</td>
+                                    <td>
+                                        {% if eq.equipment_status %}
+                                            {% if eq.equipment_status == 'В работе' %}
+                                            <span class="status-badge status-in-work">{{ eq.equipment_status }}</span>
+                                            {% elif eq.equipment_status == 'На ремонте' %}
+                                            <span class="status-badge status-in-repair">{{ eq.equipment_status }}</span>
+                                            {% elif eq.equipment_status == 'На ПТО' %}
+                                            <span class="status-badge status-in-pto">{{ eq.equipment_status }}</span>
+                                            {% else %}
+                                            <span class="status-badge">{{ eq.equipment_status }}</span>
+                                            {% endif %}
+                                        {% else %}
+                                        <span class="status-badge">—</span>
+                                        {% endif %}
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -657,20 +664,34 @@
                             <thead>
                                 <tr>
                                     <th class="number-column">№</th>
-                                    <th>Деталь</th>
-                                    <th>Предприятие</th>
-                                    <th>Склад</th>
-                                    <th>Кол-во</th>
+                                    <th class="warehouse-part-column">Деталь</th>
+                                    <th class="warehouse-facility-column">Предприятие</th>
+                                    <th class="warehouse-warehouse-column">Склад</th>
+                                    <th class="warehouse-quantity-column">Количество</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for part in parts %}
                                 <tr data-part-id="{{ part.id }}" data-facility="{{ part.facility_name or '' }}" data-warehouse="{{ part.department_name or '' }}" data-spare-part="{{ part.spare_part_name or '' }}">
                                     <td class="number-column">{{ loop.index }}</td>
-                                    <td>{{ part.spare_part_name or '—' }}</td>
-                                    <td>{{ part.facility_name or '—' }}</td>
-                                    <td>{{ part.department_name or '—' }}</td>
-                                    <td>{{ part.quantity or '—' }}</td>
+                                    <td class="editable-cell" contenteditable="false" spellcheck="false" data-field="spare_part_name">{{ part.spare_part_name or '—' }}</td>
+                                    <td class="facility-cell" tabindex="0" data-field="facility" data-facility-value="{{ part.facility_name or '' }}" data-facility-id="{{ part.facility_id or '' }}" aria-haspopup="listbox" aria-expanded="false">
+                                        <div class="role-cell-content">
+                                            <span class="role-cell-label">{{ part.facility_name or '—' }}</span>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        </div>
+                                    </td>
+                                    <td class="warehouse-cell" tabindex="0" data-field="warehouse_id" data-warehouse-id="{{ part.warehouse_id or '' }}" data-facility-name="{{ part.facility_name or '' }}" aria-haspopup="listbox" aria-expanded="false">
+                                        <div class="role-cell-content">
+                                            <span class="role-cell-label">{{ part.department_name or '—' }}</span>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        </div>
+                                    </td>
+                                    <td class="editable-cell" contenteditable="false" spellcheck="false" data-field="quantity">{{ part.quantity or '—' }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -901,8 +922,22 @@
                         <input type="text" name="spare_part_name" id="partSparePartName" required>
                     </label>
                     <label class="modal-field">
-                        <span data-required="*">Кол-во</span>
-                        <input type="number" name="quantity" id="partQuantity" min="1" required>
+                        <span data-required="*">Количество</span>
+                        <div class="number-input-wrapper">
+                            <input type="number" name="quantity" id="partQuantity" min="1" required>
+                            <div class="number-input-buttons">
+                                <button type="button" class="number-input-btn number-input-btn-up" aria-label="Увеличить" tabindex="-1">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="18 15 12 9 6 15"></polyline>
+                                    </svg>
+                                </button>
+                                <button type="button" class="number-input-btn number-input-btn-down" aria-label="Уменьшить" tabindex="-1">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
                     </label>
                 </div>
                 <div class="modal-row modal-row--halves">
@@ -953,6 +988,28 @@
     </div>
 </div>
 
+<!-- Модальное окно подтверждения удаления записи со склада -->
+<div class="modal-overlay" id="deleteWarehouseModal" aria-hidden="true">
+    <div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="deleteWarehouseModalTitle">
+        <div class="modal-header">
+            <h3 id="deleteWarehouseModalTitle">Подтверждение удаления</h3>
+            <button type="button" class="modal-close-btn" id="deleteWarehouseModalClose" aria-label="Закрыть">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p id="deleteWarehouseMessage">Вы уверены, что хотите удалить эту запись? Это действие нельзя будет отменить.</p>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="secondary-btn" id="deleteWarehouseCancel">Отмена</button>
+            <button type="button" class="primary-btn danger-btn" id="deleteWarehouseConfirm">Удалить</button>
+        </div>
+    </div>
+</div>
+
 <!-- Модальное окно подтверждения удаления оборудования -->
 <div class="modal-overlay" id="deleteEquipmentModal" aria-hidden="true">
     <div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="deleteEquipmentModalTitle">
@@ -966,13 +1023,11 @@
             </button>
         </div>
         <div class="modal-body">
-            <p id="deleteEquipmentMessage">Вы уверены, что хотите удалить это оборудование?<br>Это действие нельзя будет отменить.</p>
+            <p id="deleteEquipmentMessage">Вы уверены, что хотите удалить это оборудование? Это действие нельзя будет отменить.</p>
         </div>
-        <div class="modal-footer">
-            <div class="modal-actions">
-                <button type="button" class="secondary-btn" id="deleteEquipmentCancel">Отмена</button>
-                <button type="button" class="primary-btn danger" id="deleteEquipmentConfirm">Удалить</button>
-            </div>
+        <div class="modal-actions">
+            <button type="button" class="secondary-btn" id="deleteEquipmentCancel">Отмена</button>
+            <button type="button" class="primary-btn danger-btn" id="deleteEquipmentConfirm">Удалить</button>
         </div>
     </div>
 </div>
@@ -1162,6 +1217,16 @@
             }
         })();
 
+        // Обработчик для контактов службы поддержки (работает на всех страницах)
+        const supportToggle = document.getElementById('supportToggle');
+        const supportContacts = document.getElementById('supportContacts');
+        if (supportToggle && supportContacts) {
+            supportToggle.addEventListener('click', (event) => {
+                event.stopPropagation();
+                supportContacts.classList.toggle('active');
+            });
+        }
+
         {% if section == 'employees' %}
         // Поиск и фильтрация таблицы
         const roleOptionsMap = {{ role_labels|tojson }};
@@ -1191,8 +1256,6 @@
         const departmentFilter = document.getElementById('departmentFilter');
         const facilityFilter = document.getElementById('facilityFilter');
         const tableRows = document.querySelectorAll('.data-table tbody tr');
-        const supportToggle = document.getElementById('supportToggle');
-        const supportContacts = document.getElementById('supportContacts');
         const addEmployeeBtn = document.getElementById('addEmployeeBtn');
         const employeeModal = document.getElementById('employeeModal');
         const employeeModalClose = document.getElementById('employeeModalClose');
@@ -1464,13 +1527,6 @@
                 if (facilityFilter) facilityFilter.value = '';
                 applyTableFilters();
                 filterSelectControllers.forEach(controller => controller.sync());
-            });
-        }
-
-        if (supportToggle && supportContacts) {
-            supportToggle.addEventListener('click', (event) => {
-                event.stopPropagation();
-                supportContacts.classList.toggle('active');
             });
         }
 
@@ -2901,22 +2957,167 @@
             }
         }
 
-        // Обработчики открытия модального окна (делегирование событий)
-        document.addEventListener('click', (event) => {
-            // Проверяем, был ли клик по кнопке удаления или её содержимому (SVG)
-            const deleteBtn = event.target.closest('.delete-employee-btn');
+        // Контекстное меню для сотрудников
+        let employeeContextMenu = null;
+        let selectedEmployeeRow = null;
+        const employeeTable = document.querySelector('.data-table');
+
+        function createEmployeeContextMenu() {
+            if (employeeContextMenu) return employeeContextMenu;
+            
+            employeeContextMenu = document.createElement('div');
+            employeeContextMenu.className = 'context-menu';
+            employeeContextMenu.innerHTML = `
+                <button type="button" class="context-menu-item danger" id="employeeDeleteBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    Удалить сотрудника
+                </button>
+            `;
+            document.body.appendChild(employeeContextMenu);
+            
+            const deleteBtn = document.getElementById('employeeDeleteBtn');
+            
             if (deleteBtn) {
-                event.preventDefault();
-                event.stopPropagation();
-                const employeeId = deleteBtn.getAttribute('data-employee-id');
-                if (!employeeId) return;
-                
-                const row = deleteBtn.closest('tr');
-                if (row && employeeId) {
-                    openDeleteModal(parseInt(employeeId), row);
-                }
+                deleteBtn.addEventListener('click', () => {
+                    if (selectedEmployeeRow) {
+                        const employeeId = selectedEmployeeRow.dataset.employeeId;
+                        if (employeeId) {
+                            openDeleteModal(parseInt(employeeId), selectedEmployeeRow);
+                        }
+                    }
+                    hideEmployeeContextMenu();
+                });
             }
-        });
+            
+            return employeeContextMenu;
+        }
+
+        function showEmployeeContextMenu(event, row) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const menu = createEmployeeContextMenu();
+            selectedEmployeeRow = row;
+            
+            const tableContainer = document.querySelector('.table-container');
+            if (!tableContainer) return;
+            
+            // Сначала показываем меню, чтобы получить его размеры
+            menu.style.display = 'block';
+            menu.style.visibility = 'hidden';
+            menu.style.left = '0px';
+            menu.style.top = '0px';
+            
+            const containerRect = tableContainer.getBoundingClientRect();
+            const menuRect = menu.getBoundingClientRect();
+            
+            // Используем координаты клика относительно viewport
+            let left = event.clientX;
+            let top = event.clientY;
+            
+            // Проверяем, не выходит ли меню за правую границу таблицы
+            if (left + menuRect.width > containerRect.right) {
+                left = containerRect.right - menuRect.width - 10;
+            }
+            
+            // Проверяем, не выходит ли меню за левую границу таблицы
+            if (left < containerRect.left) {
+                left = containerRect.left + 10;
+            }
+            
+            // Проверяем, не выходит ли меню за нижнюю границу таблицы
+            if (top + menuRect.height > containerRect.bottom) {
+                top = containerRect.bottom - menuRect.height - 10;
+            }
+            
+            // Проверяем, не выходит ли меню за верхнюю границу таблицы
+            if (top < containerRect.top) {
+                top = containerRect.top + 10;
+            }
+            
+            // Устанавливаем финальную позицию и делаем меню видимым
+            menu.style.left = left + 'px';
+            menu.style.top = top + 'px';
+            menu.style.visibility = 'visible';
+            
+            // Закрываем меню при клике вне его
+            setTimeout(() => {
+                document.addEventListener('click', hideEmployeeContextMenu, { once: true });
+            }, 0);
+        }
+
+        function hideEmployeeContextMenu() {
+            if (employeeContextMenu) {
+                employeeContextMenu.style.display = 'none';
+            }
+        }
+
+        // Добавляем обработчики клика и ПКМ на строки таблицы сотрудников
+        // Используем делегирование событий, чтобы не мешать редактированию ячеек
+        if (employeeTable) {
+            const tbody = employeeTable.querySelector('tbody');
+            if (tbody) {
+                // Функция для получения всех строк таблицы сотрудников
+                function getAllEmployeeRows() {
+                    return employeeTable ? employeeTable.querySelectorAll('tbody tr') : [];
+                }
+                
+                // Функция для обновления выделения (больше не нужна, так как используем границы на ячейках)
+                function updateSelectedRowBorder() {
+                    // Теперь используем границы на ячейках, поэтому эта функция не нужна
+                }
+                
+                // Одинарный клик - выделение строки
+                tbody.addEventListener('click', (e) => {
+                    // Игнорируем клики по редактируемым ячейкам
+                    if (e.target.closest('.editable-cell[contenteditable="true"]')) {
+                        return;
+                    }
+                    
+                    const row = e.target.closest('tr');
+                    if (row) {
+                        // Если строка уже выделена, убираем выделение
+                        if (row.classList.contains('selected')) {
+                            row.classList.remove('selected');
+                        } else {
+                            // Убираем выделение с других строк
+                            getAllEmployeeRows().forEach(r => r.classList.remove('selected'));
+                            // Выделяем текущую строку
+                            row.classList.add('selected');
+                        }
+                    }
+                });
+                
+                // Убираем выделение при клике вне таблицы
+                document.addEventListener('click', (e) => {
+                    // Проверяем, что клик был не по таблице и не по контекстному меню
+                    if (!employeeTable.contains(e.target) && 
+                        !(employeeContextMenu && employeeContextMenu.contains(e.target))) {
+                        getAllEmployeeRows().forEach(r => r.classList.remove('selected'));
+                    }
+                });
+                
+                // ПКМ - выделение строки и показ контекстного меню
+                tbody.addEventListener('contextmenu', (e) => {
+                    // Проверяем, что клик был по строке, а не по редактируемой ячейке
+                    const row = e.target.closest('tr');
+                    if (row && !e.target.closest('.editable-cell[contenteditable="true"]')) {
+                        e.preventDefault();
+                        // Убираем выделение с других строк
+                        getAllEmployeeRows().forEach(r => r.classList.remove('selected'));
+                        // Выделяем текущую строку
+                        row.classList.add('selected');
+                        showEmployeeContextMenu(e, row);
+                    }
+                });
+                
+                // Обновляем позицию границы при изменении размера окна
+                window.addEventListener('resize', updateSelectedRowBorder);
+            }
+        }
 
         // Обработчики закрытия модального окна
         if (deleteEmployeeClose) {
@@ -3013,6 +3214,10 @@
 
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Escape') {
+                if (employeeContextMenu && employeeContextMenu.style.display === 'block') {
+                    hideEmployeeContextMenu();
+                    return;
+                }
                 if (roleDropdown.classList.contains('visible')) {
                     closeRoleDropdown();
                     return;
@@ -3059,6 +3264,21 @@
         const partWarehouseSelect = document.getElementById('partWarehouseSelect');
         const modalPartFacilityBtn = document.getElementById('modalPartFacilityBtn');
         const modalPartWarehouseBtn = document.getElementById('modalPartWarehouseBtn');
+        const partQuantityInput = document.getElementById('partQuantity');
+        
+        // Переменные для выделения строк и контекстного меню
+        let selectedWarehouseRow = null;
+        let warehouseContextMenu = null;
+        const warehouseTable = document.querySelector('.data-table');
+        
+        // Переменные для модального окна удаления
+        const deleteWarehouseModal = document.getElementById('deleteWarehouseModal');
+        const deleteWarehouseClose = document.getElementById('deleteWarehouseModalClose');
+        const deleteWarehouseCancel = document.getElementById('deleteWarehouseCancel');
+        const deleteWarehouseConfirm = document.getElementById('deleteWarehouseConfirm');
+        const deleteWarehouseMessage = document.getElementById('deleteWarehouseMessage');
+        let warehouseToDelete = null;
+        let warehouseToDeleteRow = null;
         
         // Данные для модального окна
         const warehousesData = {{ warehouse_choices|tojson }};
@@ -3241,6 +3461,10 @@
             partModal.setAttribute('aria-hidden', 'false');
             document.body.classList.add('modal-open');
             
+            // Закрываем все открытые dropdown'ы
+            closePartFacilityDropdown();
+            closePartWarehouseDropdown();
+            
             if (partForm) {
                 partForm.reset();
             }
@@ -3274,6 +3498,9 @@
 
         function closePartModal() {
             if (!partModal) return;
+            // Закрываем все открытые dropdown'ы
+            closePartFacilityDropdown();
+            closePartWarehouseDropdown();
             partModal.classList.remove('visible');
             partModal.setAttribute('aria-hidden', 'true');
             document.body.classList.remove('modal-open');
@@ -3367,34 +3594,276 @@
             partFacilitySelect.addEventListener('change', handlePartFacilityChange);
         }
 
+        // Создаём кастомный dropdown для предприятия в модальном окне
+        const partFacilityDropdown = document.createElement('div');
+        partFacilityDropdown.className = 'role-dropdown';
+        partFacilityDropdown.style.zIndex = '6000';
+        document.body.appendChild(partFacilityDropdown);
+        
+        let currentPartFacilityBtn = null;
+
+        function populatePartFacilityDropdown() {
+            if (!partFacilitySelect || !partFacilityDropdown) return;
+            
+            partFacilityDropdown.innerHTML = '';
+            const facilityOptions = partFacilitySelect.options || partFacilitySelect.querySelectorAll('option');
+            
+            Array.from(facilityOptions).forEach(opt => {
+                if (opt.value === '') return; // Пропускаем placeholder
+                
+                const option = document.createElement('button');
+                option.type = 'button';
+                option.className = 'role-dropdown-option';
+                option.dataset.value = opt.value;
+                option.textContent = opt.textContent.trim();
+                
+                option.addEventListener('click', () => {
+                    const value = option.dataset.value;
+                    const label = option.textContent;
+                    
+                    if (partFacilitySelect) {
+                        partFacilitySelect.value = value;
+                        partFacilitySelect.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                    
+                    if (currentPartFacilityBtn) {
+                        const labelSpan = currentPartFacilityBtn.querySelector('.modal-select-label');
+                        if (labelSpan) {
+                            labelSpan.textContent = label;
+                        }
+                        currentPartFacilityBtn.setAttribute('aria-expanded', 'false');
+                    }
+                    
+                    closePartFacilityDropdown();
+                    
+                    // Обновляем список складов
+                    if (handlePartFacilityChange) {
+                        handlePartFacilityChange();
+                    }
+                });
+                
+                partFacilityDropdown.appendChild(option);
+            });
+        }
+
+        function openPartFacilityDropdown(btn) {
+            if (!btn || !partFacilityDropdown) return;
+            
+            if (currentPartFacilityBtn === btn && partFacilityDropdown.classList.contains('visible')) {
+                closePartFacilityDropdown();
+                return;
+            }
+            
+            currentPartFacilityBtn = btn;
+            populatePartFacilityDropdown();
+            
+            const rect = btn.getBoundingClientRect();
+            partFacilityDropdown.style.position = 'fixed';
+            partFacilityDropdown.style.left = rect.left + 'px';
+            partFacilityDropdown.style.top = (rect.bottom + 4) + 'px';
+            partFacilityDropdown.style.minWidth = rect.width + 'px';
+            partFacilityDropdown.style.maxWidth = '300px';
+            partFacilityDropdown.classList.add('visible');
+            btn.setAttribute('aria-expanded', 'true');
+        }
+
+        function closePartFacilityDropdown() {
+            if (!partFacilityDropdown) return;
+            partFacilityDropdown.classList.remove('visible');
+            if (currentPartFacilityBtn) {
+                currentPartFacilityBtn.setAttribute('aria-expanded', 'false');
+                currentPartFacilityBtn = null;
+            }
+        }
+
         // Кастомные dropdown'ы для модального окна склада
         if (modalPartFacilityBtn) {
             modalPartFacilityBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const isOpen = modalPartFacilityBtn.getAttribute('aria-expanded') === 'true';
                 if (modalPartWarehouseBtn) {
                     modalPartWarehouseBtn.setAttribute('aria-expanded', 'false');
                 }
-                modalPartFacilityBtn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
-                if (!isOpen) {
-                    partFacilitySelect.focus();
-                }
+                openPartFacilityDropdown(modalPartFacilityBtn);
             });
+        }
+
+        // Закрытие dropdown при клике вне его
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.modal-select-btn[data-field="facility_id"]') && 
+                !partFacilityDropdown.contains(e.target)) {
+                closePartFacilityDropdown();
+            }
+        }, true);
+
+        // Создаём кастомный dropdown для склада в модальном окне
+        const partWarehouseDropdown = document.createElement('div');
+        partWarehouseDropdown.className = 'role-dropdown';
+        partWarehouseDropdown.style.zIndex = '6000';
+        document.body.appendChild(partWarehouseDropdown);
+        
+        let currentPartWarehouseBtn = null;
+
+        function populatePartWarehouseDropdown() {
+            if (!partWarehouseSelect || !partWarehouseDropdown) return;
+            
+            partWarehouseDropdown.innerHTML = '';
+            const warehouseOptions = partWarehouseSelect.options || partWarehouseSelect.querySelectorAll('option');
+            
+            Array.from(warehouseOptions).forEach(opt => {
+                if (opt.value === '' || opt.disabled) return; // Пропускаем placeholder и disabled
+                
+                const option = document.createElement('button');
+                option.type = 'button';
+                option.className = 'role-dropdown-option';
+                option.dataset.value = opt.value;
+                option.textContent = opt.textContent.trim();
+                
+                option.addEventListener('click', () => {
+                    const value = option.dataset.value;
+                    const label = option.textContent;
+                    
+                    if (partWarehouseSelect) {
+                        partWarehouseSelect.value = value;
+                        partWarehouseSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                    
+                    if (currentPartWarehouseBtn) {
+                        const labelSpan = currentPartWarehouseBtn.querySelector('.modal-select-label');
+                        if (labelSpan) {
+                            labelSpan.textContent = label;
+                        }
+                        currentPartWarehouseBtn.setAttribute('aria-expanded', 'false');
+                    }
+                    
+                    closePartWarehouseDropdown();
+                });
+                
+                partWarehouseDropdown.appendChild(option);
+            });
+        }
+
+        function openPartWarehouseDropdown(btn) {
+            if (!btn || btn.disabled || !partWarehouseDropdown) return;
+            
+            if (currentPartWarehouseBtn === btn && partWarehouseDropdown.classList.contains('visible')) {
+                closePartWarehouseDropdown();
+                return;
+            }
+            
+            currentPartWarehouseBtn = btn;
+            populatePartWarehouseDropdown();
+            
+            const rect = btn.getBoundingClientRect();
+            partWarehouseDropdown.style.position = 'fixed';
+            partWarehouseDropdown.style.left = rect.left + 'px';
+            partWarehouseDropdown.style.top = (rect.bottom + 4) + 'px';
+            partWarehouseDropdown.style.minWidth = rect.width + 'px';
+            partWarehouseDropdown.style.maxWidth = '300px';
+            partWarehouseDropdown.classList.add('visible');
+            btn.setAttribute('aria-expanded', 'true');
+        }
+
+        function closePartWarehouseDropdown() {
+            if (!partWarehouseDropdown) return;
+            partWarehouseDropdown.classList.remove('visible');
+            if (currentPartWarehouseBtn) {
+                currentPartWarehouseBtn.setAttribute('aria-expanded', 'false');
+                currentPartWarehouseBtn = null;
+            }
         }
 
         if (modalPartWarehouseBtn) {
             modalPartWarehouseBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                if (modalPartWarehouseBtn.disabled) return;
-                const isOpen = modalPartWarehouseBtn.getAttribute('aria-expanded') === 'true';
                 if (modalPartFacilityBtn) {
-                    modalPartFacilityBtn.setAttribute('aria-expanded', 'false');
+                    closePartFacilityDropdown();
                 }
-                modalPartWarehouseBtn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
-                if (!isOpen) {
-                    partWarehouseSelect.focus();
-                }
+                openPartWarehouseDropdown(modalPartWarehouseBtn);
             });
+        }
+
+        // Закрытие dropdown при клике вне его
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.modal-select-btn[data-field="warehouse_id"]') && 
+                !partWarehouseDropdown.contains(e.target)) {
+                closePartWarehouseDropdown();
+            }
+        }, true);
+
+        // Обработка прокрутки колёсиком мыши для поля количества
+        if (partQuantityInput) {
+            const quantityWrapper = partQuantityInput.closest('.number-input-wrapper');
+            
+            // Функция для обработки прокрутки
+            function handleQuantityWheel(e) {
+                // Проверяем, что поле в фокусе или курсор над полем/обёрткой
+                const isOverInput = document.activeElement === partQuantityInput;
+                const isOverWrapper = quantityWrapper && quantityWrapper.contains(e.target);
+                
+                if (isOverInput || isOverWrapper) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const currentValue = parseInt(partQuantityInput.value) || parseInt(partQuantityInput.min) || 1;
+                    const minValue = parseInt(partQuantityInput.min) || 1;
+                    const step = 1;
+                    
+                    // Определяем направление прокрутки
+                    let newValue;
+                    if (e.deltaY < 0) {
+                        // Прокрутка вверх - увеличиваем
+                        newValue = currentValue + step;
+                    } else {
+                        // Прокрутка вниз - уменьшаем
+                        newValue = Math.max(minValue, currentValue - step);
+                    }
+                    
+                    // Устанавливаем новое значение
+                    partQuantityInput.value = newValue;
+                    
+                    // Триггерим событие input для валидации
+                    partQuantityInput.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            }
+            
+            // Обработчик для самого input
+            partQuantityInput.addEventListener('wheel', handleQuantityWheel, { passive: false });
+            
+            // Обработчик для обёртки (чтобы работало при наведении на стрелки)
+            if (quantityWrapper) {
+                quantityWrapper.addEventListener('wheel', handleQuantityWheel, { passive: false });
+            }
+
+            // Обработка кликов на кастомные кнопки-стрелки
+            if (quantityWrapper) {
+                const btnUp = quantityWrapper.querySelector('.number-input-btn-up');
+                const btnDown = quantityWrapper.querySelector('.number-input-btn-down');
+                
+                if (btnUp) {
+                    btnUp.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        const currentValue = parseInt(partQuantityInput.value) || parseInt(partQuantityInput.min) || 1;
+                        const newValue = currentValue + 1;
+                        partQuantityInput.value = newValue;
+                        partQuantityInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    });
+                }
+                
+                if (btnDown) {
+                    btnDown.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        const currentValue = parseInt(partQuantityInput.value) || parseInt(partQuantityInput.min) || 1;
+                        const minValue = parseInt(partQuantityInput.min) || 1;
+                        const newValue = Math.max(minValue, currentValue - 1);
+                        partQuantityInput.value = newValue;
+                        partQuantityInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    });
+                }
+            }
         }
 
         // Синхронизация кастомных кнопок с нативными select
@@ -3485,14 +3954,1078 @@
             });
         }
 
-        // Закрытие модального окна по Escape
+        // Закрытие модальных окон по Escape
         document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape' && partModal && partModal.classList.contains('visible')) {
-                closePartModal();
+            if (event.key === 'Escape') {
+                // Закрываем открытые dropdown'ы
+                if (partFacilityDropdown && partFacilityDropdown.classList.contains('visible')) {
+                    closePartFacilityDropdown();
+                    event.preventDefault();
+                    return;
+                }
+                if (partWarehouseDropdown && partWarehouseDropdown.classList.contains('visible')) {
+                    closePartWarehouseDropdown();
+                    event.preventDefault();
+                    return;
+                }
+                // Закрываем модальные окна
+                if (partModal && partModal.classList.contains('visible')) {
+                    closePartModal();
+                } else if (deleteWarehouseModal && deleteWarehouseModal.classList.contains('visible')) {
+                    closeDeleteWarehouseModal();
+                }
             }
         });
 
+        // Функции для работы с контекстным меню
+        function createWarehouseContextMenu() {
+            if (warehouseContextMenu) return warehouseContextMenu;
+            
+            warehouseContextMenu = document.createElement('div');
+            warehouseContextMenu.className = 'context-menu';
+            warehouseContextMenu.innerHTML = `
+                <button type="button" class="context-menu-item danger" id="warehouseDeleteBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    Удалить
+                </button>
+            `;
+            document.body.appendChild(warehouseContextMenu);
+            
+            const deleteBtn = document.getElementById('warehouseDeleteBtn');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', () => {
+                    if (selectedWarehouseRow) {
+                        const partId = selectedWarehouseRow.dataset.partId;
+                        if (partId) {
+                            openDeleteWarehouseModal(parseInt(partId), selectedWarehouseRow);
+                        }
+                    }
+                    hideWarehouseContextMenu();
+                });
+            }
+            
+            return warehouseContextMenu;
+        }
+
+        function showWarehouseContextMenu(event, row) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const menu = createWarehouseContextMenu();
+            selectedWarehouseRow = row;
+            
+            const tableContainer = document.querySelector('.table-container');
+            if (!tableContainer) return;
+            
+            // Сначала показываем меню, чтобы получить его размеры
+            menu.style.display = 'block';
+            menu.style.visibility = 'hidden';
+            menu.style.left = '0px';
+            menu.style.top = '0px';
+            
+            const containerRect = tableContainer.getBoundingClientRect();
+            const menuRect = menu.getBoundingClientRect();
+            
+            // Используем координаты клика относительно viewport
+            let left = event.clientX;
+            let top = event.clientY;
+            
+            // Проверяем, не выходит ли меню за правую границу таблицы
+            if (left + menuRect.width > containerRect.right) {
+                left = containerRect.right - menuRect.width - 10;
+            }
+            
+            // Проверяем, не выходит ли меню за левую границу таблицы
+            if (left < containerRect.left) {
+                left = containerRect.left + 10;
+            }
+            
+            // Проверяем, не выходит ли меню за нижнюю границу таблицы
+            if (top + menuRect.height > containerRect.bottom) {
+                top = containerRect.bottom - menuRect.height - 10;
+            }
+            
+            // Проверяем, не выходит ли меню за верхнюю границу таблицы
+            if (top < containerRect.top) {
+                top = containerRect.top + 10;
+            }
+            
+            // Устанавливаем финальную позицию
+            menu.style.position = 'fixed';
+            menu.style.left = left + 'px';
+            menu.style.top = top + 'px';
+            menu.style.visibility = 'visible';
+            
+            // Закрываем меню при клике вне его
+            setTimeout(() => {
+                document.addEventListener('click', hideWarehouseContextMenu, { once: true });
+            }, 0);
+        }
+
+        function hideWarehouseContextMenu() {
+            if (warehouseContextMenu) {
+                warehouseContextMenu.style.display = 'none';
+            }
+        }
+
+        function getAllWarehouseRows() {
+            return Array.from(document.querySelectorAll('.data-table tbody tr[data-part-id]'));
+        }
+
+        // Обработка выделения строк и контекстного меню
+        if (warehouseTable) {
+            const tbody = warehouseTable.querySelector('tbody');
+            if (tbody) {
+                // Одинарный клик - выделение строки
+                tbody.addEventListener('click', (e) => {
+                    // Игнорируем клики по редактируемым ячейкам и quantity input
+                    if (e.target.closest('.editable-cell[contenteditable="true"]') ||
+                        e.target.closest('.quantity-input-wrapper') ||
+                        e.target.closest('.quantity-input') ||
+                        e.target.closest('.quantity-input-btn')) {
+                        return;
+                    }
+                    const row = e.target.closest('tr[data-part-id]');
+                    if (row) {
+                        // Если строка уже выделена, убираем выделение
+                        if (row.classList.contains('selected')) {
+                            row.classList.remove('selected');
+                            selectedWarehouseRow = null;
+                        } else {
+                            // Убираем выделение с других строк
+                            getAllWarehouseRows().forEach(r => r.classList.remove('selected'));
+                            // Выделяем текущую строку
+                            row.classList.add('selected');
+                            selectedWarehouseRow = row;
+                        }
+                    }
+                });
+                
+                // Убираем выделение при клике вне таблицы
+                document.addEventListener('click', (e) => {
+                    // Проверяем, что клик был не по таблице и не по контекстному меню
+                    if (!warehouseTable.contains(e.target) && 
+                        !(warehouseContextMenu && warehouseContextMenu.contains(e.target))) {
+                        // Не убираем выделение, если клик был по редактируемой ячейке или quantity input
+                        if (e.target.closest('.editable-cell[contenteditable="true"]') ||
+                            e.target.closest('.quantity-input-wrapper') ||
+                            e.target.closest('.quantity-input') ||
+                            e.target.closest('.quantity-input-btn')) {
+                            return;
+                        }
+                        getAllWarehouseRows().forEach(r => r.classList.remove('selected'));
+                        selectedWarehouseRow = null;
+                    }
+                });
+                
+                // ПКМ - выделение строки и показ контекстного меню
+                tbody.addEventListener('contextmenu', (e) => {
+                    const row = e.target.closest('tr[data-part-id]');
+                    if (row) {
+                        e.preventDefault();
+                        // Убираем выделение с других строк
+                        getAllWarehouseRows().forEach(r => r.classList.remove('selected'));
+                        // Выделяем текущую строку
+                        row.classList.add('selected');
+                        selectedWarehouseRow = row;
+                        showWarehouseContextMenu(e, row);
+                    }
+                });
+            }
+        }
+
+        // Закрытие контекстного меню при нажатии Escape
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && warehouseContextMenu && warehouseContextMenu.style.display === 'block') {
+                hideWarehouseContextMenu();
+            }
+        });
+
+        // Функции для работы с модальным окном удаления
+        function openDeleteWarehouseModal(partId, partRow) {
+            if (!deleteWarehouseModal) return;
+            
+            warehouseToDelete = partId;
+            warehouseToDeleteRow = partRow;
+            
+            // Получаем данные записи для отображения в сообщении
+            const sparePartName = partRow.querySelector('td:nth-child(2)')?.textContent?.trim() || '';
+            const facilityName = partRow.querySelector('td:nth-child(3)')?.textContent?.trim() || '';
+            const warehouseName = partRow.querySelector('td:nth-child(4)')?.textContent?.trim() || '';
+            const quantity = partRow.querySelector('td:nth-child(5)')?.textContent?.trim() || '';
+            
+            let message = 'Вы уверены, что хотите удалить эту запись?';
+            if (sparePartName || warehouseName) {
+                const details = [sparePartName, warehouseName].filter(Boolean).join(' (');
+                message = `Вы уверены, что хотите удалить запись "${details}${details.includes('(') ? ')' : ''}"?`;
+            }
+            message += '<br>Это действие нельзя будет отменить.';
+            
+            if (deleteWarehouseMessage) {
+                deleteWarehouseMessage.innerHTML = message;
+            }
+            
+            deleteWarehouseModal.setAttribute('aria-hidden', 'false');
+            deleteWarehouseModal.classList.add('visible');
+            document.body.classList.add('modal-open');
+        }
+
+        function closeDeleteWarehouseModal() {
+            if (!deleteWarehouseModal) return;
+            
+            deleteWarehouseModal.setAttribute('aria-hidden', 'true');
+            deleteWarehouseModal.classList.remove('visible');
+            document.body.classList.remove('modal-open');
+            warehouseToDelete = null;
+            warehouseToDeleteRow = null;
+            
+            if (deleteWarehouseConfirm) {
+                deleteWarehouseConfirm.disabled = false;
+                deleteWarehouseConfirm.textContent = 'Удалить';
+            }
+        }
+
+        // Обработчики закрытия модального окна
+        if (deleteWarehouseClose) {
+            deleteWarehouseClose.addEventListener('click', closeDeleteWarehouseModal);
+        }
+        if (deleteWarehouseCancel) {
+            deleteWarehouseCancel.addEventListener('click', closeDeleteWarehouseModal);
+        }
+
+        // Закрытие по клику на overlay
+        if (deleteWarehouseModal) {
+            deleteWarehouseModal.addEventListener('click', (event) => {
+                if (event.target === deleteWarehouseModal) {
+                    closeDeleteWarehouseModal();
+                }
+            });
+        }
+
+        // Подтверждение удаления
+        if (deleteWarehouseConfirm) {
+            deleteWarehouseConfirm.addEventListener('click', async () => {
+                if (!warehouseToDelete) return;
+                
+                deleteWarehouseConfirm.disabled = true;
+                deleteWarehouseConfirm.textContent = 'Удаление...';
+                
+                try {
+                    const response = await fetch(`/admin/warehouse/${warehouseToDelete}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    let data;
+                    try {
+                        data = await response.json();
+                    } catch (parseError) {
+                        console.error('Ошибка парсинга ответа:', parseError);
+                        // Если запись уже удалена из таблицы, закрываем модальное окно
+                        if (!warehouseToDeleteRow || !document.contains(warehouseToDeleteRow)) {
+                            closeDeleteWarehouseModal();
+                            return;
+                        }
+                        throw new Error('Не удалось обработать ответ сервера');
+                    }
+                    
+                    if (!response.ok) {
+                        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+                    }
+                    
+                    if (data.success) {
+                        // Удаляем строку из таблицы
+                        if (warehouseToDeleteRow && document.contains(warehouseToDeleteRow)) {
+                            warehouseToDeleteRow.remove();
+                            
+                            // Обновляем нумерацию строк
+                            document.querySelectorAll('.data-table tbody tr').forEach((row, index) => {
+                                const numberCell = row.querySelector('.number-column');
+                                if (numberCell) {
+                                    numberCell.textContent = index + 1;
+                                }
+                            });
+                            
+                            // Обновляем чередование строк
+                            applyWarehouseRowStriping();
+                            
+                            // Показываем уведомление об успехе
+                            const statusBox = document.getElementById('warehouseTableUpdateStatus');
+                            if (statusBox) {
+                                statusBox.setAttribute('data-state', 'success');
+                                statusBox.textContent = 'Запись успешно удалена';
+                                statusBox.classList.add('visible');
+                                setTimeout(() => {
+                                    statusBox.classList.remove('visible');
+                                }, 3000);
+                            }
+                        }
+                        // Закрываем модальное окно
+                        closeDeleteWarehouseModal();
+                    } else {
+                        const statusBox = document.getElementById('warehouseTableUpdateStatus');
+                        if (statusBox) {
+                            statusBox.setAttribute('data-state', 'error');
+                            statusBox.textContent = data.message || 'Не удалось удалить запись';
+                            statusBox.classList.add('visible');
+                            setTimeout(() => {
+                                statusBox.classList.remove('visible');
+                            }, 3000);
+                        }
+                        deleteWarehouseConfirm.disabled = false;
+                        deleteWarehouseConfirm.textContent = 'Удалить';
+                    }
+                } catch (error) {
+                    console.error('Ошибка при удалении записи:', error);
+                    // Если запись уже удалена из таблицы, закрываем модальное окно
+                    if (!warehouseToDeleteRow || !document.contains(warehouseToDeleteRow)) {
+                        closeDeleteWarehouseModal();
+                        return;
+                    }
+                    const statusBox = document.getElementById('warehouseTableUpdateStatus');
+                    if (statusBox) {
+                        statusBox.setAttribute('data-state', 'error');
+                        statusBox.textContent = 'Произошла ошибка при удалении записи';
+                        statusBox.classList.add('visible');
+                        setTimeout(() => {
+                            statusBox.classList.remove('visible');
+                        }, 3000);
+                    }
+                    deleteWarehouseConfirm.disabled = false;
+                    deleteWarehouseConfirm.textContent = 'Удалить';
+                }
+            });
+        }
+
+        // Данные для выпадающих списков в таблице
+        const facilityOptionsMap = {};
+        {% for fac in facility_choices %}
+        facilityOptionsMap[{{ fac.name|tojson }}] = {
+            id: {{ fac.id }},
+            name: {{ fac.name|tojson }}
+        };
+        {% endfor %}
+
+        const warehousesByFacility = {};
+        const warehousesDataMap = {};
+        {% for wh in warehouse_choices %}
+        (function() {
+            const facilityId = {{ wh.facility_id|tojson }};
+            const facilityName = {{ wh.facility|tojson }};
+            if (facilityId && facilityName) {
+                if (!warehousesByFacility[facilityName]) {
+                    warehousesByFacility[facilityName] = [];
+                }
+                warehousesByFacility[facilityName].push({
+                    id: {{ wh.id }},
+                    name: {{ wh.department|tojson }} || {{ wh.type|tojson }} || '—'
+                });
+            }
+            warehousesDataMap[{{ wh.id }}] = {
+                id: {{ wh.id }},
+                facility_id: facilityId,
+                facility_name: facilityName,
+                department_name: {{ wh.department|tojson }} || '—'
+            };
+        })();
+        {% endfor %}
+
+        // Выпадающие списки для предприятий в таблице
+        const facilityCells = document.querySelectorAll('.facility-cell');
+        const facilityDropdown = document.createElement('div');
+        facilityDropdown.className = 'role-dropdown';
+        document.body.appendChild(facilityDropdown);
+        let currentFacilityCell = null;
+
+        function populateFacilityDropdown() {
+            facilityDropdown.innerHTML = '';
+            Object.keys(facilityOptionsMap).forEach(facilityName => {
+                if (!facilityName || facilityName.trim() === '' || facilityName === '—') return;
+                
+                const option = document.createElement('button');
+                option.type = 'button';
+                option.className = 'role-dropdown-option';
+                option.textContent = facilityName;
+                
+                option.addEventListener('click', async () => {
+                    if (!currentFacilityCell) return;
+                    
+                    const row = currentFacilityCell.closest('tr');
+                    const partId = row?.dataset.partId;
+                    
+                    if (!partId) return;
+                    
+                    const labelSpan = currentFacilityCell.querySelector('.role-cell-label');
+                    const originalValue = currentFacilityCell.dataset.facilityValue || '';
+                    
+                    if (facilityName === originalValue) {
+                        closeFacilityDropdown();
+                        return;
+                    }
+                    
+                    // Обновляем отображаемое значение
+                    if (labelSpan) labelSpan.textContent = facilityName;
+                    currentFacilityCell.dataset.facilityValue = facilityName;
+                    currentFacilityCell.dataset.facilityId = facilityOptionsMap[facilityName].id;
+                    
+                    // Сбрасываем склад
+                    const warehouseCell = row.querySelector('.warehouse-cell');
+                    if (warehouseCell) {
+                        const warehouseLabel = warehouseCell.querySelector('.role-cell-label');
+                        if (warehouseLabel) warehouseLabel.textContent = '—';
+                        warehouseCell.dataset.warehouseId = '';
+                        warehouseCell.dataset.facilityName = facilityName;
+                    }
+                    
+                    closeFacilityDropdown();
+                    
+                    // Отправляем запрос на обновление
+                    try {
+                        const response = await fetch(`/admin/warehouse/${partId}`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                field: 'facility',
+                                value: facilityName
+                            })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            // Обновляем данные в строке
+                            row.dataset.facility = facilityName;
+                            if (data.warehouse) {
+                                const warehouseCell = row.querySelector('.warehouse-cell');
+                                if (warehouseCell) {
+                                    const warehouseLabel = warehouseCell.querySelector('.role-cell-label');
+                                    if (warehouseLabel) warehouseLabel.textContent = data.warehouse;
+                                }
+                            }
+                            
+                            const statusBox = document.getElementById('warehouseTableUpdateStatus');
+                            if (statusBox) {
+                                statusBox.setAttribute('data-state', 'success');
+                                statusBox.textContent = 'Изменения сохранены';
+                                statusBox.classList.add('visible');
+                                setTimeout(() => statusBox.classList.remove('visible'), 3000);
+                            }
+                        } else {
+                            // Откатываем изменение
+                            if (labelSpan) labelSpan.textContent = originalValue || '—';
+                            currentFacilityCell.dataset.facilityValue = originalValue;
+                            
+                            const statusBox = document.getElementById('warehouseTableUpdateStatus');
+                            if (statusBox) {
+                                statusBox.setAttribute('data-state', 'error');
+                                statusBox.textContent = data.message || 'Не удалось сохранить изменения';
+                                statusBox.classList.add('visible');
+                                setTimeout(() => statusBox.classList.remove('visible'), 3000);
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Ошибка при обновлении предприятия:', error);
+                        if (labelSpan) labelSpan.textContent = originalValue || '—';
+                        currentFacilityCell.dataset.facilityValue = originalValue;
+                    }
+                });
+                
+                facilityDropdown.appendChild(option);
+            });
+        }
+
+        function openFacilityDropdown(cell) {
+            if (currentFacilityCell === cell && facilityDropdown.classList.contains('visible')) {
+                closeFacilityDropdown();
+                return;
+            }
+            
+            currentFacilityCell = cell;
+            cell.setAttribute('aria-expanded', 'true');
+            populateFacilityDropdown();
+            
+            const rect = cell.getBoundingClientRect();
+            facilityDropdown.style.position = 'fixed';
+            facilityDropdown.style.left = rect.left + 'px';
+            facilityDropdown.style.top = (rect.bottom + 4) + 'px';
+            facilityDropdown.style.minWidth = rect.width + 'px';
+            facilityDropdown.style.maxWidth = '300px';
+            facilityDropdown.classList.add('visible');
+        }
+
+        function closeFacilityDropdown() {
+            if (currentFacilityCell) {
+                currentFacilityCell.setAttribute('aria-expanded', 'false');
+                currentFacilityCell = null;
+            }
+            facilityDropdown.classList.remove('visible');
+        }
+
+        facilityCells.forEach(cell => {
+            cell.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openFacilityDropdown(cell);
+            });
+
+            cell.addEventListener('focus', () => {
+                cell.dataset.originalValue = cell.dataset.facilityValue || '';
+            });
+
+            cell.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    openFacilityDropdown(cell);
+                }
+                if (event.key === 'Escape') {
+                    closeFacilityDropdown();
+                    cell.blur();
+                }
+            });
+        });
+
+        // Закрытие dropdown при клике вне его
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.facility-cell') && !facilityDropdown.contains(e.target)) {
+                closeFacilityDropdown();
+            }
+        }, true);
+
+        // Выпадающие списки для складов в таблице
+        const warehouseCells = document.querySelectorAll('.warehouse-cell');
+        const warehouseDropdown = document.createElement('div');
+        warehouseDropdown.className = 'role-dropdown';
+        document.body.appendChild(warehouseDropdown);
+        let currentWarehouseCell = null;
+
+        function populateWarehouseDropdown(cell) {
+            warehouseDropdown.innerHTML = '';
+            const facilityName = cell.dataset.facilityName || '';
+            const warehouses = warehousesByFacility[facilityName] || [];
+            
+            if (warehouses.length === 0) {
+                const emptyMsg = document.createElement('div');
+                emptyMsg.className = 'role-dropdown-option';
+                emptyMsg.textContent = 'Нет доступных складов';
+                emptyMsg.style.cursor = 'default';
+                emptyMsg.style.opacity = '0.6';
+                warehouseDropdown.appendChild(emptyMsg);
+                return;
+            }
+            
+            warehouses.forEach(warehouse => {
+                if (!warehouse || !warehouse.name || warehouse.name.trim() === '' || warehouse.name === '—') return;
+                
+                const option = document.createElement('button');
+                option.type = 'button';
+                option.className = 'role-dropdown-option';
+                option.textContent = warehouse.name;
+                
+                option.addEventListener('click', async () => {
+                    if (!currentWarehouseCell) return;
+                    
+                    const row = currentWarehouseCell.closest('tr');
+                    const partId = row?.dataset.partId;
+                    
+                    if (!partId) return;
+                    
+                    const labelSpan = currentWarehouseCell.querySelector('.role-cell-label');
+                    const originalValue = currentWarehouseCell.dataset.warehouseId || '';
+                    
+                    if (String(warehouse.id) === originalValue) {
+                        closeWarehouseDropdown();
+                        return;
+                    }
+                    
+                    // Обновляем отображаемое значение
+                    if (labelSpan) labelSpan.textContent = warehouse.name;
+                    currentWarehouseCell.dataset.warehouseId = warehouse.id;
+                    
+                    closeWarehouseDropdown();
+                    
+                    // Отправляем запрос на обновление
+                    try {
+                        const response = await fetch(`/admin/warehouse/${partId}`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                field: 'warehouse_id',
+                                value: warehouse.id
+                            })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            // Обновляем данные в строке
+                            row.dataset.warehouse = warehouse.name;
+                            if (data.facility) {
+                                const facilityCell = row.querySelector('.facility-cell');
+                                if (facilityCell) {
+                                    const facilityLabel = facilityCell.querySelector('.role-cell-label');
+                                    if (facilityLabel) facilityLabel.textContent = data.facility;
+                                    facilityCell.dataset.facilityValue = data.facility;
+                                }
+                            }
+                            
+                            const statusBox = document.getElementById('warehouseTableUpdateStatus');
+                            if (statusBox) {
+                                statusBox.setAttribute('data-state', 'success');
+                                statusBox.textContent = 'Изменения сохранены';
+                                statusBox.classList.add('visible');
+                                setTimeout(() => statusBox.classList.remove('visible'), 3000);
+                            }
+                        } else {
+                            // Откатываем изменение
+                            if (labelSpan) labelSpan.textContent = '—';
+                            currentWarehouseCell.dataset.warehouseId = '';
+                            
+                            const statusBox = document.getElementById('warehouseTableUpdateStatus');
+                            if (statusBox) {
+                                statusBox.setAttribute('data-state', 'error');
+                                statusBox.textContent = data.message || 'Не удалось сохранить изменения';
+                                statusBox.classList.add('visible');
+                                setTimeout(() => statusBox.classList.remove('visible'), 3000);
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Ошибка при обновлении склада:', error);
+                        if (labelSpan) labelSpan.textContent = '—';
+                        currentWarehouseCell.dataset.warehouseId = '';
+                    }
+                });
+                
+                warehouseDropdown.appendChild(option);
+            });
+        }
+
+        function openWarehouseDropdown(cell) {
+            if (currentWarehouseCell === cell && warehouseDropdown.classList.contains('visible')) {
+                closeWarehouseDropdown();
+                return;
+            }
+            
+            const facilityName = cell.dataset.facilityName || '';
+            if (!facilityName || facilityName === '—') {
+                const statusBox = document.getElementById('warehouseTableUpdateStatus');
+                if (statusBox) {
+                    statusBox.setAttribute('data-state', 'error');
+                    statusBox.textContent = 'Сначала выберите предприятие';
+                    statusBox.classList.add('visible');
+                    setTimeout(() => statusBox.classList.remove('visible'), 3000);
+                }
+                return;
+            }
+            
+            currentWarehouseCell = cell;
+            cell.setAttribute('aria-expanded', 'true');
+            populateWarehouseDropdown(cell);
+            
+            const rect = cell.getBoundingClientRect();
+            warehouseDropdown.style.position = 'fixed';
+            warehouseDropdown.style.left = rect.left + 'px';
+            warehouseDropdown.style.top = (rect.bottom + 4) + 'px';
+            warehouseDropdown.style.minWidth = rect.width + 'px';
+            warehouseDropdown.style.maxWidth = '300px';
+            warehouseDropdown.classList.add('visible');
+        }
+
+        function closeWarehouseDropdown() {
+            if (currentWarehouseCell) {
+                currentWarehouseCell.setAttribute('aria-expanded', 'false');
+                currentWarehouseCell = null;
+            }
+            warehouseDropdown.classList.remove('visible');
+        }
+
+        warehouseCells.forEach(cell => {
+            cell.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openWarehouseDropdown(cell);
+            });
+
+            cell.addEventListener('focus', () => {
+                cell.dataset.originalValue = cell.dataset.warehouseId || '';
+            });
+
+            cell.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    openWarehouseDropdown(cell);
+                }
+                if (event.key === 'Escape') {
+                    closeWarehouseDropdown();
+                    cell.blur();
+                }
+            });
+        });
+
+        // Закрытие dropdown при клике вне его
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.warehouse-cell') && !warehouseDropdown.contains(e.target)) {
+                closeWarehouseDropdown();
+            }
+        }, true);
+
         applyWarehouseTableFilters();
+
+        // Функция отката ячейки склада
+        function revertWarehouseCell(cell) {
+            if (!cell) return;
+            cell.textContent = cell.dataset.originalValue || '';
+        }
+
+        // Обновление ячейки склада
+        function updateWarehouseCell(cell, partId, field, value) {
+            cell.classList.add('saving');
+            fetch(`/admin/warehouse/${partId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ field, value })
+            })
+            .then(async response => {
+                const data = await response.json();
+                return { ok: response.ok, data };
+            })
+            .then(({ ok, data }) => {
+                cell.classList.remove('saving');
+                if (ok && data.success) {
+                    // Удаляем quantity input wrapper, если он есть
+                    const wrapper = cell.querySelector('.quantity-input-wrapper');
+                    if (wrapper) {
+                        wrapper.remove();
+                    }
+                    
+                    // Для количества преобразуем значение в число для отображения
+                    if (field === 'quantity') {
+                        const quantityValue = parseInt(data.value) || 0;
+                        // Отображаем прочерк для 0, иначе число
+                        cell.textContent = quantityValue === 0 ? '—' : quantityValue.toString();
+                    } else {
+                        // Для названия детали отображаем значение или прочерк
+                        cell.textContent = data.value || '—';
+                    }
+                    cell.dataset.originalValue = cell.textContent;
+                    
+                    // Обновляем данные в строке для фильтрации
+                    const row = cell.closest('tr');
+                    if (row && field === 'spare_part_name') {
+                        row.dataset.sparePart = data.value || '';
+                    }
+                    
+                    const statusBox = document.getElementById('warehouseTableUpdateStatus');
+                    if (statusBox) {
+                        statusBox.setAttribute('data-state', 'success');
+                        statusBox.textContent = 'Изменения сохранены';
+                        statusBox.classList.add('visible');
+                        setTimeout(() => statusBox.classList.remove('visible'), 3000);
+                    }
+                } else {
+                    cell.classList.add('error');
+                    revertWarehouseCell(cell);
+                    const statusBox = document.getElementById('warehouseTableUpdateStatus');
+                    if (statusBox) {
+                        statusBox.setAttribute('data-state', 'error');
+                        statusBox.textContent = data.message || 'Ошибка сохранения';
+                        statusBox.classList.add('visible');
+                        setTimeout(() => statusBox.classList.remove('visible'), 3000);
+                    }
+                    setTimeout(() => cell.classList.remove('error'), 1500);
+                }
+            })
+            .catch(() => {
+                cell.classList.remove('saving');
+                cell.classList.add('error');
+                revertWarehouseCell(cell);
+                const statusBox = document.getElementById('warehouseTableUpdateStatus');
+                if (statusBox) {
+                    statusBox.setAttribute('data-state', 'error');
+                    statusBox.textContent = 'Сеть недоступна. Попробуйте позже.';
+                    statusBox.classList.add('visible');
+                    setTimeout(() => statusBox.classList.remove('visible'), 3000);
+                }
+                setTimeout(() => cell.classList.remove('error'), 1500);
+            });
+        }
+
+        // Редактирование ячеек склада
+        function setupWarehouseEditableCells() {
+            const editableWarehouseCells = warehouseTable ? warehouseTable.querySelectorAll('td.editable-cell[data-field]') : [];
+            editableWarehouseCells.forEach(cell => {
+                const field = cell.dataset.field;
+                
+                // Для ячейки "Количество" используем number input с кастомными стрелками
+                if (field === 'quantity') {
+                    let quantityInput = null;
+                    let quantityWrapper = null;
+                    let quantityButtons = null;
+                    
+                    cell.addEventListener('dblclick', () => {
+                        // Если уже редактируется, не делаем ничего
+                        if (cell.querySelector('.quantity-input-wrapper')) return;
+                        
+                        const originalText = cell.textContent.trim();
+                        const originalValue = originalText === '—' ? '0' : originalText;
+                        cell.dataset.originalValue = originalValue;
+                        
+                        // Сохраняем текущий текст для отображения
+                        const currentValue = originalText === '—' ? '0' : originalText;
+                        
+                        // Создаём обёртку
+                        quantityWrapper = document.createElement('div');
+                        quantityWrapper.className = 'quantity-input-wrapper';
+                        
+                        // Создаём input
+                        quantityInput = document.createElement('input');
+                        quantityInput.type = 'number';
+                        quantityInput.min = '0';
+                        quantityInput.value = currentValue;
+                        quantityInput.className = 'quantity-input';
+                        
+                        // Создаём кнопки-стрелки
+                        quantityButtons = document.createElement('div');
+                        quantityButtons.className = 'quantity-input-buttons';
+                        
+                        const btnUp = document.createElement('button');
+                        btnUp.type = 'button';
+                        btnUp.className = 'quantity-input-btn quantity-input-btn-up';
+                        btnUp.setAttribute('aria-label', 'Увеличить количество');
+                        btnUp.setAttribute('tabindex', '-1');
+                        btnUp.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>';
+                        
+                        const btnDown = document.createElement('button');
+                        btnDown.type = 'button';
+                        btnDown.className = 'quantity-input-btn quantity-input-btn-down';
+                        btnDown.setAttribute('aria-label', 'Уменьшить количество');
+                        btnDown.setAttribute('tabindex', '-1');
+                        btnDown.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+                        
+                        quantityButtons.appendChild(btnUp);
+                        quantityButtons.appendChild(btnDown);
+                        
+                        quantityWrapper.appendChild(quantityInput);
+                        quantityWrapper.appendChild(quantityButtons);
+                        
+                        // Очищаем ячейку и вставляем обёртку
+                        cell.textContent = '';
+                        cell.appendChild(quantityWrapper);
+                        
+                        // Фокусируемся на input и выделяем текст
+                        quantityInput.focus();
+                        quantityInput.select();
+                        
+                        // Обработчики для кнопок - используем mousedown, чтобы предотвратить blur
+                        btnUp.addEventListener('mousedown', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const current = parseInt(quantityInput.value) || 0;
+                            quantityInput.value = Math.max(0, current + 1).toString();
+                            quantityInput.dispatchEvent(new Event('input', { bubbles: true }));
+                            // Возвращаем фокус на input
+                            quantityInput.focus();
+                        });
+                        
+                        btnDown.addEventListener('mousedown', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const current = parseInt(quantityInput.value) || 0;
+                            quantityInput.value = Math.max(0, current - 1).toString();
+                            quantityInput.dispatchEvent(new Event('input', { bubbles: true }));
+                            // Возвращаем фокус на input
+                            quantityInput.focus();
+                        });
+                        
+                        // Предотвращаем blur при клике на кнопки
+                        btnUp.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        });
+                        
+                        btnDown.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        });
+                        
+                        // Обработчик для колесика мыши
+                        quantityWrapper.addEventListener('wheel', (e) => {
+                            if (document.activeElement === quantityInput) {
+                                e.preventDefault();
+                                const delta = e.deltaY > 0 ? -1 : 1;
+                                const current = parseInt(quantityInput.value) || 0;
+                                quantityInput.value = Math.max(0, current + delta).toString();
+                                quantityInput.dispatchEvent(new Event('input', { bubbles: true }));
+                            }
+                        }, { passive: false });
+                        
+                        // Обработчики для клавиатуры
+                        quantityInput.addEventListener('keydown', (event) => {
+                            if (event.key === 'Enter') {
+                                event.preventDefault();
+                                quantityInput.blur();
+                            }
+                            if (event.key === 'Escape') {
+                                event.preventDefault();
+                                revertWarehouseQuantityCell(cell, originalValue);
+                            }
+                        });
+                        
+                        // Обработчик для blur - с задержкой, чтобы проверить, не кликнули ли на кнопку
+                        quantityInput.addEventListener('blur', () => {
+                            // Используем небольшую задержку, чтобы проверить, не был ли это клик на кнопку
+                            setTimeout(() => {
+                                // Проверяем, что input всё ещё существует (не был удалён)
+                                if (!cell.querySelector('.quantity-input-wrapper')) return;
+                                
+                                // Если фокус вернулся на input, значит это был клик на кнопку
+                                if (document.activeElement === quantityInput) {
+                                    return;
+                                }
+                                
+                                // Если blur произошёл не из-за клика на кнопку, обрабатываем сохранение
+                                const newValue = quantityInput.value.trim();
+                                const numValue = parseInt(newValue);
+                                
+                                if (isNaN(numValue) || numValue < 0) {
+                                    revertWarehouseQuantityCell(cell, originalValue);
+                                    const statusBox = document.getElementById('warehouseTableUpdateStatus');
+                                    if (statusBox) {
+                                        statusBox.setAttribute('data-state', 'error');
+                                        statusBox.textContent = 'Некорректное количество';
+                                        statusBox.classList.add('visible');
+                                        setTimeout(() => statusBox.classList.remove('visible'), 3000);
+                                    }
+                                    return;
+                                }
+                                
+                                const normalizedOriginal = originalValue === '—' ? '0' : originalValue;
+                                const normalizedNew = numValue.toString();
+                                
+                                if (normalizedNew === normalizedOriginal) {
+                                    revertWarehouseQuantityCell(cell, originalValue);
+                                    return;
+                                }
+                                
+                                const row = cell.closest('tr');
+                                const partId = row ? row.dataset.partId : null;
+                                if (!partId) {
+                                    revertWarehouseQuantityCell(cell, originalValue);
+                                    const statusBox = document.getElementById('warehouseTableUpdateStatus');
+                                    if (statusBox) {
+                                        statusBox.setAttribute('data-state', 'error');
+                                        statusBox.textContent = 'Не удалось определить запись.';
+                                        statusBox.classList.add('visible');
+                                        setTimeout(() => statusBox.classList.remove('visible'), 3000);
+                                    }
+                                    return;
+                                }
+                                
+                                // Обновляем ячейку через updateWarehouseCell
+                                updateWarehouseCell(cell, partId, 'quantity', normalizedNew);
+                            }, 50);
+                        });
+                    });
+                } else {
+                    // Для остальных ячеек (например, "Деталь") используем обычный contenteditable
+                    cell.addEventListener('dblclick', () => {
+                        cell.contentEditable = 'true';
+                        cell.dataset.originalValue = cell.textContent.trim();
+                        cell.focus();
+                        const range = document.createRange();
+                        range.selectNodeContents(cell);
+                        const selection = window.getSelection();
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    });
+
+                    cell.addEventListener('keydown', (event) => {
+                        if (cell.contentEditable !== 'true') return;
+                        
+                        if (event.key === 'Enter') {
+                            event.preventDefault();
+                            cell.blur();
+                        }
+                        if (event.key === 'Escape') {
+                            event.preventDefault();
+                            revertWarehouseCell(cell);
+                            cell.blur();
+                        }
+                    });
+
+                    cell.addEventListener('blur', () => {
+                        cell.contentEditable = 'false';
+                        
+                        const originalValue = cell.dataset.originalValue ?? '';
+                        let newValue = cell.textContent.trim();
+                        
+                        // Для названия детали проверяем, что не пустое
+                        if (cell.dataset.field === 'spare_part_name') {
+                            if (!newValue || newValue.trim() === '') {
+                                revertWarehouseCell(cell);
+                                const statusBox = document.getElementById('warehouseTableUpdateStatus');
+                                if (statusBox) {
+                                    statusBox.setAttribute('data-state', 'error');
+                                    statusBox.textContent = 'Название детали не может быть пустым';
+                                    statusBox.classList.add('visible');
+                                    setTimeout(() => statusBox.classList.remove('visible'), 3000);
+                                }
+                                return;
+                            }
+                        }
+                        
+                        // Нормализуем значения для сравнения
+                        const normalizedOriginal = originalValue === '—' ? '' : originalValue;
+                        const normalizedNew = newValue === '—' ? '' : newValue;
+                        if (normalizedNew === normalizedOriginal) {
+                            return;
+                        }
+                        
+                        const row = cell.closest('tr');
+                        const partId = row ? row.dataset.partId : null;
+                        if (!partId) {
+                            revertWarehouseCell(cell);
+                            const statusBox = document.getElementById('warehouseTableUpdateStatus');
+                            if (statusBox) {
+                                statusBox.setAttribute('data-state', 'error');
+                                statusBox.textContent = 'Не удалось определить запись.';
+                                statusBox.classList.add('visible');
+                                setTimeout(() => statusBox.classList.remove('visible'), 3000);
+                            }
+                            return;
+                        }
+                        const field = cell.dataset.field;
+                        if (!field) {
+                            revertWarehouseCell(cell);
+                            return;
+                        }
+                        updateWarehouseCell(cell, partId, field, newValue);
+                    });
+                }
+            });
+        }
+        
+        // Функция для восстановления ячейки количества
+        function revertWarehouseQuantityCell(cell, originalValue) {
+            const wrapper = cell.querySelector('.quantity-input-wrapper');
+            if (wrapper) {
+                wrapper.remove();
+            }
+            const displayValue = originalValue === '0' || originalValue === '' ? '—' : originalValue;
+            cell.textContent = displayValue;
+        }
+
+        // Инициализация редактируемых ячеек
+        setupWarehouseEditableCells();
+
         {% endif %}
     </script>
 
@@ -3500,6 +5033,9 @@
     <script>
         // JavaScript для работы с таблицей оборудования
         (function() {
+            'use strict';
+            
+            try {
             const equipmentSearch = document.getElementById('equipmentSearch');
             const equipmentFilterToggle = document.getElementById('equipmentFilterToggle');
             const equipmentFilterDropdown = document.getElementById('equipmentFilterDropdown');
@@ -3588,9 +5124,47 @@
                 const menu = createContextMenu();
                 selectedEquipmentRow = row;
                 
+                const tableContainer = document.querySelector('.table-container');
+                if (!tableContainer) return;
+                
+                // Сначала показываем меню, чтобы получить его размеры
                 menu.style.display = 'block';
-                menu.style.left = event.pageX + 'px';
-                menu.style.top = event.pageY + 'px';
+                menu.style.visibility = 'hidden';
+                menu.style.left = '0px';
+                menu.style.top = '0px';
+                
+                const containerRect = tableContainer.getBoundingClientRect();
+                const menuRect = menu.getBoundingClientRect();
+                
+                // Используем координаты клика относительно viewport
+                let left = event.clientX;
+                let top = event.clientY;
+                
+                // Проверяем, не выходит ли меню за правую границу таблицы
+                if (left + menuRect.width > containerRect.right) {
+                    left = containerRect.right - menuRect.width - 10;
+                }
+                
+                // Проверяем, не выходит ли меню за левую границу таблицы
+                if (left < containerRect.left) {
+                    left = containerRect.left + 10;
+                }
+                
+                // Проверяем, не выходит ли меню за нижнюю границу таблицы
+                if (top + menuRect.height > containerRect.bottom) {
+                    top = containerRect.bottom - menuRect.height - 10;
+                }
+                
+                // Проверяем, не выходит ли меню за верхнюю границу таблицы
+                if (top < containerRect.top) {
+                    top = containerRect.top + 10;
+                }
+                
+                // Устанавливаем финальную позицию
+                menu.style.position = 'fixed';
+                menu.style.left = left + 'px';
+                menu.style.top = top + 'px';
+                menu.style.visibility = 'visible';
                 
                 // Закрываем меню при клике вне его
                 setTimeout(() => {
@@ -3609,36 +5183,61 @@
                 return equipmentTable ? equipmentTable.querySelectorAll('tbody tr') : [];
             }
 
-            // Выделение строки при одинарном клике
+            // Выделение строки при одинарном клике и контекстное меню
             function setupRowHandlers() {
-                const rows = getAllEquipmentRows();
-                rows.forEach(row => {
-                    // Удаляем старые обработчики, если они есть
-                    const newRow = row.cloneNode(true);
-                    row.parentNode.replaceChild(newRow, row);
+                const tbody = equipmentTable ? equipmentTable.querySelector('tbody') : null;
+                if (!tbody) return;
+
+                // Одинарный клик - выделение строки
+                tbody.addEventListener('click', (e) => {
+                    // Игнорируем клики по редактируемым ячейкам
+                    if (e.target.closest('.editable-cell[contenteditable="true"]')) {
+                        return;
+                    }
+                    // Игнорируем клики по ячейкам типа (они обрабатываются отдельно)
+                    if (e.target.closest('.role-cell[data-field="equipment_type"]')) {
+                        return;
+                    }
                     
-                    newRow.addEventListener('click', (e) => {
-                        // Игнорируем клики по редактируемым ячейкам
-                        if (e.target.closest('.editable-cell[contenteditable="true"]')) {
-                            return;
+                    const row = e.target.closest('tr');
+                    if (row) {
+                        // Если строка уже выделена, убираем выделение
+                        if (row.classList.contains('selected')) {
+                            row.classList.remove('selected');
+                            selectedEquipmentRow = null;
+                        } else {
+                            // Убираем выделение с других строк
+                            getAllEquipmentRows().forEach(r => r.classList.remove('selected'));
+                            // Выделяем текущую строку
+                            row.classList.add('selected');
+                            selectedEquipmentRow = row;
                         }
-                        
+                    }
+                });
+                
+                // Убираем выделение при клике вне таблицы
+                document.addEventListener('click', (e) => {
+                    // Проверяем, что клик был не по таблице и не по контекстному меню
+                    if (!equipmentTable.contains(e.target) && 
+                        !(equipmentContextMenu && equipmentContextMenu.contains(e.target))) {
+                        getAllEquipmentRows().forEach(r => r.classList.remove('selected'));
+                        selectedEquipmentRow = null;
+                    }
+                });
+                
+                // ПКМ - выделение строки и показ контекстного меню
+                tbody.addEventListener('contextmenu', (e) => {
+                    // Проверяем, что клик был по строке, а не по редактируемой ячейке
+                    const row = e.target.closest('tr');
+                    if (row && !e.target.closest('.editable-cell[contenteditable="true"]')) {
+                        e.preventDefault();
                         // Убираем выделение с других строк
                         getAllEquipmentRows().forEach(r => r.classList.remove('selected'));
                         // Выделяем текущую строку
-                        newRow.classList.add('selected');
-                        selectedEquipmentRow = newRow;
-                    });
-
-                    // Контекстное меню при правом клике
-                    newRow.addEventListener('contextmenu', (e) => {
-                        e.preventDefault();
-                        // Выделяем строку
-                        getAllEquipmentRows().forEach(r => r.classList.remove('selected'));
-                        newRow.classList.add('selected');
-                        selectedEquipmentRow = newRow;
-                        showContextMenu(e, newRow);
-                    });
+                        row.classList.add('selected');
+                        selectedEquipmentRow = row;
+                        showContextMenu(e, row);
+                    }
                 });
             }
 
@@ -3661,6 +5260,13 @@
             // Функция отката ячейки
             function revertEquipmentCell(cell) {
                 if (!cell) return;
+                if (cell.classList.contains('role-cell')) {
+                    const typeValue = cell.dataset.originalValue || '';
+                    const labelSpan = cell.querySelector('.role-cell-label');
+                    if (labelSpan) labelSpan.textContent = typeValue || '—';
+                    cell.dataset.typeValue = typeValue;
+                    return;
+                }
                 cell.textContent = cell.dataset.originalValue || '';
             }
 
@@ -3681,8 +5287,22 @@
                 .then(({ ok, data }) => {
                     cell.classList.remove('saving');
                     if (ok && data.success) {
-                        cell.textContent = data.value || '';
-                        cell.dataset.originalValue = cell.textContent;
+                        if (cell.classList.contains('role-cell')) {
+                            const labelSpan = cell.querySelector('.role-cell-label');
+                            const typeValue = data.value || '';
+                            if (labelSpan) labelSpan.textContent = typeValue || '—';
+                            cell.dataset.typeValue = typeValue;
+                            cell.dataset.originalValue = typeValue;
+                            cell.setAttribute('aria-expanded', 'false');
+                            // Обновляем data-type в строке для фильтрации
+                            const row = cell.closest('tr');
+                            if (row) {
+                                row.dataset.type = typeValue;
+                            }
+                        } else {
+                            cell.textContent = data.value || '';
+                            cell.dataset.originalValue = cell.textContent;
+                        }
                         showEquipmentStatus('Изменения сохранены', 'success');
                     } else {
                         cell.classList.add('error');
@@ -3757,6 +5377,424 @@
 
             setupEditableCells();
 
+            // Выпадающий список типов оборудования
+            const equipmentTypeOptions = {{ equipment_types|tojson }};
+            const typeDropdown = document.createElement('div');
+            typeDropdown.className = 'role-dropdown';
+            document.body.appendChild(typeDropdown);
+
+            let currentTypeCell = null;
+
+            function populateTypeDropdown() {
+                typeDropdown.innerHTML = '';
+                
+                equipmentTypeOptions.forEach(type => {
+                    if (!type || type.trim() === '') return;
+                    const option = document.createElement('button');
+                    option.type = 'button';
+                    option.className = 'role-dropdown-option';
+                    option.dataset.value = type;
+                    option.textContent = type;
+                    option.addEventListener('click', () => {
+                        const targetCell = currentTypeCell;
+                        if (!targetCell) return;
+                        if (targetCell.dataset.typeValue === type) {
+                            closeTypeDropdown();
+                            return;
+                        }
+                        const row = targetCell.closest('tr');
+                        if (!row) return;
+                        const equipmentId = row.dataset.equipmentId;
+                        if (!equipmentId) return;
+                        targetCell.dataset.originalValue = targetCell.dataset.typeValue || '';
+                        updateEquipmentCell(targetCell, equipmentId, 'equipment_type', type);
+                        closeTypeDropdown();
+                    });
+                    typeDropdown.appendChild(option);
+                });
+            }
+
+            function positionTypeDropdown(cell) {
+                if (!cell || !typeDropdown) return;
+                
+                const rect = cell.getBoundingClientRect();
+                const cellWidth = cell.offsetWidth;
+                const rectWidth = rect.width;
+                const finalWidth = Math.max(cellWidth, rectWidth);
+                
+                const viewportHeight = window.innerHeight;
+                const maxDropdownHeight = 300; // Максимальная высота выпадающего списка
+                
+                const tableContainer = document.querySelector('.table-container');
+                let containerRect = null;
+                if (tableContainer) {
+                    containerRect = tableContainer.getBoundingClientRect();
+                }
+                
+                const spaceBelow = viewportHeight - rect.bottom;
+                const spaceAbove = rect.top;
+                
+                let availableSpaceBelow = spaceBelow;
+                let availableSpaceAbove = spaceAbove;
+                
+                if (containerRect) {
+                    const containerBottom = containerRect.bottom;
+                    const containerTop = containerRect.top;
+                    availableSpaceBelow = Math.min(spaceBelow, containerBottom - rect.bottom);
+                    availableSpaceAbove = Math.min(spaceAbove, rect.top - containerTop);
+                }
+                
+                // Вычисляем оптимальную высоту с учетом доступного пространства
+                let calculatedHeight = maxDropdownHeight;
+                if (availableSpaceBelow < maxDropdownHeight && availableSpaceAbove > availableSpaceBelow) {
+                    // Открываем вверх, используем доступное пространство сверху
+                    calculatedHeight = Math.min(maxDropdownHeight, availableSpaceAbove - 10);
+                } else {
+                    // Открываем вниз, используем доступное пространство снизу
+                    calculatedHeight = Math.min(maxDropdownHeight, availableSpaceBelow - 10);
+                }
+                
+                // Устанавливаем максимальную высоту
+                typeDropdown.style.maxHeight = `${calculatedHeight}px`;
+                
+                const openUpward = availableSpaceBelow < calculatedHeight && availableSpaceAbove > availableSpaceBelow;
+                
+                typeDropdown.style.position = 'fixed';
+                if (openUpward) {
+                    typeDropdown.style.bottom = `${viewportHeight - rect.top + 6}px`;
+                    typeDropdown.style.top = 'auto';
+                    typeDropdown.style.maxHeight = `${Math.min(calculatedHeight, availableSpaceAbove - 10)}px`;
+                } else {
+                    typeDropdown.style.top = `${rect.bottom + 6}px`;
+                    typeDropdown.style.bottom = 'auto';
+                    typeDropdown.style.maxHeight = `${Math.min(calculatedHeight, availableSpaceBelow - 10)}px`;
+                }
+                typeDropdown.style.left = `${rect.left}px`;
+                typeDropdown.style.width = `${finalWidth}px`;
+                typeDropdown.style.minWidth = `${finalWidth}px`;
+                typeDropdown.style.maxWidth = `${finalWidth}px`;
+                typeDropdown.style.boxSizing = 'border-box';
+                typeDropdown.style.flexShrink = '0';
+                typeDropdown.style.flexGrow = '0';
+                
+                const options = typeDropdown.querySelectorAll('.role-dropdown-option');
+                options.forEach(opt => {
+                    opt.style.width = '100%';
+                    opt.style.minWidth = '100%';
+                    opt.style.maxWidth = '100%';
+                    opt.style.boxSizing = 'border-box';
+                    opt.classList.toggle('selected', opt.dataset.value === cell.dataset.typeValue);
+                });
+            }
+
+            function openTypeDropdown(cell) {
+                currentTypeCell = cell;
+                cell.setAttribute('aria-expanded', 'true');
+                populateTypeDropdown();
+                typeDropdown.classList.add('visible');
+                
+                // Убеждаемся, что обработчики событий работают
+                // Добавляем обработчик wheel с более высоким приоритетом
+                const wheelHandler = (event) => {
+                    if (typeDropdown.classList.contains('visible')) {
+                        const rect = typeDropdown.getBoundingClientRect();
+                        const isOverDropdown = event.clientX >= rect.left && 
+                                              event.clientX <= rect.right &&
+                                              event.clientY >= rect.top && 
+                                              event.clientY <= rect.bottom;
+                        
+                        if (isOverDropdown) {
+                            event.stopPropagation();
+                            event.stopImmediatePropagation();
+                            isScrollingDropdown = true;
+                            
+                            const scrollTop = typeDropdown.scrollTop;
+                            const scrollHeight = typeDropdown.scrollHeight;
+                            const height = typeDropdown.clientHeight;
+                            const delta = event.deltaY;
+                            
+                            if ((scrollTop === 0 && delta < 0) || (scrollTop + height >= scrollHeight && delta > 0)) {
+                                event.preventDefault();
+                            }
+                            
+                            setTimeout(() => {
+                                isScrollingDropdown = false;
+                            }, 100);
+                        }
+                    }
+                };
+                
+                // Удаляем старый обработчик, если есть
+                typeDropdown.removeEventListener('wheel', wheelHandler, { capture: true });
+                // Добавляем новый обработчик
+                typeDropdown.addEventListener('wheel', wheelHandler, { passive: false, capture: true });
+                
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        positionTypeDropdown(cell);
+                        requestAnimationFrame(() => {
+                            positionTypeDropdown(cell);
+                        });
+                    });
+                });
+            }
+
+            function closeTypeDropdown() {
+                if (currentTypeCell) {
+                    currentTypeCell.setAttribute('aria-expanded', 'false');
+                }
+                currentTypeCell = null;
+                typeDropdown.classList.remove('visible');
+            }
+
+            // Обработчики для ячеек типов
+            function setupTypeCellHandlers() {
+                const typeCells = equipmentTable ? equipmentTable.querySelectorAll('td.role-cell[data-field="equipment_type"]') : [];
+                typeCells.forEach(cell => {
+                    // Удаляем старые обработчики, если они есть
+                    const newCell = cell.cloneNode(true);
+                    cell.parentNode.replaceChild(newCell, cell);
+                    
+                    newCell.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        if (currentTypeCell === newCell && typeDropdown.classList.contains('visible')) {
+                            closeTypeDropdown();
+                        } else {
+                            closeTypeDropdown();
+                            openTypeDropdown(newCell);
+                        }
+                    });
+
+                    newCell.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (currentTypeCell === newCell && typeDropdown.classList.contains('visible')) {
+                                closeTypeDropdown();
+                            } else {
+                                closeTypeDropdown();
+                                openTypeDropdown(newCell);
+                            }
+                        } else if (e.key === 'Escape') {
+                            closeTypeDropdown();
+                        }
+                    });
+                });
+            }
+            
+            setupTypeCellHandlers();
+
+            // Функция для проверки, находится ли точка внутри выпадающего списка
+            function isPointInDropdown(x, y) {
+                if (!typeDropdown.classList.contains('visible')) return false;
+                const rect = typeDropdown.getBoundingClientRect();
+                return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+            }
+            
+            // Глобальный обработчик wheel на document с capture: true (срабатывает первым)
+            document.addEventListener('wheel', (event) => {
+                if (isPointInDropdown(event.clientX, event.clientY)) {
+                    event.stopPropagation();
+                    event.stopImmediatePropagation();
+                    isScrollingDropdown = true;
+                    
+                    // Прокручиваем список вручную, если нужно
+                    const scrollTop = typeDropdown.scrollTop;
+                    const scrollHeight = typeDropdown.scrollHeight;
+                    const height = typeDropdown.clientHeight;
+                    const delta = event.deltaY;
+                    
+                    // Если прокрутка достигла границ, предотвращаем дальнейшую прокрутку страницы
+                    if ((scrollTop === 0 && delta < 0) || (scrollTop + height >= scrollHeight && delta > 0)) {
+                        event.preventDefault();
+                    }
+                    
+                    setTimeout(() => {
+                        isScrollingDropdown = false;
+                    }, 300);
+                    return;
+                }
+            }, { capture: true, passive: false });
+            
+            // Флаги для отслеживания взаимодействия с выпадающим списком
+            let isDraggingScrollbar = false;
+            let mousedownInDropdown = false;
+            
+            // Глобальный обработчик mousedown на document с capture: true
+            document.addEventListener('mousedown', (event) => {
+                if (isPointInDropdown(event.clientX, event.clientY)) {
+                    event.stopPropagation();
+                    event.stopImmediatePropagation();
+                    mousedownInDropdown = true;
+                    
+                    // Проверяем, не кликнули ли мы на скроллбар (правая часть элемента)
+                    const rect = typeDropdown.getBoundingClientRect();
+                    const scrollbarWidth = 12; // Ширина скроллбара с небольшим запасом
+                    const isOnScrollbar = event.clientX >= rect.right - scrollbarWidth;
+                    
+                    if (isOnScrollbar) {
+                        isDraggingScrollbar = true;
+                        isScrollingDropdown = true;
+                    } else {
+                        // Устанавливаем флаг, чтобы предотвратить закрытие при последующем событии scroll
+                        isScrollingDropdown = true;
+                        setTimeout(() => {
+                            isScrollingDropdown = false;
+                        }, 300);
+                    }
+                    return;
+                } else {
+                    mousedownInDropdown = false;
+                }
+            }, { capture: true });
+            
+            // Обработчик mouseup для сброса флага перетаскивания
+            document.addEventListener('mouseup', (event) => {
+                if (isDraggingScrollbar) {
+                    isDraggingScrollbar = false;
+                    // Увеличиваем задержку перед сбросом флага, чтобы обработчик click успел проверить
+                    setTimeout(() => {
+                        isScrollingDropdown = false;
+                    }, 300);
+                }
+                if (isPointInDropdown(event.clientX, event.clientY) || mousedownInDropdown) {
+                    event.stopPropagation();
+                    event.stopImmediatePropagation();
+                    mousedownInDropdown = false;
+                }
+            }, { capture: true });
+            
+            // Обработчик mousemove для отслеживания перетаскивания скроллбара
+            document.addEventListener('mousemove', (event) => {
+                if (isDraggingScrollbar) {
+                    isScrollingDropdown = true;
+                }
+            }, { capture: true });
+            
+            // Глобальный обработчик click на document (срабатывает последним)
+            document.addEventListener('click', (event) => {
+                // Не закрываем, если список не видим
+                if (!typeDropdown.classList.contains('visible')) return;
+                
+                // Не закрываем, если происходит перетаскивание скроллбара или прокрутка
+                if (isDraggingScrollbar || isScrollingDropdown) {
+                    return;
+                }
+                
+                // Не закрываем, если клик был внутри выпадающего списка
+                if (typeDropdown.contains(event.target)) return;
+                
+                // Не закрываем, если клик был на ячейке типа
+                if (event.target.closest('.role-cell[data-field="equipment_type"]')) return;
+                
+                // Проверяем координаты на случай, если клик был на скроллбаре
+                if (isPointInDropdown(event.clientX, event.clientY)) {
+                    return;
+                }
+                
+                // Небольшая задержка перед закрытием, чтобы дать время обработать события mousedown/mouseup
+                setTimeout(() => {
+                    // Повторно проверяем флаги перед закрытием
+                    if (!isDraggingScrollbar && !isScrollingDropdown && !mousedownInDropdown && typeDropdown.classList.contains('visible')) {
+                        closeTypeDropdown();
+                    }
+                }, 150);
+            }, { capture: false });
+            
+            // Обработчики на самом элементе для дополнительной защиты
+            typeDropdown.addEventListener('mousedown', (event) => {
+                event.stopPropagation();
+                event.stopImmediatePropagation();
+            }, { capture: true });
+            
+            typeDropdown.addEventListener('click', (event) => {
+                event.stopPropagation();
+                event.stopImmediatePropagation();
+            }, { capture: true });
+            
+            typeDropdown.addEventListener('wheel', (event) => {
+                event.stopPropagation();
+                event.stopImmediatePropagation();
+            }, { capture: true, passive: false });
+
+            window.addEventListener('resize', () => {
+                if (currentTypeCell) {
+                    requestAnimationFrame(() => {
+                        positionTypeDropdown(currentTypeCell);
+                    });
+                }
+            });
+
+            // Флаг для отслеживания прокрутки внутри выпадающего списка
+            let isScrollingDropdown = false;
+            let dropdownScrollTimeout = null;
+            
+            // Отслеживаем прокрутку внутри выпадающего списка
+            typeDropdown.addEventListener('scroll', (event) => {
+                if (typeDropdown.classList.contains('visible')) {
+                    isScrollingDropdown = true;
+                    // Очищаем предыдущий таймаут
+                    if (dropdownScrollTimeout) {
+                        clearTimeout(dropdownScrollTimeout);
+                    }
+                    // Сбрасываем флаг через задержку
+                    dropdownScrollTimeout = setTimeout(() => {
+                        isScrollingDropdown = false;
+                    }, 200);
+                }
+            });
+            
+            window.addEventListener('scroll', (event) => {
+                // Не закрываем, если прокрутка происходит внутри выпадающего списка
+                if (isScrollingDropdown) return;
+                
+                // Проверяем, что прокрутка не была вызвана прокруткой внутри списка
+                // Для этого проверяем, не находится ли курсор над выпадающим списком
+                if (currentTypeCell && typeDropdown.classList.contains('visible')) {
+                    // Получаем текущую позицию курсора (если доступна)
+                    // Если событие scroll было вызвано прокруткой внутри списка, не закрываем
+                    if (isScrollingDropdown) return;
+                    
+                    // Небольшая задержка, чтобы дать время обработать событие scroll внутри списка
+                    setTimeout(() => {
+                        if (!isScrollingDropdown && typeDropdown.classList.contains('visible')) {
+                            closeTypeDropdown();
+                        }
+                    }, 100);
+                }
+            }, true);
+
+            const tableContainer = document.querySelector('.table-container');
+            if (tableContainer) {
+                tableContainer.addEventListener('scroll', () => {
+                    // Не закрываем, если прокрутка происходит внутри выпадающего списка
+                    if (isScrollingDropdown) return;
+                    if (currentTypeCell && typeDropdown.classList.contains('visible')) {
+                        // Небольшая задержка, чтобы дать время обработать событие scroll внутри списка
+                        setTimeout(() => {
+                            if (!isScrollingDropdown && typeDropdown.classList.contains('visible')) {
+                                closeTypeDropdown();
+                            }
+                        }, 50);
+                    }
+                });
+            }
+
+            // Функция для чередования цветов строк
+            function applyEquipmentRowStriping() {
+                let visibleIndex = 0;
+                getAllEquipmentRows().forEach(row => {
+                    if (row.style.display === 'none') {
+                        row.classList.remove('alt-row');
+                        return;
+                    }
+                    const isAlt = visibleIndex % 2 === 1;
+                    row.classList.toggle('alt-row', isAlt);
+                    visibleIndex += 1;
+                });
+            }
+
             // Фильтрация таблицы
             function applyEquipmentFilters() {
                 const searchValue = equipmentSearch ? equipmentSearch.value.toLowerCase().trim() : '';
@@ -3793,19 +5831,40 @@
                         visibleIndex++;
                     }
                 });
+
+                // Применяем чередование цветов
+                applyEquipmentRowStriping();
             }
 
             // Поиск
             if (equipmentSearch) {
                 equipmentSearch.addEventListener('input', applyEquipmentFilters);
+            } else {
+                console.error('equipmentSearch не найден');
             }
 
             // Фильтры
+            const equipmentFilterSelectWrappers = document.querySelectorAll('#equipmentFilterDropdown .filter-select[data-target]');
+            const equipmentFilterSelectControllers = new Map();
+
+            function closeEquipmentFilterSelectMenus() {
+                equipmentFilterSelectWrappers.forEach(wrapper => {
+                    wrapper.classList.remove('open');
+                    const btn = wrapper.querySelector('.filter-select-btn');
+                    if (btn) {
+                        btn.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            }
+
             if (equipmentFilterToggle && equipmentFilterDropdown) {
                 equipmentFilterToggle.addEventListener('click', (e) => {
                     e.stopPropagation();
                     equipmentFilterDropdown.classList.toggle('active');
                     equipmentFilterToggle.classList.toggle('active');
+                    if (!equipmentFilterDropdown.classList.contains('active')) {
+                        closeEquipmentFilterSelectMenus();
+                    }
                 });
 
                 [typeFilter, statusFilter, locationFilter].forEach(filter => {
@@ -3821,6 +5880,7 @@
                         if (statusFilter) statusFilter.value = '';
                         if (locationFilter) locationFilter.value = '';
                         applyEquipmentFilters();
+                        equipmentFilterSelectControllers.forEach(controller => controller.sync());
                     });
                 }
 
@@ -3828,9 +5888,79 @@
                     if (!equipmentFilterDropdown.contains(event.target) && !equipmentFilterToggle.contains(event.target)) {
                         equipmentFilterDropdown.classList.remove('active');
                         equipmentFilterToggle.classList.remove('active');
+                        closeEquipmentFilterSelectMenus();
                     }
                 });
             }
+
+            // Инициализация кастомных фильтров
+            equipmentFilterSelectWrappers.forEach(wrapper => {
+                const targetId = wrapper.dataset.target;
+                const selectEl = document.getElementById(targetId);
+                if (!selectEl) return;
+
+                const button = wrapper.querySelector('.filter-select-btn');
+                const label = button ? button.querySelector('.filter-select-label') : null;
+                const optionButtons = wrapper.querySelectorAll('.filter-option');
+                const resetBtn = wrapper.parentElement.querySelector('.filter-reset-btn[data-target="' + targetId + '"]');
+
+                function syncUI() {
+                    const value = selectEl.value || '';
+                    const selectedOption = Array.from(selectEl.options).find(opt => opt.value === value);
+                    const displayText = selectedOption ? selectedOption.textContent.trim() : 'Все';
+                    if (label) {
+                        label.textContent = displayText;
+                    }
+                    if (resetBtn) {
+                        resetBtn.style.display = value ? '' : 'none';
+                    }
+                }
+
+                optionButtons.forEach(btn => {
+                    btn.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        const value = btn.dataset.value || '';
+                        if (selectEl.value !== value) {
+                            selectEl.value = value;
+                            selectEl.dispatchEvent(new Event('change'));
+                        } else {
+                            selectEl.dispatchEvent(new Event('change'));
+                        }
+                        syncUI();
+                        closeEquipmentFilterSelectMenus();
+                    });
+                });
+
+                if (button) {
+                    button.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        const isOpen = wrapper.classList.contains('open');
+                        closeEquipmentFilterSelectMenus();
+                        if (!isOpen) {
+                            wrapper.classList.add('open');
+                            button.setAttribute('aria-expanded', 'true');
+                        }
+                    });
+                }
+
+                selectEl.addEventListener('change', syncUI);
+
+                if (resetBtn) {
+                    resetBtn.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        selectEl.value = '';
+                        selectEl.dispatchEvent(new Event('change'));
+                        syncUI();
+                        closeEquipmentFilterSelectMenus();
+                    });
+                }
+
+                syncUI();
+                equipmentFilterSelectControllers.set(selectEl, { sync: syncUI });
+            });
 
             // Модальное окно добавления
             const equipmentForm = document.getElementById('equipmentForm');
@@ -3840,6 +5970,13 @@
             const addSparePartTypeBtn = document.getElementById('addSparePartTypeBtn');
             const sparePartTypeSelect = document.getElementById('sparePartTypeSelect');
             let selectedSparePartTypes = [];
+
+            // Определяем переменные для кнопок выпадающих списков ДО их использования
+            const equipmentTypeBtn = document.getElementById('equipmentTypeBtn');
+            const equipmentImageBtn = document.getElementById('equipmentImageBtn');
+            const equipmentMaintenanceBtn = document.getElementById('equipmentMaintenanceBtn');
+            const equipmentDepartmentBtn = document.getElementById('equipmentDepartmentBtn');
+            const sparePartTypeBtn = document.getElementById('sparePartTypeBtn');
 
             function openEquipmentModal() {
                 if (!equipmentModal) return;
@@ -3994,8 +6131,7 @@
                 });
             }
             
-            // Типы деталей
-            const sparePartTypeSelect = document.getElementById('sparePartTypeSelect');
+            // Типы деталей (переменная уже объявлена выше)
             if (sparePartTypeSelect) {
                 equipmentModalSelectData.spare_part_type = {};
                 Array.from(sparePartTypeSelect.options).forEach(opt => {
@@ -4091,13 +6227,7 @@
                 }
             }
 
-            // Обработчики для кнопок выпадающих списков
-            const equipmentTypeBtn = document.getElementById('equipmentTypeBtn');
-            const equipmentImageBtn = document.getElementById('equipmentImageBtn');
-            const equipmentMaintenanceBtn = document.getElementById('equipmentMaintenanceBtn');
-            const equipmentDepartmentBtn = document.getElementById('equipmentDepartmentBtn');
-            const sparePartTypeBtn = document.getElementById('sparePartTypeBtn');
-
+            // Обработчики для кнопок выпадающих списков (переменные уже определены выше)
             [equipmentTypeBtn, equipmentImageBtn, equipmentMaintenanceBtn, equipmentDepartmentBtn, sparePartTypeBtn].forEach(btn => {
                 if (!btn) return;
                 btn.addEventListener('click', (e) => {
@@ -4190,6 +6320,8 @@
 
             if (addEquipmentBtn) {
                 addEquipmentBtn.addEventListener('click', openEquipmentModal);
+            } else {
+                console.error('addEquipmentBtn не найден');
             }
 
             [equipmentModalClose, equipmentModalCancel].forEach(btn => {
@@ -4214,8 +6346,9 @@
                 equipmentToDeleteRow = equipmentRow;
                 
                 const equipmentName = equipmentRow.querySelector('td:nth-child(2)')?.textContent?.trim() || '';
+                const equipmentText = equipmentName || 'оборудование';
                 if (deleteEquipmentMessage) {
-                    deleteEquipmentMessage.innerHTML = `Вы уверены, что хотите удалить оборудование "${equipmentName}"?<br>Это действие нельзя будет отменить.`;
+                    deleteEquipmentMessage.innerHTML = `Вы уверены, что хотите удалить оборудование "${equipmentText}"?<br>Это действие нельзя будет отменить.`;
                 }
                 
                 deleteEquipmentModal.setAttribute('aria-hidden', 'false');
@@ -4290,6 +6423,9 @@
                                 setupRowHandlers();
                                 setupEditableCells();
                                 
+                                // Применяем чередование цветов после удаления
+                                applyEquipmentRowStriping();
+                                
                                 showEquipmentStatus('Оборудование удалено', 'success');
                             }
                             closeDeleteEquipmentModal();
@@ -4324,6 +6460,9 @@
 
             // Применяем фильтры при загрузке
             applyEquipmentFilters();
+            } catch (error) {
+                console.error('Ошибка при инициализации скрипта оборудования:', error);
+            }
         })();
     </script>
     {% endif %}

@@ -1,6 +1,20 @@
 /* Специфичные стили для страницы "Склад" */
 /* Здесь можно добавлять стили, специфичные только для страницы склада */
 
+/* Синхронизация ширины столбца номера - должна быть такой же как в других таблицах (50px) */
+.data-table th.number-column,
+.data-table td.number-column {
+    width: 50px !important;
+    min-width: 50px !important;
+    max-width: 50px !important;
+    padding: 12px 4px !important;
+    box-sizing: border-box !important;
+}
+
+.data-table th.number-column {
+    padding: 14px 4px !important;
+}
+
 /* Закреплённый заголовок таблицы */
 .table-container .data-table thead {
     position: sticky;
@@ -26,6 +40,165 @@ html.dark-theme .table-container .data-table thead th {
     position: relative;
 }
 
+/* Выделение строки при клике */
+.data-table tbody tr.selected {
+    position: relative;
+}
+
+/* Граница выделения - используем границы на ячейках */
+/* Верхняя и нижняя границы на всех ячейках, кроме первой */
+.data-table tbody tr.selected td:not(:first-child) {
+    border-top: 1px solid #b8a082 !important;
+    border-bottom: 1px solid #b8a082 !important;
+    position: relative;
+}
+
+/* Левая граница на второй ячейке (после колонки с номером) */
+.data-table tbody tr.selected td:nth-child(2) {
+    border-left: 1px solid #b8a082 !important;
+}
+
+/* Правая граница на последней ячейке */
+.data-table tbody tr.selected td:last-child {
+    border-right: 1px solid #b8a082 !important;
+}
+
+/* Только правая граница на колонке с номером */
+.data-table tbody tr.selected td.number-column {
+    border-right: 1px solid #b8a082 !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    position: relative;
+    z-index: 2;
+}
+
+/* Убираем все границы с первой ячейки */
+.data-table tbody tr.selected td:first-child {
+    border-top: none !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    position: relative;
+    z-index: 2;
+}
+
+/* Псевдоэлемент на первой ячейке для перекрытия верхней границы второй ячейки */
+.data-table tbody tr.selected td.number-column::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 0;
+    right: -1px;
+    height: 2px;
+    background: inherit;
+    z-index: 3;
+}
+
+/* Псевдоэлемент на первой ячейке для перекрытия нижней границы второй ячейки */
+.data-table tbody tr.selected td.number-column::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: -1px;
+    height: 2px;
+    background: inherit;
+    z-index: 3;
+}
+
+html.dark-theme .data-table tbody tr.selected td:not(:first-child) {
+    border-top-color: #b8a082 !important;
+    border-bottom-color: #b8a082 !important;
+}
+
+html.dark-theme .data-table tbody tr.selected td:nth-child(2) {
+    border-left-color: #b8a082 !important;
+}
+
+html.dark-theme .data-table tbody tr.selected td:last-child {
+    border-right-color: #b8a082 !important;
+}
+
+html.dark-theme .data-table tbody tr.selected td.number-column {
+    border-right-color: #b8a082 !important;
+    border-top: none !important;
+    border-bottom: none !important;
+}
+
+html.dark-theme .data-table tbody tr.selected td:first-child {
+    border-top: none !important;
+    border-bottom: none !important;
+    border-left: none !important;
+}
+
+/* Контекстное меню */
+.context-menu {
+    position: fixed;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 4px;
+    z-index: 10000;
+    min-width: 180px;
+    display: none;
+}
+
+html.dark-theme .context-menu {
+    background: #2a2a2a;
+    border-color: #444;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.context-menu-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border: none;
+    background: transparent;
+    color: #333;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.context-menu-item:hover {
+    background-color: #f5f5f5;
+}
+
+.context-menu-item.danger {
+    color: #d32f2f;
+}
+
+.context-menu-item.danger:hover {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+html.dark-theme .context-menu-item {
+    color: #e0e0e0;
+}
+
+html.dark-theme .context-menu-item:hover {
+    background-color: #3a3a3a;
+}
+
+html.dark-theme .context-menu-item.danger {
+    color: #ef5350;
+}
+
+html.dark-theme .context-menu-item.danger:hover {
+    background-color: #4a1f1f;
+    color: #f44336;
+}
+
+.context-menu-item svg {
+    flex-shrink: 0;
+}
+
 /* Стили для модального окна добавления детали */
 #partModal .modal-window {
     width: min(600px, 90%);
@@ -48,5 +221,145 @@ html.dark-theme #partModal .modal-window {
 
 #partModal .modal-row--halves .modal-field:nth-child(2n) {
     margin-right: 0 !important;
+}
+
+/* Стили для столбцов таблицы склада */
+/* Столбцы "Деталь", "Предприятие" и "Склад" - одинаковой ширины, но с минимальными размерами */
+.data-table th.warehouse-part-column,
+.data-table th.warehouse-facility-column,
+.data-table th.warehouse-warehouse-column {
+    min-width: 200px;
+}
+
+.data-table tbody tr td:nth-child(2):not(.facility-cell):not(.warehouse-cell) {
+    min-width: 200px;
+}
+
+/* Переопределяем стили для facility-cell и warehouse-cell в таблице склада */
+/* Убираем фиксированные ширины из table.css, оставляем только min-width */
+.data-table tbody tr td.facility-cell {
+    width: auto !important;
+    min-width: 200px !important;
+    max-width: none !important;
+}
+
+.data-table tbody tr td.warehouse-cell {
+    width: auto !important;
+    min-width: 200px !important;
+    max-width: none !important;
+}
+
+/* Столбец "Количество" - значительно уже (70px), но с минимальной шириной */
+.data-table th.warehouse-quantity-column {
+    min-width: 60px;
+    max-width: 80px;
+    text-align: center;
+    padding: 14px 4px;
+}
+
+.data-table tbody tr td:nth-child(5) {
+    min-width: 60px !important;
+    max-width: 80px !important;
+    text-align: center;
+    padding: 12px 4px;
+    box-sizing: border-box;
+}
+
+/* Стили для quantity input в таблице */
+.data-table td .quantity-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.data-table td .quantity-input {
+    width: 100%;
+    padding: 4px 20px 4px 4px;
+    border: 1px solid #dd9e00;
+    border-radius: 6px;
+    background: white;
+    color: #333;
+    font-size: 14px;
+    text-align: center;
+    -moz-appearance: textfield;
+    box-sizing: border-box;
+}
+
+.data-table td .quantity-input::-webkit-outer-spin-button,
+.data-table td .quantity-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.data-table td .quantity-input-buttons {
+    position: absolute;
+    right: 0px;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    width: 20px;
+    pointer-events: none;
+    z-index: 1;
+    border-left: 1px solid transparent;
+    border-radius: 0 6px 6px 0;
+    overflow: hidden;
+}
+
+.data-table td .quantity-input-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    pointer-events: auto;
+    color: #999;
+    transition: color 0.2s ease, background 0.2s ease;
+    min-height: 0;
+    background-color: white;
+}
+
+.data-table td .quantity-input-btn:hover {
+    color: #dd9e00;
+    background: rgba(221, 158, 0, 0.1);
+}
+
+.data-table td .quantity-input-btn:active {
+    background: rgba(221, 158, 0, 0.2);
+}
+
+.data-table td .quantity-input-btn svg {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+}
+
+/* Для тёмной темы */
+html.dark-theme .data-table td .quantity-input {
+    background: #1f1f1f;
+    color: #e0e0e0;
+    border-color: #dd9e00;
+}
+
+html.dark-theme .data-table td .quantity-input-btn {
+    color: #bbb;
+    background-color: #1f1f1f;
+}
+
+html.dark-theme .data-table td .quantity-input-btn:hover {
+    color: #dd9e00;
+    background: rgba(221, 158, 0, 0.15);
+}
+
+html.dark-theme .data-table td .quantity-input-btn:active {
+    background: rgba(221, 158, 0, 0.25);
 }
 

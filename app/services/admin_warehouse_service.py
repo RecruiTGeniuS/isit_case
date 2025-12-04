@@ -152,6 +152,128 @@ class AdminWarehouseService:
                 for row in cur.fetchall()
             ]
     
+    def delete(self, part_stock_quantity_id):
+        """Удалить запись со склада"""
+        with get_db_cursor(commit=True) as cur:
+            cur.execute("DELETE FROM part_stock_quantity WHERE part_stock_quantity_id = %s", (part_stock_quantity_id,))
+            if cur.rowcount == 0:
+                raise ValueError('Запись не найдена')
+    
+    def update_field(self, part_stock_quantity_id, field, value):
+        """Обновить поле записи склада"""
+        editable_fields = {
+            'warehouse_id': 'warehouse_id',
+            'facility': 'facility',  # Специальная обработка для предприятия
+            'spare_part_name': 'spare_part_name',  # Название детали
+            'quantity': 'quantity'  # Количество
+        }
+        
+        if field not in editable_fields:
+            raise ValueError(f'Поле {field} недоступно для редактирования')
+        
+        # Для spare_part_name обновляем название детали
+        if field == 'spare_part_name':
+            spare_part_name = value.strip() if isinstance(value, str) else ''
+            if not spare_part_name:
+                raise ValueError('Название детали не может быть пустым')
+            
+            # Получаем текущую запись, чтобы узнать spare_part_id
+            part = self.get_by_id(part_stock_quantity_id)
+            if not part:
+                raise ValueError('Запись не найдена')
+            
+            spare_part_id = part.get('spare_part_id')
+            if not spare_part_id:
+                raise ValueError('Не найден ID детали')
+            
+            # Обновляем название детали
+            with get_db_cursor(commit=True) as cur:
+                cur.execute("""
+                    UPDATE spare_part 
+                    SET spare_part_name = %s 
+                    WHERE spare_part_id = %s
+                """, (spare_part_name, spare_part_id))
+                if cur.rowcount == 0:
+                    raise ValueError('Деталь не найдена')
+            return
+        
+        # Для quantity обновляем количество
+        if field == 'quantity':
+            try:
+                quantity = int(value) if value else 0
+                if quantity < 0:
+                    raise ValueError('Количество не может быть отрицательным')
+            except (TypeError, ValueError):
+                raise ValueError('Некорректное количество')
+            
+            with get_db_cursor(commit=True) as cur:
+                cur.execute("""
+                    UPDATE part_stock_quantity 
+                    SET quantity = %s 
+                    WHERE part_stock_quantity_id = %s
+                """, (quantity, part_stock_quantity_id))
+                if cur.rowcount == 0:
+                    raise ValueError('Запись не найдена')
+            return
+        
+        # Для facility нужно найти warehouse_id для выбранного предприятия или сбросить его
+        if field == 'facility':
+            facility_name = value.strip() if isinstance(value, str) else ''
+            
+            if not facility_name:
+                # Если предприятие пустое, сбрасываем warehouse_id
+                with get_db_cursor(commit=True) as cur:
+                    cur.execute("""
+                        UPDATE part_stock_quantity 
+                        SET warehouse_id = NULL 
+                        WHERE part_stock_quantity_id = %s
+                    """, (part_stock_quantity_id,))
+                    if cur.rowcount == 0:
+                        raise ValueError('Запись не найдена')
+                return
+            
+            # Находим facility_id по названию
+            with get_db_cursor() as cur:
+                cur.execute("SELECT facility_id FROM facility WHERE facility_name = %s", (facility_name,))
+                facility_row = cur.fetchone()
+                
+                if not facility_row:
+                    raise ValueError(f'Предприятие "{facility_name}" не найдено')
+                
+                facility_id = facility_row[0]
+                
+                # Находим первый склад для этого предприятия (если есть)
+                # Но по требованию пользователя не устанавливаем автоматически, а сбрасываем
+                # warehouse_id будет установлен позже при выборе склада
+                with get_db_cursor(commit=True) as cur2:
+                    cur2.execute("""
+                        UPDATE part_stock_quantity 
+                        SET warehouse_id = NULL 
+                        WHERE part_stock_quantity_id = %s
+                    """, (part_stock_quantity_id,))
+                    if cur2.rowcount == 0:
+                        raise ValueError('Запись не найдена')
+            return
+        
+        # Для warehouse_id обрабатываем как число
+        if field == 'warehouse_id':
+            if value == '' or value is None:
+                db_value = None
+            else:
+                try:
+                    db_value = int(value)
+                except (TypeError, ValueError):
+                    raise ValueError('Некорректный ID склада')
+            
+            with get_db_cursor(commit=True) as cur:
+                cur.execute("""
+                    UPDATE part_stock_quantity 
+                    SET warehouse_id = %s 
+                    WHERE part_stock_quantity_id = %s
+                """, (db_value, part_stock_quantity_id))
+                if cur.rowcount == 0:
+                    raise ValueError('Запись не найдена')
+    
     def _row_to_dict(self, row):
         """Преобразование строки БД в словарь"""
         return {

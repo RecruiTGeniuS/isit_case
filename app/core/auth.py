@@ -1,4 +1,6 @@
 """Модуль аутентификации и авторизации"""
+import secrets
+from datetime import datetime, timedelta
 from flask import session
 from core.database import get_db_cursor
 
@@ -53,4 +55,76 @@ def save_user_to_session(user):
     session['role'] = user['role']
     session['avatar_path'] = user['avatar_path']
     session['password'] = user['password']
+
+def create_user_token(employee_id):
+    """Создать токен для пользователя"""
+    token = secrets.token_urlsafe(32)
+    expires_at = datetime.now() + timedelta(days=30)  # Токен действителен 30 дней
+    
+    with get_db_cursor(commit=True) as cur:
+        # Удаляем старые токены для этого пользователя
+        cur.execute("""
+            DELETE FROM user_token 
+            WHERE employee_id = %s
+        """, (employee_id,))
+        
+        # Создаем новый токен
+        cur.execute("""
+            INSERT INTO user_token (employee_id, token, expires_at, created_at, last_used_at)
+            VALUES (%s, %s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            RETURNING token_id
+        """, (employee_id, token, expires_at))
+        cur.fetchone()
+    
+    return token
+
+def get_user_by_token(token):
+    """Получить пользователя по токену"""
+    if not token:
+        return None
+    
+    with get_db_cursor() as cur:
+        cur.execute("""
+            SELECT ut.employee_id, ut.token, ut.expires_at, ut.last_used_at,
+                   e.login, e.password, e.last_name, e.first_name, 
+                   e.patronymic, e.employee_post, e.user_role, e.avatar_path
+            FROM user_token ut
+            JOIN employee e ON ut.employee_id = e.employee_id
+            WHERE ut.token = %s AND ut.expires_at > CURRENT_TIMESTAMP
+        """, (token,))
+        result = cur.fetchone()
+        
+        if result:
+            # Обновляем last_used_at
+            cur.execute("""
+                UPDATE user_token 
+                SET last_used_at = CURRENT_TIMESTAMP 
+                WHERE token = %s
+            """, (token,))
+            cur.connection.commit()
+            
+            return {
+                'employee_id': result[0],
+                'login': result[4],
+                'password': result[5],
+                'last_name': result[6],
+                'first_name': result[7],
+                'patronymic': result[8],
+                'post': result[9],
+                'role': result[10],
+                'avatar_path': result[11],
+            }
+    
+    return None
+
+def delete_user_token(token):
+    """Удалить токен пользователя"""
+    if not token:
+        return
+    
+    with get_db_cursor(commit=True) as cur:
+        cur.execute("""
+            DELETE FROM user_token 
+            WHERE token = %s
+        """, (token,))
 

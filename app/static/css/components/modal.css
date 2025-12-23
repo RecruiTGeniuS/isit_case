@@ -862,6 +862,46 @@ html.dark-theme .modal-field input[readonly] {
     color: #9a9a9a;
 }
 
+/* Стили для кастомных полей ввода (тип и периодичность ТО) */
+.custom-input-field {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #333;
+    background: white;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.custom-input-field:focus {
+    outline: none;
+    border-color: rgba(221, 158, 0, 0.4);
+    box-shadow: 0 0 0 3px rgba(221, 158, 0, 0.1);
+}
+
+.custom-input-field::placeholder {
+    color: #9a9a9a;
+}
+
+/* Тёмная тема для кастомных полей */
+html.dark-theme .custom-input-field {
+    background: #1f1f1f;
+    border-color: #3a3a3a;
+    color: #f5f5f5;
+}
+
+html.dark-theme .custom-input-field:focus {
+    border-color: rgba(221, 158, 0, 0.4);
+    box-shadow: 0 0 0 3px rgba(221, 158, 0, 0.1);
+}
+
+html.dark-theme .custom-input-field::placeholder {
+    color: #666;
+}
+
 html.dark-theme .modal-form input[readonly] {
     background: #2a2a2a;
     color: #9a9a9a;
@@ -1050,17 +1090,16 @@ html.dark-theme .modal-overlay .modal-form select option:checked {
 .modal-field input[type="date"]::-webkit-calendar-picker-indicator {
     cursor: pointer;
     opacity: 1;
-    filter: invert(0.5);
+    filter: invert(0.4);
     width: 18px;
     height: 18px;
     padding: 4px;
     border-radius: 4px;
-    transition: all 0.2s;
+    transition: filter 0.2s;
 }
 
 .modal-field input[type="date"]::-webkit-calendar-picker-indicator:hover {
-    background: rgba(0, 0, 0, 0.1);
-    filter: invert(0.6);
+    filter: invert(0.15);
 }
 
 .modal-field input[type="date"]::-webkit-datetime-edit-text {
@@ -1095,12 +1134,11 @@ html.dark-theme .modal-field input[type="date"]:focus {
 }
 
 html.dark-theme .modal-field input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(0.7);
+    filter: invert(0.9);
 }
 
 html.dark-theme .modal-field input[type="date"]::-webkit-calendar-picker-indicator:hover {
-    background: rgba(255, 255, 255, 0.15);
-    filter: invert(0.85);
+    filter: invert(1);
 }
 
 html.dark-theme .modal-field input[type="date"]::-webkit-datetime-edit-text {
@@ -1121,11 +1159,19 @@ html.dark-theme .modal-field input[type="date"]:not(:valid)::-webkit-datetime-ed
 @supports (-webkit-appearance: none) {
     /* Стили для календаря WebKit */
     input[type="date"]::-webkit-calendar-picker-indicator {
-        filter: invert(0.3);
+        filter: invert(0.4);
+    }
+    
+    input[type="date"]::-webkit-calendar-picker-indicator:hover {
+        filter: invert(0.15);
     }
     
     html.dark-theme input[type="date"]::-webkit-calendar-picker-indicator {
-        filter: invert(0.7);
+        filter: invert(0.9);
+    }
+    
+    html.dark-theme input[type="date"]::-webkit-calendar-picker-indicator:hover {
+        filter: invert(1);
     }
 }
 
@@ -1151,7 +1197,11 @@ html.dark-theme .modal-field input[type="date"]::placeholder {
 @supports (-webkit-appearance: none) {
     /* Стили для календаря WebKit в тёмной теме */
     html.dark-theme input[type="date"]::-webkit-calendar-picker-indicator {
-        filter: invert(0.65);
+        filter: invert(0.9);
+    }
+    
+    html.dark-theme input[type="date"]::-webkit-calendar-picker-indicator:hover {
+        filter: invert(1);
     }
     
     /* Стили для самого календаря при раскрытии (ограниченная поддержка) */
@@ -1159,6 +1209,28 @@ html.dark-theme .modal-field input[type="date"]::placeholder {
         background: #1f1f1f;
         color: #f5f5f5;
     }
+}
+
+/* Тёмная тема для выпадающего календаря */
+html.dark-theme input[type="date"] {
+    color-scheme: dark;
+}
+
+/* Дополнительные стили для тёмного календаря в Chrome/Edge */
+@supports (color-scheme: dark) {
+    html.dark-theme .modal-field input[type="date"] {
+        color-scheme: dark;
+    }
+}
+
+/* Стилизация элементов календаря через псевдоэлементы (для WebKit) */
+html.dark-theme input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+    background: transparent;
+}
+
+html.dark-theme input[type="date"]::-webkit-inner-spin-button,
+html.dark-theme input[type="date"]::-webkit-clear-button {
+    filter: invert(0.8);
 }
 
 /* Стили для календаря при раскрытии (через псевдоэлементы) */

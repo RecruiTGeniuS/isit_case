@@ -54,13 +54,13 @@
             <form class="auth-form" method="POST" action="/">
                 <div class="form-group">
                     <label for="login" class="form-label">Логин</label>
-                    <input type="text" id="login" name="login" class="form-input" required>
+                    <input type="text" id="login" name="login" class="form-input" value="{{ saved_login or '' }}" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="password" class="form-label">Пароль</label>
                     <div class="password-wrapper">
-                        <input type="password" id="password" name="password" class="form-input" required>
+                        <input type="password" id="password" name="password" class="form-input" value="{{ saved_password or '' }}" required>
                         <button type="button" class="password-toggle" id="passwordToggle" aria-label="Показать пароль">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -165,6 +165,43 @@
         
         // Инициализируем тему при загрузке
         initTheme();
+
+        // Функция для получения cookie
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+
+        // При загрузке страницы проверяем наличие сохраненного логина и пароля
+        // (если они не были переданы через шаблон)
+        window.addEventListener('DOMContentLoaded', function() {
+            const loginInput = document.getElementById('login');
+            const passwordInput = document.getElementById('password');
+            const rememberCheckbox = document.getElementById('remember');
+            
+            // Если логин не заполнен из шаблона, пытаемся получить из cookie
+            if (!loginInput.value) {
+                const savedLogin = getCookie('remember_login');
+                if (savedLogin) {
+                    loginInput.value = savedLogin;
+                }
+            }
+            
+            // Если пароль не заполнен из шаблона, пытаемся получить из cookie
+            if (!passwordInput.value) {
+                const savedPassword = getCookie('remember_password');
+                if (savedPassword) {
+                    passwordInput.value = savedPassword;
+                }
+            }
+            
+            // Если есть сохраненные данные, ставим галочку "Запомнить меня"
+            if ((loginInput.value || passwordInput.value) && rememberCheckbox) {
+                rememberCheckbox.checked = true;
+            }
+        });
     </script>
 </body>
 </html>

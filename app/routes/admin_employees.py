@@ -124,9 +124,11 @@ def update_employee_field(employee_id):
             employee = service.get_by_id(employee_id)
             if employee:
                 display_value = employee.get('department') or '—'
+                facility_name = employee.get('facility') or ''
                 return jsonify({
                     'success': True, 
-                    'value': display_value
+                    'value': display_value,
+                    'facility': facility_name
                 })
         
         return jsonify({'success': True, 'value': display_value})

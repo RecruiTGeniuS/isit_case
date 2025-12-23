@@ -98,7 +98,8 @@ def search_equipment():
         results = service.search_equipment_by_name(query)
         return jsonify({'success': True, 'results': results})
     except Exception as e:
-        return jsonify({'success': False, 'message': 'Ошибка поиска.'}), 500
+        current_app.logger.error(f'Ошибка поиска оборудования: {str(e)}', exc_info=True)
+        return jsonify({'success': False, 'message': f'Ошибка поиска: {str(e)}'}), 500
 
 @bp.route('/upload-image', methods=['POST'])
 def upload_equipment_image_new():
@@ -140,14 +141,23 @@ def create_equipment():
     
     data = request.get_json(silent=True) or {}
     
+    # Логируем входящие данные для отладки
+    current_app.logger.info(f'Создание оборудования. Данные: {data}')
+    
     # Проверяем, это новое или существующее оборудование
     if data.get('existing_equipment_id'):
         # Существующее оборудование - только создаем assignment
         try:
+            # Логируем данные для отладки
+            current_app.logger.info(f'Создание assignment. Данные: {data}')
             service = AdminEquipmentService()
             equipment = service.create_assignment(data)
             return jsonify({'success': True, 'equipment': equipment})
+        except ValueError as e:
+            current_app.logger.error(f'Ошибка валидации при создании assignment: {str(e)}')
+            return jsonify({'success': False, 'message': str(e)}), 400
         except Exception as e:
+            current_app.logger.error(f'Ошибка создания assignment: {str(e)}', exc_info=True)
             return jsonify({'success': False, 'message': 'Не удалось добавить оборудование.'}), 500
     else:
         # Новое оборудование
@@ -161,6 +171,7 @@ def create_equipment():
             equipment = service.create(data)
             return jsonify({'success': True, 'equipment': equipment})
         except Exception as e:
+            current_app.logger.error(f'Ошибка создания оборудования: {str(e)}', exc_info=True)
             return jsonify({'success': False, 'message': 'Не удалось добавить оборудование.'}), 500
 
 @bp.route('/<int:equipment_id>', methods=['PATCH'])
@@ -173,14 +184,26 @@ def update_equipment_field(equipment_id):
     payload = request.get_json(silent=True) or {}
     field = payload.get('field')
     value = payload.get('value', '')
+    equipment_assignment_id = payload.get('equipment_assignment_id')
     
     try:
         service = AdminEquipmentService()
-        service.update_field(equipment_id, field, value)
+        service.update_field(equipment_id, field, value, equipment_assignment_id)
         
-        display_value = value or ''
-        
-        return jsonify({'success': True, 'value': display_value})
+        # Для department_id нужно вернуть название отдела и предприятия
+        if field == 'department_id':
+            if value:
+                departments = service.get_departments()
+                dept = next((d for d in departments if d['id'] == int(value)), None)
+                display_value = dept['name'] if dept else value
+                facility_name = dept['facility_name'] if dept else None
+            else:
+                display_value = ''
+                facility_name = None
+            return jsonify({'success': True, 'value': display_value, 'facility_name': facility_name})
+        else:
+            display_value = value or ''
+            return jsonify({'success': True, 'value': display_value})
     except ValueError as e:
         return jsonify({'success': False, 'message': str(e)}), 400
     except Exception:
@@ -188,7 +211,7 @@ def update_equipment_field(equipment_id):
 
 @bp.route('/<int:equipment_id>', methods=['DELETE'])
 def delete_equipment(equipment_id):
-    """Удаление оборудования"""
+    """Удаление оборудования (полное удаление со всеми assignment'ами)"""
     auth_check = check_auth()
     if auth_check:
         return auth_check
@@ -198,9 +221,29 @@ def delete_equipment(equipment_id):
         service.delete(equipment_id)
         return jsonify({'success': True, 'message': 'Оборудование успешно удалено'})
     except ValueError as e:
+        current_app.logger.error(f'Ошибка валидации при удалении оборудования {equipment_id}: {str(e)}')
         return jsonify({'success': False, 'message': str(e)}), 400
-    except Exception:
+    except Exception as e:
+        current_app.logger.error(f'Ошибка удаления оборудования {equipment_id}: {str(e)}', exc_info=True)
         return jsonify({'success': False, 'message': 'Не удалось удалить оборудование.'}), 500
+
+@bp.route('/assignment/<int:equipment_assignment_id>', methods=['DELETE'])
+def delete_equipment_assignment(equipment_assignment_id):
+    """Удаление размещения оборудования (только assignment, не само оборудование)"""
+    auth_check = check_auth()
+    if auth_check:
+        return auth_check
+    
+    try:
+        service = AdminEquipmentService()
+        service.delete_assignment(equipment_assignment_id)
+        return jsonify({'success': True, 'message': 'Размещение оборудования успешно удалено'})
+    except ValueError as e:
+        current_app.logger.error(f'Ошибка валидации при удалении размещения {equipment_assignment_id}: {str(e)}')
+        return jsonify({'success': False, 'message': str(e)}), 400
+    except Exception as e:
+        current_app.logger.error(f'Ошибка удаления размещения {equipment_assignment_id}: {str(e)}', exc_info=True)
+        return jsonify({'success': False, 'message': 'Не удалось удалить размещение оборудования.'}), 500
 
 @bp.route('/passport/<int:equipment_id>', methods=['GET'])
 def equipment_passport(equipment_id):

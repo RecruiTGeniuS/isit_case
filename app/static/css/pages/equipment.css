@@ -82,6 +82,57 @@ html.dark-theme .context-menu-item.danger:hover {
     flex-shrink: 0;
 }
 
+/* Увеличение высоты строк в таблице оборудования */
+#equipmentTable tbody tr {
+    min-height: 56px;
+}
+
+#equipmentTable td {
+    padding: 16px 16px !important;
+    min-height: 56px;
+    vertical-align: middle;
+}
+
+#equipmentTable td.role-cell,
+#equipmentTable td.facility-cell,
+#equipmentTable td.department-cell {
+    min-height: 56px;
+}
+
+#equipmentTable td.role-cell .role-cell-label,
+#equipmentTable td.facility-cell .role-cell-label,
+#equipmentTable td.department-cell .role-cell-label {
+    min-height: 56px;
+    padding: 16px 16px !important;
+    padding-right: 6px !important;
+}
+
+/* Расширение столбца "Отдел" в таблице оборудования */
+#equipmentTable th:nth-child(5),
+#equipmentTable td.department-cell {
+    width: 280px !important;
+    max-width: 280px !important;
+    min-width: 250px !important;
+}
+
+/* Заголовок "Отдел" по центру, содержимое ячеек - слева */
+#equipmentTable th:nth-child(5) {
+    text-align: center !important;
+}
+
+#equipmentTable td.department-cell {
+    text-align: left !important;
+}
+
+#equipmentTable td.department-cell .role-cell-content {
+    justify-content: flex-start !important;
+}
+
+#equipmentTable td.department-cell .role-cell-label {
+    text-align: left !important;
+    justify-content: flex-start !important;
+}
+
 /* Стили для ячейки статуса в таблице оборудования */
 /* Переопределяем правила из table.css для столбца статуса */
 #equipmentTable th:last-child,
@@ -109,6 +160,48 @@ html.dark-theme .context-menu-item.danger:hover {
     padding: 8px 12px !important;
     border-radius: 12px !important;
     text-align: center !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: #fff !important;
+    background: #6b7280 !important; /* Серый по умолчанию */
+}
+
+/* Статус "В работе" - зелёный (приглушённый) */
+#equipmentTable td:last-child .status-badge.status-in-work {
+    background: rgba(34, 197, 94, 0.6) !important;
+    color: #fff !important;
+}
+
+/* Статус "На ПТО" - синий (приглушённый) */
+#equipmentTable td:last-child .status-badge.status-in-pto {
+    background: rgba(59, 130, 246, 0.6) !important;
+    color: #fff !important;
+}
+
+/* Статус "На ремонте" - жёлтый (приглушённый) */
+#equipmentTable td:last-child .status-badge.status-in-repair {
+    background: rgba(234, 179, 8, 0.6) !important;
+    color: #fff !important;
+}
+
+/* Стили для тёмной темы */
+html.dark-theme #equipmentTable td:last-child .status-badge {
+    background: rgba(75, 85, 99, 0.6) !important;
+}
+
+html.dark-theme #equipmentTable td:last-child .status-badge.status-in-work {
+    background: rgba(22, 163, 74, 0.6) !important;
+    color: #fff !important;
+}
+
+html.dark-theme #equipmentTable td:last-child .status-badge.status-in-pto {
+    background: rgba(37, 99, 235, 0.6) !important;
+    color: #fff !important;
+}
+
+html.dark-theme #equipmentTable td:last-child .status-badge.status-in-repair {
+    background: rgba(202, 138, 4, 0.6) !important;
+    color: #fff !important;
 }
 
 /* Кнопка "Назад" на странице паспорта */

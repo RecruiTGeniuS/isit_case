@@ -185,23 +185,30 @@ html.dark-theme .context-menu-item.danger:hover {
     flex-shrink: 0;
 }
 
+/* Выравнивание текста по левому краю в столбце "Должность" */
+.data-table td:nth-child(5) {
+    text-align: left !important;
+}
+
 /* Ограничение ширины столбца "Права доступа" */
 .data-table th:nth-child(10),
 .data-table td:nth-child(10).role-cell {
-    width: 180px !important;
-    min-width: 150px !important;
-    max-width: 200px !important;
+    width: 280px !important;
+    min-width: 250px !important;
+    max-width: 300px !important;
     box-sizing: border-box;
 }
 
 .data-table td:nth-child(10).role-cell .role-cell-content {
     max-width: 100%;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .data-table td:nth-child(10).role-cell .role-cell-label {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    word-wrap: break-word;
+    text-align: left !important;
 }
 

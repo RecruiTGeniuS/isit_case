@@ -4,6 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>УТОР - Панель администратора</title>
+    <script>
+        // Применяем тему сразу, чтобы избежать мерцания (FOUC)
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            let theme = savedTheme;
+            
+            if (!theme) {
+                // Определяем системную тему
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    theme = 'dark';
+                } else {
+                    theme = 'light';
+                }
+            }
+            
+            // Применяем класс темы сразу
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark-theme');
+            } else {
+                document.documentElement.classList.add('light-theme');
+            }
+            
+            // Добавляем базовые стили для предотвращения белого фона
+            const style = document.createElement('style');
+            style.textContent = `
+                html.dark-theme, html.dark-theme body {
+                    background-color: #1b1b1c !important;
+                    color: #e0e0e0 !important;
+                }
+                html.dark-theme .admin-container {
+                    background-color: #1b1b1c !important;
+                }
+            `;
+            document.head.appendChild(style);
+        })();
+    </script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body class="admin-page">
@@ -281,6 +317,68 @@
                                         {% endfor %}
                                     </select>
                                 </div>
+                                <div class="filter-group">
+                                    <label for="sortColumnFilter">Сортировать по</label>
+                                    <div class="filter-select-wrapper">
+                                        <div class="filter-select" data-target="sortColumnFilter">
+                                            <button type="button" class="filter-select-btn" aria-haspopup="listbox" aria-expanded="false">
+                                                <span class="filter-select-label">Исходный порядок</span>
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                                </svg>
+                                            </button>
+                                            <div class="filter-options-list" role="listbox">
+                                                <button type="button" class="filter-option" data-value="">Исходный порядок</button>
+                                                <button type="button" class="filter-option" data-value="1">Фамилия</button>
+                                                <button type="button" class="filter-option" data-value="2">Имя</button>
+                                                <button type="button" class="filter-option" data-value="3">Отчество</button>
+                                                <button type="button" class="filter-option" data-value="4">Должность</button>
+                                                <button type="button" class="filter-option" data-value="6">Email</button>
+                                                <button type="button" class="filter-option" data-value="7">Отдел</button>
+                                                <button type="button" class="filter-option" data-value="8">Предприятие</button>
+                                                <button type="button" class="filter-option" data-value="9">Права доступа</button>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="filter-reset-btn" data-target="sortColumnFilter" aria-label="Сбросить фильтр" title="Сбросить фильтр" style="display: none;">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <select id="sortColumnFilter" class="filter-native-select">
+                                        <option value="">Исходный порядок</option>
+                                        <option value="1">Фамилия</option>
+                                        <option value="2">Имя</option>
+                                        <option value="3">Отчество</option>
+                                        <option value="4">Должность</option>
+                                        <option value="6">Email</option>
+                                        <option value="7">Отдел</option>
+                                        <option value="8">Предприятие</option>
+                                        <option value="9">Права доступа</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="sortDirectionFilter">Направление</label>
+                                    <div class="filter-select-wrapper">
+                                        <div class="filter-select" data-target="sortDirectionFilter">
+                                            <button type="button" class="filter-select-btn" aria-haspopup="listbox" aria-expanded="false">
+                                                <span class="filter-select-label">По возрастанию</span>
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                                </svg>
+                                            </button>
+                                            <div class="filter-options-list" role="listbox">
+                                                <button type="button" class="filter-option" data-value="asc">По возрастанию</button>
+                                                <button type="button" class="filter-option" data-value="desc">По убыванию</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <select id="sortDirectionFilter" class="filter-native-select">
+                                        <option value="asc">По возрастанию</option>
+                                        <option value="desc">По убыванию</option>
+                                    </select>
+                                </div>
                                 <button type="button" class="reset-filter-btn" id="resetFilters">Сбросить все фильтры</button>
                             </div>
                         </div>
@@ -469,6 +567,62 @@
                                         {% endfor %}
                                     </select>
                                 </div>
+                                <div class="filter-group">
+                                    <label for="equipmentSortColumnFilter">Сортировать по</label>
+                                    <div class="filter-select-wrapper">
+                                        <div class="filter-select" data-target="equipmentSortColumnFilter">
+                                            <button type="button" class="filter-select-btn" aria-haspopup="listbox" aria-expanded="false">
+                                                <span class="filter-select-label">Исходный порядок</span>
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                                </svg>
+                                            </button>
+                                            <div class="filter-options-list" role="listbox">
+                                                <button type="button" class="filter-option" data-value="">Исходный порядок</button>
+                                                <button type="button" class="filter-option" data-value="1">Название</button>
+                                                <button type="button" class="filter-option" data-value="2">Тип</button>
+                                                <button type="button" class="filter-option" data-value="3">Предприятие</button>
+                                                <button type="button" class="filter-option" data-value="4">Отдел</button>
+                                                <button type="button" class="filter-option" data-value="5">Расположение</button>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="filter-reset-btn" data-target="equipmentSortColumnFilter" aria-label="Сбросить фильтр" title="Сбросить фильтр" style="display: none;">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <select id="equipmentSortColumnFilter" class="filter-native-select">
+                                        <option value="">Исходный порядок</option>
+                                        <option value="1">Название</option>
+                                        <option value="2">Тип</option>
+                                        <option value="3">Предприятие</option>
+                                        <option value="4">Отдел</option>
+                                        <option value="5">Расположение</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="equipmentSortDirectionFilter">Направление</label>
+                                    <div class="filter-select-wrapper">
+                                        <div class="filter-select" data-target="equipmentSortDirectionFilter">
+                                            <button type="button" class="filter-select-btn" aria-haspopup="listbox" aria-expanded="false">
+                                                <span class="filter-select-label">По возрастанию</span>
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                                </svg>
+                                            </button>
+                                            <div class="filter-options-list" role="listbox">
+                                                <button type="button" class="filter-option" data-value="asc">По возрастанию</button>
+                                                <button type="button" class="filter-option" data-value="desc">По убыванию</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <select id="equipmentSortDirectionFilter" class="filter-native-select">
+                                        <option value="asc">По возрастанию</option>
+                                        <option value="desc">По убыванию</option>
+                                    </select>
+                                </div>
                                 <button type="button" class="reset-filter-btn" id="resetEquipmentFilters">Сбросить все фильтры</button>
                             </div>
                         </div>
@@ -480,18 +634,36 @@
                                     <th class="number-column">№</th>
                                     <th>Название</th>
                                     <th>Тип</th>
+                                    <th>Предприятие</th>
+                                    <th>Отдел</th>
                                     <th>Расположение</th>
                                     <th>Статус</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for eq in equipment %}
-                                <tr data-equipment-id="{{ eq.id }}" data-type="{{ eq.equipment_type or '' }}" data-status="{{ eq.equipment_status or '' }}" data-location="{{ eq.location or '' }}">
+                                <tr data-equipment-id="{{ eq.id }}" data-equipment-assignment-id="{{ eq.equipment_assignment_id or '' }}" data-type="{{ eq.equipment_type or '' }}" data-status="{{ eq.equipment_status or '' }}" data-location="{{ eq.location or '' }}" data-department="{{ eq.department or '' }}" data-facility="{{ eq.facility or '' }}">
                                     <td class="number-column">{{ loop.index }}</td>
                                     <td class="editable-cell" contenteditable="false" spellcheck="false" data-field="equipment_name">{{ eq.equipment_name or '' }}</td>
                                     <td class="role-cell" tabindex="0" data-field="equipment_type" data-type-value="{{ eq.equipment_type or '' }}" aria-haspopup="listbox" aria-expanded="false">
                                         <div class="role-cell-content">
                                             <span class="role-cell-label">{{ eq.equipment_type or '—' }}</span>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        </div>
+                                    </td>
+                                    <td class="facility-cell" tabindex="0" data-field="facility" data-facility-value="{{ eq.facility or '' }}" aria-haspopup="listbox" aria-expanded="false">
+                                        <div class="role-cell-content">
+                                            <span class="role-cell-label">{{ eq.facility or '—' }}</span>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        </div>
+                                    </td>
+                                    <td class="department-cell" tabindex="0" data-field="department_id" data-department-id="{{ eq.department_id or '' }}" data-facility-name="{{ eq.facility or '' }}" aria-haspopup="listbox" aria-expanded="false">
+                                        <div class="role-cell-content">
+                                            <span class="role-cell-label">{{ eq.department or '—' }}</span>
                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                                 <polyline points="6 9 12 15 18 9"></polyline>
                                             </svg>
@@ -840,6 +1012,60 @@
                                         {% for sp in spare_part_options %}
                                         <option value="{{ sp }}">{{ sp }}</option>
                                         {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="warehouseSortColumnFilter">Сортировать по</label>
+                                    <div class="filter-select-wrapper">
+                                        <div class="filter-select" data-target="warehouseSortColumnFilter">
+                                            <button type="button" class="filter-select-btn" aria-haspopup="listbox" aria-expanded="false">
+                                                <span class="filter-select-label">Исходный порядок</span>
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                                </svg>
+                                            </button>
+                                            <div class="filter-options-list" role="listbox">
+                                                <button type="button" class="filter-option" data-value="">Исходный порядок</button>
+                                                <button type="button" class="filter-option" data-value="1">Деталь</button>
+                                                <button type="button" class="filter-option" data-value="2">Предприятие</button>
+                                                <button type="button" class="filter-option" data-value="3">Склад</button>
+                                                <button type="button" class="filter-option" data-value="4">Количество</button>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="filter-reset-btn" data-target="warehouseSortColumnFilter" aria-label="Сбросить фильтр" title="Сбросить фильтр" style="display: none;">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <select id="warehouseSortColumnFilter" class="filter-native-select">
+                                        <option value="">Исходный порядок</option>
+                                        <option value="1">Деталь</option>
+                                        <option value="2">Предприятие</option>
+                                        <option value="3">Склад</option>
+                                        <option value="4">Количество</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="warehouseSortDirectionFilter">Направление</label>
+                                    <div class="filter-select-wrapper">
+                                        <div class="filter-select" data-target="warehouseSortDirectionFilter">
+                                            <button type="button" class="filter-select-btn" aria-haspopup="listbox" aria-expanded="false">
+                                                <span class="filter-select-label">По возрастанию</span>
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                                </svg>
+                                            </button>
+                                            <div class="filter-options-list" role="listbox">
+                                                <button type="button" class="filter-option" data-value="asc">По возрастанию</button>
+                                                <button type="button" class="filter-option" data-value="desc">По убыванию</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <select id="warehouseSortDirectionFilter" class="filter-native-select">
+                                        <option value="asc">По возрастанию</option>
+                                        <option value="desc">По убыванию</option>
                                     </select>
                                 </div>
                                 <button type="button" class="reset-filter-btn" id="warehouseResetFilters">Сбросить все фильтры</button>
@@ -1366,7 +1592,7 @@
                                 </select>
                             </div>
                             <div id="customEquipmentTypeRow" style="display: none; margin-top: 8px;">
-                                <input type="text" name="custom_equipment_type" id="customEquipmentType" placeholder="Введите новый тип оборудования" style="width: 100%; padding: 10px; border: 1px solid var(--border-medium); border-radius: var(--radius-sm);">
+                                <input type="text" name="custom_equipment_type" id="customEquipmentType" class="custom-input-field" placeholder="Введите новый тип оборудования">
                             </div>
                         </label>
                         <label class="modal-field">
@@ -1387,12 +1613,9 @@
                                     <option value="custom">Другое</option>
                                 </select>
                             </div>
-                        </label>
-                    </div>
-                    <div class="modal-row" id="customMaintenanceRow" style="display: none;">
-                        <label class="modal-field">
-                            <span data-required="">Количество дней периодичности</span>
-                            <input type="number" name="custom_maintenance_frequency" id="customMaintenanceFrequency" min="1" placeholder="Введите количество дней">
+                            <div id="customMaintenanceRow" style="display: none; margin-top: 8px;">
+                                <input type="text" name="custom_maintenance_frequency" id="customMaintenanceFrequency" class="custom-input-field" placeholder="Введите количество дней">
+                            </div>
                         </label>
                     </div>
                     <div class="modal-row">
@@ -1431,7 +1654,22 @@
                         </label>
                         <label class="modal-field">
                             <span data-required="">Срок действия гарантии</span>
-                            <input type="date" name="guarantee_date">
+                            <div style="display: flex; gap: 8px; align-items: flex-start;">
+                                <input type="number" name="warranty_period_value" min="1" placeholder="Количество" style="flex: 1;" id="warrantyPeriodValue">
+                                <div class="modal-select-wrapper" style="flex: 0 0 140px;">
+                                    <button type="button" class="modal-select-btn" id="warrantyPeriodUnitBtn" data-field="warranty_period_unit" aria-haspopup="listbox" aria-expanded="false">
+                                        <span class="modal-select-label">Месяцев</span>
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <polyline points="6 9 12 15 18 9"></polyline>
+                                        </svg>
+                                    </button>
+                                    <select name="warranty_period_unit" id="warrantyPeriodUnit" style="display: none;">
+                                        <option value="days">Дней</option>
+                                        <option value="months" selected>Месяцев</option>
+                                        <option value="years">Лет</option>
+                                    </select>
+                                </div>
+                            </div>
                         </label>
                     </div>
                     <div class="modal-row">
@@ -1777,25 +2015,15 @@
             }
         }
 
-        // Инициализация темы при загрузке
+        // Инициализация темы при загрузке (тема уже применена в head, обновляем только иконки)
         (function() {
-            const savedTheme = localStorage.getItem('theme');
-            let theme = savedTheme;
-            
-            if (!theme) {
-                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    theme = 'dark';
-                } else {
-                    theme = 'light';
-                }
-            }
-            
-            document.documentElement.classList.add(theme + '-theme');
+            const html = document.documentElement;
+            const isDark = html.classList.contains('dark-theme');
             
             // Обновляем иконки переключателя темы
             const sunIcon = document.querySelector('#themeSwitch .sun-icon');
             const moonIcon = document.querySelector('#themeSwitch .moon-icon');
-            if (theme === 'dark') {
+            if (isDark) {
                 if (sunIcon) sunIcon.style.display = 'block';
                 if (moonIcon) moonIcon.style.display = 'none';
             } else {
@@ -1811,6 +2039,105 @@
             supportToggle.addEventListener('click', (event) => {
                 event.stopPropagation();
                 supportContacts.classList.toggle('active');
+            });
+        }
+
+        // Общие функции сортировки таблиц (доступны для всех секций)
+        function sortTable(table, columnIndex, sortDirection) {
+            const tbody = table.querySelector('tbody');
+            if (!tbody) return;
+
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const header = table.querySelector(`thead th:nth-child(${columnIndex + 1})`);
+            const headerText = header ? header.textContent.trim().toLowerCase() : '';
+            
+            // Определяем, является ли столбец числовым
+            const isNumberColumn = columnIndex === 0 || 
+                                   headerText.includes('количество') || 
+                                   headerText.includes('количество') ||
+                                   headerText === '№';
+
+            rows.sort((a, b) => {
+                const aCell = a.cells[columnIndex];
+                const bCell = b.cells[columnIndex];
+                
+                if (!aCell || !bCell) return 0;
+
+                let aValue = aCell.textContent.trim();
+                let bValue = bCell.textContent.trim();
+
+                // Обработка специальных случаев
+                if (aValue === '—' || aValue === '') aValue = '';
+                if (bValue === '—' || bValue === '') bValue = '';
+
+                // Если это числовой столбец или оба значения являются числами
+                if (isNumberColumn) {
+                    const aNum = parseFloat(aValue.replace(/\s/g, '')) || 0;
+                    const bNum = parseFloat(bValue.replace(/\s/g, '')) || 0;
+                    return sortDirection === 'asc' ? aNum - bNum : bNum - aNum;
+                }
+
+                // Проверяем, являются ли значения числами (для автоматического определения)
+                const aIsNum = !isNaN(parseFloat(aValue.replace(/\s/g, ''))) && aValue !== '';
+                const bIsNum = !isNaN(parseFloat(bValue.replace(/\s/g, ''))) && bValue !== '';
+                
+                if (aIsNum && bIsNum) {
+                    const aNum = parseFloat(aValue.replace(/\s/g, '')) || 0;
+                    const bNum = parseFloat(bValue.replace(/\s/g, '')) || 0;
+                    return sortDirection === 'asc' ? aNum - bNum : bNum - aNum;
+                }
+
+                // Для текстовых значений - сортировка по алфавиту
+                // Используем localeCompare для правильной сортировки русских букв
+                const comparison = aValue.localeCompare(bValue, 'ru', { 
+                    sensitivity: 'base',
+                    numeric: true 
+                });
+                return sortDirection === 'asc' ? comparison : -comparison;
+            });
+
+            // Перемещаем отсортированные строки в DOM
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        // Функция применения сортировки из меню фильтров
+        function applyTableSorting(table, columnIndex, sortDirection, filterFunction, rowStripingFunction) {
+            if (columnIndex === null || sortDirection === null) {
+                return; // Сортировка не выбрана
+            }
+
+            // Сортируем таблицу
+            sortTable(table, columnIndex, sortDirection);
+
+            // Применяем фильтры (они сохраняют видимость строк)
+            if (filterFunction) {
+                filterFunction();
+            }
+
+            // Обновляем чередование строк
+            if (rowStripingFunction) {
+                rowStripingFunction();
+            }
+
+            // Обновляем номера строк
+            updateRowNumbers(table);
+        }
+
+        // Функция обновления номеров строк
+        function updateRowNumbers(table) {
+            const tbody = table.querySelector('tbody');
+            if (!tbody) return;
+
+            let visibleIndex = 0;
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach(row => {
+                if (row.style.display !== 'none') {
+                    const numberCell = row.querySelector('.number-column');
+                    if (numberCell) {
+                        numberCell.textContent = visibleIndex + 1;
+                    }
+                    visibleIndex++;
+                }
             });
         }
 
@@ -1842,7 +2169,10 @@
         const roleFilter = document.getElementById('roleFilter');
         const departmentFilter = document.getElementById('departmentFilter');
         const facilityFilter = document.getElementById('facilityFilter');
+        const sortColumnFilter = document.getElementById('sortColumnFilter');
+        const sortDirectionFilter = document.getElementById('sortDirectionFilter');
         const tableRows = document.querySelectorAll('.data-table tbody tr');
+        const employeeTableForSorting = document.querySelector('.data-table');
         const addEmployeeBtn = document.getElementById('addEmployeeBtn');
         const employeeModal = document.getElementById('employeeModal');
         const employeeModalClose = document.getElementById('employeeModalClose');
@@ -2031,8 +2361,12 @@
         }
 
         function applyRowStriping() {
+            // Получаем актуальные строки из DOM каждый раз
+            const table = document.querySelector('.data-table');
+            if (!table) return;
+            const rows = table.querySelectorAll('tbody tr');
             let visibleIndex = 0;
-            tableRows.forEach(row => {
+            rows.forEach(row => {
                 if (row.style.display === 'none') {
                     row.classList.remove('alt-row');
                     return;
@@ -2112,8 +2446,34 @@
                 if (roleFilter) roleFilter.value = '';
                 if (departmentFilter) departmentFilter.value = '';
                 if (facilityFilter) facilityFilter.value = '';
+                if (sortColumnFilter) sortColumnFilter.value = '';
+                if (sortDirectionFilter) sortDirectionFilter.value = 'asc';
                 applyTableFilters();
                 filterSelectControllers.forEach(controller => controller.sync());
+            });
+        }
+
+        // Обработчики сортировки для таблицы сотрудников
+        if (sortColumnFilter) {
+            sortColumnFilter.addEventListener('change', () => {
+                const columnIndex = sortColumnFilter.value ? parseInt(sortColumnFilter.value) : null;
+                const sortDirection = sortDirectionFilter ? sortDirectionFilter.value : 'asc';
+                if (columnIndex !== null && employeeTableForSorting) {
+                    applyTableSorting(employeeTableForSorting, columnIndex, sortDirection, applyTableFilters, applyRowStriping);
+                } else if (columnIndex === null) {
+                    // Если выбрано "Исходный порядок", просто применяем фильтры без сортировки
+                    applyTableFilters();
+                }
+            });
+        }
+
+        if (sortDirectionFilter) {
+            sortDirectionFilter.addEventListener('change', () => {
+                const columnIndex = sortColumnFilter && sortColumnFilter.value ? parseInt(sortColumnFilter.value) : null;
+                const sortDirection = sortDirectionFilter.value;
+                if (columnIndex !== null && employeeTableForSorting) {
+                    applyTableSorting(employeeTableForSorting, columnIndex, sortDirection, applyTableFilters, applyRowStriping);
+                }
             });
         }
 
@@ -2380,6 +2740,8 @@
                         // Обновляем также department в строке
                         const row = cell.closest('tr');
                         if (row) {
+                            // Обновляем data-facility в строке для фильтрации
+                            row.dataset.facility = facilityName || '';
                             const departmentCell = row.querySelector('.department-cell');
                             if (departmentCell) {
                                 const deptLabelSpan = departmentCell.querySelector('.role-cell-label');
@@ -2397,7 +2759,8 @@
                         const deptName = data.value || '';
                         if (labelSpan) labelSpan.textContent = deptName || '—';
                         // Нужно найти ID отдела по названию для обновления dataset
-                        const facilityName = cell.dataset.facilityName || '';
+                        // Используем facility из ответа сервера, если он есть, иначе из dataset ячейки
+                        const facilityName = data.facility || cell.dataset.facilityName || '';
                         const departments = departmentsByFacility[facilityName] || [];
                         const dept = departments.find(d => d.name === deptName);
                         if (dept) {
@@ -2405,8 +2768,27 @@
                         } else {
                             cell.dataset.departmentId = '';
                         }
+                        // Обновляем facilityName в ячейке, если оно пришло с сервера
+                        if (data.facility !== undefined) {
+                            cell.dataset.facilityName = facilityName || '';
+                        }
                         cell.dataset.originalValue = cell.dataset.departmentId;
                         cell.setAttribute('aria-expanded', 'false');
+                        // Обновляем data-атрибуты строки для фильтрации
+                        const row = cell.closest('tr');
+                        if (row) {
+                            row.dataset.department = deptName || '';
+                            row.dataset.facility = facilityName || '';
+                            // Также обновляем facility-cell, если он есть
+                            const facilityCell = row.querySelector('.facility-cell');
+                            if (facilityCell && data.facility !== undefined) {
+                                const facilityLabelSpan = facilityCell.querySelector('.role-cell-label');
+                                if (facilityLabelSpan) {
+                                    facilityLabelSpan.textContent = facilityName || '—';
+                                }
+                                facilityCell.dataset.facilityValue = facilityName || '';
+                            }
+                        }
                     } else {
                         cell.textContent = data.value || '';
                         cell.dataset.originalValue = cell.textContent;
@@ -3006,8 +3388,9 @@
             });
         });
 
-        // Выпадающие списки для отделов
-        const departmentCells = document.querySelectorAll('.department-cell');
+        // Выпадающие списки для отделов (только для страницы "Сотрудники")
+        // Исключаем ячейки из таблицы оборудования
+        const departmentCells = document.querySelectorAll('.department-cell:not(#equipmentTable .department-cell)');
         const departmentDropdown = document.createElement('div');
         departmentDropdown.className = 'role-dropdown';
         document.body.appendChild(departmentDropdown);
@@ -3127,20 +3510,67 @@
         }
 
         document.addEventListener('click', (event) => {
+            // Не закрываем, если клик внутри dropdown или на ячейке отдела
             if (departmentDropdown.contains(event.target)) return;
             if (event.target.closest('.department-cell')) return;
+            
+            // Проверяем, что клик не внутри видимой области dropdown (для скроллбара)
+            if (departmentDropdown.classList.contains('visible')) {
+                const rect = departmentDropdown.getBoundingClientRect();
+                const x = event.clientX;
+                const y = event.clientY;
+                // Проверяем, что клик внутри области dropdown (включая скроллбар)
+                if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                    return;
+                }
+            }
+            
             closeDepartmentDropdown();
         });
 
+        // Обработка прокрутки внутри dropdown - предотвращаем всплытие
+        departmentDropdown.addEventListener('wheel', (event) => {
+            event.stopPropagation();
+        }, { passive: true });
+
+        departmentDropdown.addEventListener('scroll', (event) => {
+            event.stopPropagation();
+        });
+
+        // Обработка всех событий мыши внутри dropdown - предотвращаем закрытие
+        departmentDropdown.addEventListener('mousedown', (event) => {
+            event.stopPropagation();
+        });
+
+        departmentDropdown.addEventListener('mouseup', (event) => {
+            event.stopPropagation();
+        });
+
+        departmentDropdown.addEventListener('click', (event) => {
+            event.stopPropagation();
+        });
+
+        // Обработка touch событий для мобильных устройств
+        departmentDropdown.addEventListener('touchstart', (event) => {
+            event.stopPropagation();
+        }, { passive: true });
+
+        departmentDropdown.addEventListener('touchmove', (event) => {
+            event.stopPropagation();
+        }, { passive: true });
+
         window.addEventListener('resize', () => {
-            if (currentDepartmentCell) {
+            if (currentDepartmentCell && departmentDropdown.classList.contains('visible')) {
                 requestAnimationFrame(() => {
                     positionDepartmentDropdown(currentDepartmentCell);
                 });
             }
         });
 
-        window.addEventListener('scroll', () => {
+        // Закрываем только при прокрутке окна, но не при прокрутке внутри dropdown
+        window.addEventListener('scroll', (event) => {
+            // Проверяем, что прокрутка не внутри dropdown
+            if (departmentDropdown.contains(event.target)) return;
             if (currentDepartmentCell && departmentDropdown.classList.contains('visible')) {
                 closeDepartmentDropdown();
             }
@@ -3148,7 +3578,9 @@
 
         const tableContainerDepartment = document.querySelector('.table-container');
         if (tableContainerDepartment) {
-            tableContainerDepartment.addEventListener('scroll', () => {
+            tableContainerDepartment.addEventListener('scroll', (event) => {
+                // Проверяем, что прокрутка не внутри dropdown
+                if (departmentDropdown.contains(event.target)) return;
                 if (currentDepartmentCell && departmentDropdown.classList.contains('visible')) {
                     closeDepartmentDropdown();
                 }
@@ -3846,6 +4278,8 @@
         const facilityWarehouseFilter = document.getElementById('facilityWarehouseFilter');
         const warehouseAddressFilter = document.getElementById('warehouseAddressFilter');
         const sparePartFilter = document.getElementById('sparePartFilter');
+        const warehouseSortColumnFilter = document.getElementById('warehouseSortColumnFilter');
+        const warehouseSortDirectionFilter = document.getElementById('warehouseSortDirectionFilter');
         const warehouseTableRows = document.querySelectorAll('.data-table tbody tr');
         const warehouseResetFiltersBtn = document.getElementById('warehouseResetFilters');
         const addPartBtn = document.getElementById('addPartBtn');
@@ -3892,8 +4326,11 @@
         });
 
         function applyWarehouseRowStriping() {
+            // Получаем актуальные строки из DOM каждый раз
+            if (!warehouseTable) return;
+            const rows = warehouseTable.querySelectorAll('tbody tr');
             let visibleIndex = 0;
-            warehouseTableRows.forEach(row => {
+            rows.forEach(row => {
                 if (row.style.display === 'none') {
                     row.classList.remove('alt-row');
                     return;
@@ -3906,20 +4343,33 @@
 
         function applyWarehouseTableFilters() {
             const searchValue = warehouseSearchInput ? warehouseSearchInput.value.toLowerCase().trim() : '';
-            const facilityValue = facilityWarehouseFilter ? facilityWarehouseFilter.value : '';
-            const warehouseValue = warehouseAddressFilter ? warehouseAddressFilter.value : '';
-            const sparePartValue = sparePartFilter ? sparePartFilter.value : '';
+            const facilityValue = facilityWarehouseFilter ? facilityWarehouseFilter.value.toLowerCase() : '';
+            const warehouseValue = warehouseAddressFilter ? warehouseAddressFilter.value.toLowerCase() : '';
+            const sparePartValue = sparePartFilter ? sparePartFilter.value.toLowerCase() : '';
 
-            warehouseTableRows.forEach(row => {
+            // Получаем актуальные строки из DOM для лучшей производительности
+            if (!warehouseTable) return;
+            const rows = warehouseTable.querySelectorAll('tbody tr');
+            
+            // Оптимизация: если нет фильтров, показываем все строки сразу
+            if (!searchValue && !facilityValue && !warehouseValue && !sparePartValue) {
+                rows.forEach(row => {
+                    row.style.display = '';
+                });
+                applyWarehouseRowStriping();
+                return;
+            }
+
+            rows.forEach(row => {
                 const text = row.textContent.toLowerCase();
                 const rowFacility = (row.dataset.facility || '').toLowerCase();
                 const rowWarehouse = (row.dataset.warehouse || '').toLowerCase();
                 const rowSparePart = (row.dataset.sparePart || '').toLowerCase();
 
                 const matchesSearch = searchValue === '' || text.includes(searchValue);
-                const matchesFacility = facilityValue === '' || rowFacility === facilityValue.toLowerCase();
-                const matchesWarehouse = warehouseValue === '' || rowWarehouse === warehouseValue.toLowerCase();
-                const matchesSparePart = sparePartValue === '' || rowSparePart === sparePartValue.toLowerCase();
+                const matchesFacility = facilityValue === '' || rowFacility === facilityValue;
+                const matchesWarehouse = warehouseValue === '' || rowWarehouse === warehouseValue;
+                const matchesSparePart = sparePartValue === '' || rowSparePart === sparePartValue;
 
                 row.style.display = (matchesSearch && matchesFacility && matchesWarehouse && matchesSparePart) ? '' : 'none';
             });
@@ -3927,8 +4377,15 @@
             applyWarehouseRowStriping();
         }
 
+        // Debounce для поиска - оптимизация производительности
+        let warehouseSearchTimeout = null;
         if (warehouseSearchInput) {
-            warehouseSearchInput.addEventListener('input', applyWarehouseTableFilters);
+            warehouseSearchInput.addEventListener('input', () => {
+                clearTimeout(warehouseSearchTimeout);
+                warehouseSearchTimeout = setTimeout(() => {
+                    applyWarehouseTableFilters();
+                }, 150); // Задержка 150ms для оптимизации
+            });
         }
 
         [facilityWarehouseFilter, warehouseAddressFilter, sparePartFilter].forEach(select => {
@@ -3974,8 +4431,34 @@
                 if (facilityWarehouseFilter) facilityWarehouseFilter.value = '';
                 if (warehouseAddressFilter) warehouseAddressFilter.value = '';
                 if (sparePartFilter) sparePartFilter.value = '';
+                if (warehouseSortColumnFilter) warehouseSortColumnFilter.value = '';
+                if (warehouseSortDirectionFilter) warehouseSortDirectionFilter.value = 'asc';
                 applyWarehouseTableFilters();
                 warehouseFilterSelectControllers.forEach(controller => controller.sync());
+            });
+        }
+
+        // Обработчики сортировки для таблицы склада
+        if (warehouseSortColumnFilter) {
+            warehouseSortColumnFilter.addEventListener('change', () => {
+                const columnIndex = warehouseSortColumnFilter.value ? parseInt(warehouseSortColumnFilter.value) : null;
+                const sortDirection = warehouseSortDirectionFilter ? warehouseSortDirectionFilter.value : 'asc';
+                if (columnIndex !== null && warehouseTable) {
+                    applyTableSorting(warehouseTable, columnIndex, sortDirection, applyWarehouseTableFilters, applyWarehouseRowStriping);
+                } else if (columnIndex === null) {
+                    // Если выбрано "Исходный порядок", просто применяем фильтры без сортировки
+                    applyWarehouseTableFilters();
+                }
+            });
+        }
+
+        if (warehouseSortDirectionFilter) {
+            warehouseSortDirectionFilter.addEventListener('change', () => {
+                const columnIndex = warehouseSortColumnFilter && warehouseSortColumnFilter.value ? parseInt(warehouseSortColumnFilter.value) : null;
+                const sortDirection = warehouseSortDirectionFilter.value;
+                if (columnIndex !== null && warehouseTable) {
+                    applyTableSorting(warehouseTable, columnIndex, sortDirection, applyWarehouseTableFilters, applyWarehouseRowStriping);
+                }
             });
         }
 
@@ -4674,60 +5157,80 @@
         if (warehouseTable) {
             const tbody = warehouseTable.querySelector('tbody');
             if (tbody) {
-                // Одинарный клик - выделение строки
+                // Одинарный клик - выделение строки (оптимизировано)
                 tbody.addEventListener('click', (e) => {
-                    // Игнорируем клики по редактируемым ячейкам и quantity input
-                    if (e.target.closest('.editable-cell[contenteditable="true"]') ||
-                        e.target.closest('.quantity-input-wrapper') ||
-                        e.target.closest('.quantity-input') ||
-                        e.target.closest('.quantity-input-btn')) {
+                    const target = e.target;
+                    // Быстрая проверка на редактируемые элементы
+                    if (target.closest('.editable-cell[contenteditable="true"]') ||
+                        target.closest('.quantity-input-wrapper') ||
+                        target.closest('.quantity-input') ||
+                        target.closest('.quantity-input-btn')) {
                         return;
                     }
-                    const row = e.target.closest('tr[data-part-id]');
-                    if (row) {
+                    const row = target.closest('tr[data-part-id]');
+                    if (!row) return;
+                    
+                    // Используем requestAnimationFrame для отложенного выполнения тяжелых операций
+                    requestAnimationFrame(() => {
                         // Если строка уже выделена, убираем выделение
                         if (row.classList.contains('selected')) {
                             row.classList.remove('selected');
                             selectedWarehouseRow = null;
                         } else {
-                            // Убираем выделение с других строк
-                            getAllWarehouseRows().forEach(r => r.classList.remove('selected'));
+                            // Убираем выделение с других строк (используем кэшированный селектор)
+                            if (selectedWarehouseRow && selectedWarehouseRow !== row) {
+                                selectedWarehouseRow.classList.remove('selected');
+                            }
                             // Выделяем текущую строку
                             row.classList.add('selected');
                             selectedWarehouseRow = row;
                         }
-                    }
-                });
+                    });
+                }, { passive: true });
                 
-                // Убираем выделение при клике вне таблицы
+                // Убираем выделение при клике вне таблицы (оптимизировано)
                 document.addEventListener('click', (e) => {
+                    const target = e.target;
+                    // Быстрая проверка - если нет выделенных строк, выходим
+                    if (!selectedWarehouseRow) return;
+                    
                     // Проверяем, что клик был не по таблице и не по контекстному меню
-                    if (!warehouseTable.contains(e.target) && 
-                        !(warehouseContextMenu && warehouseContextMenu.contains(e.target))) {
+                    if (!warehouseTable.contains(target) && 
+                        !(warehouseContextMenu && warehouseContextMenu.contains(target))) {
                         // Не убираем выделение, если клик был по редактируемой ячейке или quantity input
-                        if (e.target.closest('.editable-cell[contenteditable="true"]') ||
-                            e.target.closest('.quantity-input-wrapper') ||
-                            e.target.closest('.quantity-input') ||
-                            e.target.closest('.quantity-input-btn')) {
+                        if (target.closest('.editable-cell[contenteditable="true"]') ||
+                            target.closest('.quantity-input-wrapper') ||
+                            target.closest('.quantity-input') ||
+                            target.closest('.quantity-input-btn')) {
                             return;
                         }
-                        getAllWarehouseRows().forEach(r => r.classList.remove('selected'));
-                        selectedWarehouseRow = null;
+                        // Используем requestAnimationFrame для отложенного выполнения
+                        requestAnimationFrame(() => {
+                            if (selectedWarehouseRow) {
+                                selectedWarehouseRow.classList.remove('selected');
+                                selectedWarehouseRow = null;
+                            }
+                        });
                     }
-                });
+                }, { passive: true });
                 
-                // ПКМ - выделение строки и показ контекстного меню
+                // ПКМ - выделение строки и показ контекстного меню (оптимизировано)
                 tbody.addEventListener('contextmenu', (e) => {
                     const row = e.target.closest('tr[data-part-id]');
-                    if (row) {
-                        e.preventDefault();
+                    if (!row) return;
+                    
+                    e.preventDefault();
+                    // Используем requestAnimationFrame для отложенного выполнения
+                    requestAnimationFrame(() => {
                         // Убираем выделение с других строк
-                        getAllWarehouseRows().forEach(r => r.classList.remove('selected'));
+                        if (selectedWarehouseRow && selectedWarehouseRow !== row) {
+                            selectedWarehouseRow.classList.remove('selected');
+                        }
                         // Выделяем текущую строку
                         row.classList.add('selected');
                         selectedWarehouseRow = row;
                         showWarehouseContextMenu(e, row);
-                    }
+                    });
                 });
             }
         }
@@ -5272,6 +5775,7 @@
 
         applyWarehouseTableFilters();
 
+
         // Функция отката ячейки склада
         function revertWarehouseCell(cell) {
             if (!cell) return;
@@ -5638,6 +6142,8 @@
             const statusFilter = document.getElementById('statusFilter');
             const locationFilter = document.getElementById('locationFilter');
             const resetEquipmentFilters = document.getElementById('resetEquipmentFilters');
+            const equipmentSortColumnFilter = document.getElementById('equipmentSortColumnFilter');
+            const equipmentSortDirectionFilter = document.getElementById('equipmentSortDirectionFilter');
             const equipmentTable = document.getElementById('equipmentTable');
             const equipmentStatusBox = document.getElementById('equipmentTableUpdateStatus');
             const addEquipmentBtn = document.getElementById('addEquipmentBtn');
@@ -5700,9 +6206,17 @@
                 if (deleteBtn) {
                     deleteBtn.addEventListener('click', () => {
                         if (selectedEquipmentRow) {
+                            const equipmentAssignmentId = selectedEquipmentRow.dataset.equipmentAssignmentId;
                             const equipmentId = selectedEquipmentRow.dataset.equipmentId;
-                            if (equipmentId) {
-                                openDeleteEquipmentModal(parseInt(equipmentId), selectedEquipmentRow);
+                            
+                            // Проверяем, есть ли assignment_id (не пустая строка и не undefined)
+                            if (equipmentAssignmentId && equipmentAssignmentId.trim() !== '') {
+                                openDeleteEquipmentModal(parseInt(equipmentAssignmentId), selectedEquipmentRow, 'assignment');
+                            } else if (equipmentId && equipmentId.trim() !== '') {
+                                // Если нет assignment_id, но есть equipment_id, удаляем само оборудование
+                                openDeleteEquipmentModal(parseInt(equipmentId), selectedEquipmentRow, 'equipment');
+                            } else {
+                                showEquipmentStatus('Не удалось определить оборудование для удаления', 'error');
                             }
                         }
                         hideContextMenu();
@@ -5793,6 +6307,10 @@
                     if (e.target.closest('.role-cell[data-field="equipment_type"]')) {
                         return;
                     }
+                    // Игнорируем клики по ячейкам предприятий и отделов (они обрабатываются отдельно)
+                    if (e.target.closest('.facility-cell') || e.target.closest('.department-cell')) {
+                        return;
+                    }
                     
                     const row = e.target.closest('tr');
                     if (row) {
@@ -5866,14 +6384,18 @@
             }
 
             // Обновление ячейки оборудования
-            function updateEquipmentCell(cell, equipmentId, field, value) {
+            function updateEquipmentCell(cell, equipmentId, field, value, equipmentAssignmentId = null) {
                 cell.classList.add('saving');
+                const payload = { field, value };
+                if (equipmentAssignmentId) {
+                    payload.equipment_assignment_id = equipmentAssignmentId;
+                }
                 fetch(`/admin/equipment/${equipmentId}`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ field, value })
+                    body: JSON.stringify(payload)
                 })
                 .then(async response => {
                     const data = await response.json();
@@ -5884,16 +6406,59 @@
                     if (ok && data.success) {
                         if (cell.classList.contains('role-cell')) {
                             const labelSpan = cell.querySelector('.role-cell-label');
-                            const typeValue = data.value || '';
-                            if (labelSpan) labelSpan.textContent = typeValue || '—';
-                            cell.dataset.typeValue = typeValue;
-                            cell.dataset.originalValue = typeValue;
+                            const value = data.value || '';
+                            if (labelSpan) labelSpan.textContent = value || '—';
+                            if (cell.dataset.field === 'equipment_type') {
+                                cell.dataset.typeValue = value;
+                                const row = cell.closest('tr');
+                                if (row) {
+                                    row.dataset.type = value;
+                                }
+                            } else if (cell.dataset.field === 'department_id') {
+                                cell.dataset.departmentId = value || '';
+                                const row = cell.closest('tr');
+                                if (row) {
+                                    // Обновляем название отдела в data-атрибуте
+                                    row.dataset.department = value || '';
+                                }
+                            }
+                            cell.dataset.originalValue = value;
                             cell.setAttribute('aria-expanded', 'false');
-                            // Обновляем data-type в строке для фильтрации
+                        } else if (cell.classList.contains('department-cell')) {
+                            const labelSpan = cell.querySelector('.role-cell-label');
+                            const value = data.value || '';
+                            if (labelSpan) labelSpan.textContent = value || '—';
                             const row = cell.closest('tr');
                             if (row) {
-                                row.dataset.type = typeValue;
+                                row.dataset.department = value || '';
+                                // Обновляем предприятие, если оно изменилось (только если facility_name не пустое)
+                                if (data.facility_name !== undefined && data.facility_name !== null && data.facility_name !== '') {
+                                    const facilityCell = row.querySelector('.facility-cell');
+                                    if (facilityCell) {
+                                        const facilityLabel = facilityCell.querySelector('.role-cell-label');
+                                        if (facilityLabel) {
+                                            facilityLabel.textContent = data.facility_name;
+                                        }
+                                        facilityCell.dataset.facilityValue = data.facility_name;
+                                    }
+                                    row.dataset.facility = data.facility_name;
+                                    // Обновляем facilityName в ячейке отдела
+                                    cell.dataset.facilityName = data.facility_name;
+                                }
+                                // Обновляем departmentId в ячейке отдела
+                                if (value === '' || value === '—') {
+                                    cell.dataset.departmentId = '';
+                                } else {
+                                    // Если значение не пустое, нужно найти ID отдела
+                                    const facilityName = cell.dataset.facilityName || '';
+                                    const departments = equipmentDepartmentsByFacility[facilityName] || [];
+                                    const dept = departments.find(d => d.name === value);
+                                    if (dept) {
+                                        cell.dataset.departmentId = String(dept.id);
+                                    }
+                                }
                             }
+                            cell.dataset.originalValue = cell.dataset.departmentId || '';
                         } else {
                             cell.textContent = data.value || '';
                             cell.dataset.originalValue = cell.textContent;
@@ -5971,6 +6536,26 @@
             }
 
             setupEditableCells();
+
+            // Данные для выпадающих списков предприятий и отделов
+            const equipmentDepartmentsData = {{ department_choices|tojson }};
+            const equipmentFacilityOptionsMap = {};
+            {% for fac in facility_choices %}
+            equipmentFacilityOptionsMap[{{ fac.name|tojson }}] = {{ fac.name|tojson }};
+            {% endfor %}
+            const equipmentDepartmentsByFacility = {};
+            {% for dept in department_choices %}
+            const equipmentFacilityName_{{ loop.index }} = {{ dept.facility_name|tojson }};
+            if (equipmentFacilityName_{{ loop.index }}) {
+                if (!equipmentDepartmentsByFacility[equipmentFacilityName_{{ loop.index }}]) {
+                    equipmentDepartmentsByFacility[equipmentFacilityName_{{ loop.index }}] = [];
+                }
+                equipmentDepartmentsByFacility[equipmentFacilityName_{{ loop.index }}].push({
+                    id: {{ dept.id }},
+                    name: {{ dept.name|tojson }}
+                });
+            }
+            {% endfor %}
 
             // Выпадающий список типов оборудования
             const equipmentTypeOptions = {{ equipment_types|tojson }};
@@ -6180,6 +6765,386 @@
             
             setupTypeCellHandlers();
 
+            // Выпадающие списки для предприятий
+            const equipmentFacilityDropdown = document.createElement('div');
+            equipmentFacilityDropdown.className = 'role-dropdown';
+            document.body.appendChild(equipmentFacilityDropdown);
+            let currentEquipmentFacilityCell = null;
+            
+            // Выпадающие списки для отделов
+            const equipmentDepartmentDropdown = document.createElement('div');
+            equipmentDepartmentDropdown.className = 'role-dropdown';
+            equipmentDepartmentDropdown.setAttribute('data-equipment-department', 'true');
+            document.body.appendChild(equipmentDepartmentDropdown);
+            let currentEquipmentDepartmentCell = null;
+
+            function populateEquipmentFacilityDropdown() {
+                equipmentFacilityDropdown.innerHTML = '';
+                Object.keys(equipmentFacilityOptionsMap).forEach(facilityName => {
+                    if (!facilityName || facilityName.trim() === '') return;
+                    const option = document.createElement('button');
+                    option.type = 'button';
+                    option.className = 'role-dropdown-option';
+                    option.dataset.value = facilityName;
+                    option.textContent = facilityName;
+                    option.addEventListener('click', () => {
+                        const targetCell = currentEquipmentFacilityCell;
+                        if (!targetCell) return;
+                        if (targetCell.dataset.facilityValue === facilityName) {
+                            closeEquipmentFacilityDropdown();
+                            return;
+                        }
+                        const row = targetCell.closest('tr');
+                        if (!row) return;
+                        const equipmentId = row.dataset.equipmentId;
+                        const equipmentAssignmentId = row.dataset.equipmentAssignmentId;
+                        if (!equipmentId) return;
+                        targetCell.dataset.originalValue = targetCell.dataset.facilityValue || '';
+                        // Обновляем facility в data-атрибуте строки
+                        row.dataset.facility = facilityName;
+                        // Для facility пока просто обновляем отображение, так как это вычисляемое поле
+                        const labelSpan = targetCell.querySelector('.role-cell-label');
+                        if (labelSpan) labelSpan.textContent = facilityName || '—';
+                        targetCell.dataset.facilityValue = facilityName;
+                        
+                        // Сбрасываем отдел при смене предприятия
+                        const departmentCell = row.querySelector('.department-cell');
+                        if (departmentCell) {
+                            const deptLabelSpan = departmentCell.querySelector('.role-cell-label');
+                            // Устанавливаем прочерк в отделе при смене предприятия
+                            if (deptLabelSpan) deptLabelSpan.textContent = '—';
+                            departmentCell.dataset.departmentId = '';
+                            // Обновляем facilityName для правильного отображения списка отделов
+                            departmentCell.dataset.facilityName = facilityName || '';
+                            row.dataset.department = '';
+                            
+                            // Сбрасываем отдел в базе данных
+                            if (equipmentAssignmentId) {
+                                updateEquipmentCell(departmentCell, equipmentId, 'department_id', '', parseInt(equipmentAssignmentId));
+                            }
+                        }
+                        
+                        closeEquipmentFacilityDropdown();
+                    });
+                    equipmentFacilityDropdown.appendChild(option);
+                });
+            }
+
+            function positionEquipmentFacilityDropdown(cell) {
+                if (!cell || !equipmentFacilityDropdown) return;
+                
+                const rect = cell.getBoundingClientRect();
+                
+                // КРИТИЧЕСКИ ВАЖНО: сначала полностью убираем inset, который переопределяет left
+                equipmentDepartmentDropdown.style.removeProperty('inset');
+                equipmentDepartmentDropdown.style.setProperty('inset', 'unset', 'important');
+                // Также убираем top, bottom, right, чтобы они не конфликтовали
+                equipmentDepartmentDropdown.style.removeProperty('top');
+                equipmentDepartmentDropdown.style.removeProperty('bottom');
+                equipmentDepartmentDropdown.style.removeProperty('right');
+                equipmentDepartmentDropdown.style.removeProperty('left');
+                
+                // Используем offsetWidth для получения реальной ширины ячейки
+                // offsetWidth включает padding и border, что даёт точную ширину
+                const cellWidth = cell.offsetWidth;
+                // Также проверяем rect.width для сравнения
+                const rectWidth = rect.width;
+                // Используем максимальное значение для надёжности
+                const finalWidth = Math.max(cellWidth, rectWidth);
+                const dropdownHeight = equipmentFacilityDropdown.offsetHeight || 200;
+                const viewportHeight = window.innerHeight;
+                
+                const tableContainer = document.querySelector('.table-container');
+                let containerRect = null;
+                if (tableContainer) {
+                    containerRect = tableContainer.getBoundingClientRect();
+                }
+                
+                const spaceBelow = viewportHeight - rect.bottom;
+                const spaceAbove = rect.top;
+                
+                let availableSpaceBelow = spaceBelow;
+                let availableSpaceAbove = spaceAbove;
+                
+                if (containerRect) {
+                    const containerBottom = containerRect.bottom;
+                    const containerTop = containerRect.top;
+                    availableSpaceBelow = Math.min(spaceBelow, containerBottom - rect.bottom);
+                    availableSpaceAbove = Math.min(spaceAbove, rect.top - containerTop);
+                }
+                
+                const openUpward = availableSpaceBelow < dropdownHeight && availableSpaceAbove > availableSpaceBelow;
+                
+                equipmentFacilityDropdown.style.position = 'fixed';
+                equipmentFacilityDropdown.style.zIndex = '10000';
+                if (openUpward) {
+                    equipmentFacilityDropdown.style.bottom = `${viewportHeight - rect.top + 6}px`;
+                    equipmentFacilityDropdown.style.top = 'auto';
+                } else {
+                    equipmentFacilityDropdown.style.top = `${rect.bottom + 6}px`;
+                    equipmentFacilityDropdown.style.bottom = 'auto';
+                }
+                equipmentFacilityDropdown.style.left = `${rect.left}px`;
+                equipmentFacilityDropdown.style.width = `${finalWidth}px`;
+                equipmentFacilityDropdown.style.minWidth = `${finalWidth}px`;
+                equipmentFacilityDropdown.style.maxWidth = `${finalWidth}px`;
+                equipmentFacilityDropdown.style.boxSizing = 'border-box';
+                equipmentFacilityDropdown.style.flexShrink = '0';
+                equipmentFacilityDropdown.style.flexGrow = '0';
+                // Сбрасываем любые ограничения ширины
+                equipmentFacilityDropdown.style.setProperty('width', `${finalWidth}px`, 'important');
+                equipmentFacilityDropdown.style.setProperty('min-width', `${finalWidth}px`, 'important');
+                equipmentFacilityDropdown.style.setProperty('max-width', `${finalWidth}px`, 'important');
+                
+                const options = equipmentFacilityDropdown.querySelectorAll('.role-dropdown-option');
+                options.forEach(opt => {
+                    opt.style.width = '100%';
+                    opt.style.minWidth = '100%';
+                    opt.style.maxWidth = '100%';
+                    opt.style.boxSizing = 'border-box';
+                    opt.classList.toggle('selected', opt.dataset.value === cell.dataset.facilityValue);
+                });
+            }
+
+            function openEquipmentFacilityDropdown(cell) {
+                currentEquipmentFacilityCell = cell;
+                cell.setAttribute('aria-expanded', 'true');
+                populateEquipmentFacilityDropdown();
+                equipmentFacilityDropdown.classList.add('visible');
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        positionEquipmentFacilityDropdown(cell);
+                        requestAnimationFrame(() => {
+                            positionEquipmentFacilityDropdown(cell);
+                        });
+                    });
+                });
+            }
+
+            function closeEquipmentFacilityDropdown() {
+                if (currentEquipmentFacilityCell) {
+                    currentEquipmentFacilityCell.setAttribute('aria-expanded', 'false');
+                }
+                currentEquipmentFacilityCell = null;
+                equipmentFacilityDropdown.classList.remove('visible');
+            }
+
+            function populateEquipmentDepartmentDropdown(cell) {
+                equipmentDepartmentDropdown.innerHTML = '';
+                // Получаем предприятие из ячейки отдела или из ячейки предприятия той же строки
+                let facilityName = cell.dataset.facilityName || '';
+                const row = cell.closest('tr');
+                if (row) {
+                    const facilityCell = row.querySelector('.facility-cell');
+                    if (facilityCell && facilityCell.dataset.facilityValue) {
+                        // Используем актуальное предприятие из ячейки предприятия
+                        facilityName = facilityCell.dataset.facilityValue;
+                        // Обновляем facilityName в ячейке отдела для будущих использований
+                        cell.dataset.facilityName = facilityName;
+                    }
+                }
+                const departments = equipmentDepartmentsByFacility[facilityName] || [];
+                
+                departments.forEach(dept => {
+                    if (!dept || !dept.name || dept.name.trim() === '') return;
+                    const option = document.createElement('button');
+                    option.type = 'button';
+                    option.className = 'role-dropdown-option';
+                    option.dataset.value = dept.id;
+                    option.textContent = dept.name;
+                    option.addEventListener('click', () => {
+                        const targetCell = currentEquipmentDepartmentCell;
+                        if (!targetCell) return;
+                        const currentId = targetCell.dataset.departmentId || '';
+                        if (currentId === String(dept.id)) {
+                            closeEquipmentDepartmentDropdown();
+                            return;
+                        }
+                        const row = targetCell.closest('tr');
+                        if (!row) return;
+                        const equipmentId = row.dataset.equipmentId;
+                        const equipmentAssignmentId = row.dataset.equipmentAssignmentId;
+                        if (!equipmentId || !equipmentAssignmentId) return;
+                        targetCell.dataset.originalValue = targetCell.dataset.departmentId || '';
+                        updateEquipmentCell(targetCell, equipmentId, 'department_id', dept.id, parseInt(equipmentAssignmentId));
+                        closeEquipmentDepartmentDropdown();
+                    });
+                    equipmentDepartmentDropdown.appendChild(option);
+                });
+            }
+
+            function positionEquipmentDepartmentDropdown(cell) {
+                if (!cell || !equipmentDepartmentDropdown) return;
+                
+                const rect = cell.getBoundingClientRect();
+                
+                // Используем offsetWidth для получения реальной ширины ячейки
+                // offsetWidth включает padding и border, что даёт точную ширину
+                const cellWidth = cell.offsetWidth;
+                // Также проверяем rect.width для сравнения
+                const rectWidth = rect.width;
+                // Используем максимальное значение для надёжности
+                const finalWidth = Math.max(cellWidth, rectWidth);
+                const dropdownHeight = equipmentDepartmentDropdown.offsetHeight || 200;
+                const viewportHeight = window.innerHeight;
+                
+                const tableContainer = document.querySelector('.table-container');
+                let containerRect = null;
+                if (tableContainer) {
+                    containerRect = tableContainer.getBoundingClientRect();
+                }
+                
+                const spaceBelow = viewportHeight - rect.bottom;
+                const spaceAbove = rect.top;
+                
+                let availableSpaceBelow = spaceBelow;
+                let availableSpaceAbove = spaceAbove;
+                
+                if (containerRect) {
+                    const containerBottom = containerRect.bottom;
+                    const containerTop = containerRect.top;
+                    availableSpaceBelow = Math.min(spaceBelow, containerBottom - rect.bottom);
+                    availableSpaceAbove = Math.min(spaceAbove, rect.top - containerTop);
+                }
+                
+                const openUpward = availableSpaceBelow < dropdownHeight && availableSpaceAbove > availableSpaceBelow;
+                
+                equipmentDepartmentDropdown.style.position = 'fixed';
+                equipmentDepartmentDropdown.style.zIndex = '10000';
+                if (openUpward) {
+                    equipmentDepartmentDropdown.style.bottom = `${viewportHeight - rect.top + 6}px`;
+                    equipmentDepartmentDropdown.style.top = 'auto';
+                } else {
+                    equipmentDepartmentDropdown.style.top = `${rect.bottom + 6}px`;
+                    equipmentDepartmentDropdown.style.bottom = 'auto';
+                }
+                equipmentDepartmentDropdown.style.left = `${rect.left}px`;
+                equipmentDepartmentDropdown.style.width = `${finalWidth}px`;
+                equipmentDepartmentDropdown.style.minWidth = `${finalWidth}px`;
+                equipmentDepartmentDropdown.style.maxWidth = `${finalWidth}px`;
+                equipmentDepartmentDropdown.style.boxSizing = 'border-box';
+                equipmentDepartmentDropdown.style.flexShrink = '0';
+                equipmentDepartmentDropdown.style.flexGrow = '0';
+                // Сбрасываем любые ограничения ширины
+                equipmentDepartmentDropdown.style.setProperty('width', `${finalWidth}px`, 'important');
+                equipmentDepartmentDropdown.style.setProperty('min-width', `${finalWidth}px`, 'important');
+                equipmentDepartmentDropdown.style.setProperty('max-width', `${finalWidth}px`, 'important');
+                
+                const options = equipmentDepartmentDropdown.querySelectorAll('.role-dropdown-option');
+                options.forEach(opt => {
+                    opt.style.width = '100%';
+                    opt.style.minWidth = '100%';
+                    opt.style.maxWidth = '100%';
+                    opt.style.boxSizing = 'border-box';
+                    opt.classList.toggle('selected', opt.dataset.value === cell.dataset.departmentId);
+                });
+            }
+
+            function openEquipmentDepartmentDropdown(cell) {
+                currentEquipmentDepartmentCell = cell;
+                cell.setAttribute('aria-expanded', 'true');
+                populateEquipmentDepartmentDropdown(cell);
+                equipmentDepartmentDropdown.classList.add('visible');
+                // Применяем позиционирование (внутри функции уже есть requestAnimationFrame)
+                positionEquipmentDepartmentDropdown(cell);
+            }
+
+            function closeEquipmentDepartmentDropdown() {
+                if (currentEquipmentDepartmentCell) {
+                    currentEquipmentDepartmentCell.setAttribute('aria-expanded', 'false');
+                }
+                currentEquipmentDepartmentCell = null;
+                equipmentDepartmentDropdown.classList.remove('visible');
+            }
+
+            // Обработчики для ячеек предприятий и отделов
+            function setupEquipmentFacilityDepartmentHandlers() {
+                const facilityCells = equipmentTable ? equipmentTable.querySelectorAll('td.facility-cell') : [];
+                const departmentCells = equipmentTable ? equipmentTable.querySelectorAll('td.department-cell') : [];
+                
+                facilityCells.forEach(cell => {
+                    // Удаляем старые обработчики через клонирование
+                    const newCell = cell.cloneNode(true);
+                    cell.parentNode.replaceChild(newCell, cell);
+                    
+                    newCell.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        closeEquipmentDepartmentDropdown();
+                        closeTypeDropdown();
+                        if (currentEquipmentFacilityCell === newCell && equipmentFacilityDropdown.classList.contains('visible')) {
+                            closeEquipmentFacilityDropdown();
+                        } else {
+                            closeEquipmentFacilityDropdown();
+                            openEquipmentFacilityDropdown(newCell);
+                        }
+                    });
+                    newCell.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            closeEquipmentDepartmentDropdown();
+                            closeTypeDropdown();
+                            if (currentEquipmentFacilityCell === newCell && equipmentFacilityDropdown.classList.contains('visible')) {
+                                closeEquipmentFacilityDropdown();
+                            } else {
+                                closeEquipmentFacilityDropdown();
+                                openEquipmentFacilityDropdown(newCell);
+                            }
+                        } else if (e.key === 'Escape') {
+                            closeEquipmentFacilityDropdown();
+                        }
+                    });
+                });
+                
+                departmentCells.forEach(cell => {
+                    // Удаляем старые обработчики через клонирование
+                    const newCell = cell.cloneNode(true);
+                    cell.parentNode.replaceChild(newCell, cell);
+                    
+                    newCell.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        closeEquipmentFacilityDropdown();
+                        closeTypeDropdown();
+                        if (currentEquipmentDepartmentCell === newCell && equipmentDepartmentDropdown.classList.contains('visible')) {
+                            closeEquipmentDepartmentDropdown();
+                        } else {
+                            closeEquipmentDepartmentDropdown();
+                            openEquipmentDepartmentDropdown(newCell);
+                        }
+                    });
+                    newCell.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            closeEquipmentFacilityDropdown();
+                            closeTypeDropdown();
+                            if (currentEquipmentDepartmentCell === newCell && equipmentDepartmentDropdown.classList.contains('visible')) {
+                                closeEquipmentDepartmentDropdown();
+                            } else {
+                                closeEquipmentDepartmentDropdown();
+                                openEquipmentDepartmentDropdown(newCell);
+                            }
+                        } else if (e.key === 'Escape') {
+                            closeEquipmentDepartmentDropdown();
+                        }
+                    });
+                });
+            }
+            
+            setupEquipmentFacilityDepartmentHandlers();
+
+            // Закрытие выпадающих списков при клике вне
+            document.addEventListener('click', (e) => {
+                if (!equipmentFacilityDropdown.contains(e.target) && !e.target.closest('.facility-cell')) {
+                    closeEquipmentFacilityDropdown();
+                }
+                if (!equipmentDepartmentDropdown.contains(e.target) && !e.target.closest('.department-cell')) {
+                    closeEquipmentDepartmentDropdown();
+                }
+            });
+
             // Функция для проверки, находится ли точка внутри выпадающего списка
             function isPointInDropdown(x, y) {
                 if (!typeDropdown.classList.contains('visible')) return false;
@@ -6378,8 +7343,11 @@
 
             // Функция для чередования цветов строк
             function applyEquipmentRowStriping() {
+                // Получаем актуальные строки из DOM каждый раз
+                if (!equipmentTable) return;
+                const rows = equipmentTable.querySelectorAll('tbody tr');
                 let visibleIndex = 0;
-                getAllEquipmentRows().forEach(row => {
+                rows.forEach(row => {
                     if (row.style.display === 'none') {
                         row.classList.remove('alt-row');
                         return;
@@ -6474,8 +7442,34 @@
                         if (typeFilter) typeFilter.value = '';
                         if (statusFilter) statusFilter.value = '';
                         if (locationFilter) locationFilter.value = '';
+                        if (equipmentSortColumnFilter) equipmentSortColumnFilter.value = '';
+                        if (equipmentSortDirectionFilter) equipmentSortDirectionFilter.value = 'asc';
                         applyEquipmentFilters();
                         equipmentFilterSelectControllers.forEach(controller => controller.sync());
+                    });
+                }
+
+                // Обработчики сортировки для таблицы оборудования
+                if (equipmentSortColumnFilter) {
+                    equipmentSortColumnFilter.addEventListener('change', () => {
+                        const columnIndex = equipmentSortColumnFilter.value ? parseInt(equipmentSortColumnFilter.value) : null;
+                        const sortDirection = equipmentSortDirectionFilter ? equipmentSortDirectionFilter.value : 'asc';
+                        if (columnIndex !== null && equipmentTable) {
+                            applyTableSorting(equipmentTable, columnIndex, sortDirection, applyEquipmentFilters, applyEquipmentRowStriping);
+                        } else if (columnIndex === null) {
+                            // Если выбрано "Исходный порядок", просто применяем фильтры без сортировки
+                            applyEquipmentFilters();
+                        }
+                    });
+                }
+
+                if (equipmentSortDirectionFilter) {
+                    equipmentSortDirectionFilter.addEventListener('change', () => {
+                        const columnIndex = equipmentSortColumnFilter && equipmentSortColumnFilter.value ? parseInt(equipmentSortColumnFilter.value) : null;
+                        const sortDirection = equipmentSortDirectionFilter.value;
+                        if (columnIndex !== null && equipmentTable) {
+                            applyTableSorting(equipmentTable, columnIndex, sortDirection, applyEquipmentFilters, applyEquipmentRowStriping);
+                        }
                     });
                 }
 
@@ -6613,11 +7607,33 @@
                     if (equipmentNameInput) equipmentNameInput.value = '';
                     if (existingEquipmentId) existingEquipmentId.value = '';
                 }
+                
+                // Скрываем поля для кастомных значений
+                const customEquipmentTypeRow = document.getElementById('customEquipmentTypeRow');
+                const customMaintenanceRow = document.getElementById('customMaintenanceRow');
+                const customEquipmentType = document.getElementById('customEquipmentType');
+                const customMaintenanceFrequency = document.getElementById('customMaintenanceFrequency');
+                
+                if (customEquipmentTypeRow) {
+                    customEquipmentTypeRow.style.display = 'none';
+                }
+                if (customMaintenanceRow) {
+                    customMaintenanceRow.style.display = 'none';
+                }
+                if (customEquipmentType) {
+                    customEquipmentType.value = '';
+                    customEquipmentType.removeAttribute('required');
+                }
+                if (customMaintenanceFrequency) {
+                    customMaintenanceFrequency.value = '';
+                    customMaintenanceFrequency.removeAttribute('required');
+                }
                 // Сброс выпадающих списков
                 closeEquipmentModalDropdown();
                 const equipmentFacilityBtn = document.getElementById('equipmentFacilityBtn');
                 const equipmentFacilityBtnNew = document.getElementById('equipmentFacilityBtnNew');
-                const equipmentBtns = [equipmentTypeBtn, equipmentMaintenanceBtn, equipmentFacilityBtn, equipmentFacilityBtnNew, equipmentDepartmentBtn, equipmentDepartmentBtnNew, sparePartTypeBtn];
+                const warrantyPeriodUnitBtn = document.getElementById('warrantyPeriodUnitBtn');
+                const equipmentBtns = [equipmentTypeBtn, equipmentMaintenanceBtn, equipmentFacilityBtn, equipmentFacilityBtnNew, equipmentDepartmentBtn, equipmentDepartmentBtnNew, sparePartTypeBtn, warrantyPeriodUnitBtn];
                 equipmentBtns.forEach(btn => {
                     if (btn) {
                         const label = btn.querySelector('.modal-select-label');
@@ -6628,13 +7644,24 @@
                                 'equipmentFacilityBtn': 'Выберите предприятие',
                                 'equipmentDepartmentBtn': 'Сначала выберите предприятие',
                                 'equipmentDepartmentBtnNew': 'Выберите отдел',
-                                'sparePartTypeBtn': 'Выберите тип детали'
+                                'sparePartTypeBtn': 'Выберите тип детали',
+                                'warrantyPeriodUnitBtn': 'Месяцев'
                             };
                             label.textContent = defaultTexts[btn.id] || 'Выберите...';
                         }
                         btn.setAttribute('aria-expanded', 'false');
                     }
                 });
+                
+                // Инициализация выпадающего списка единиц измерения гарантии
+                const warrantyPeriodUnitSelect = document.getElementById('warrantyPeriodUnit');
+                if (warrantyPeriodUnitBtn && warrantyPeriodUnitSelect) {
+                    const label = warrantyPeriodUnitBtn.querySelector('.modal-select-label');
+                    const selectedOption = warrantyPeriodUnitSelect.options[warrantyPeriodUnitSelect.selectedIndex];
+                    if (label && selectedOption) {
+                        label.textContent = selectedOption.textContent;
+                    }
+                }
                 // Сброс выбора предприятия и отдела для существующего оборудования
                 const equipmentFacilitySelect = document.getElementById('equipmentFacilitySelect');
                 const equipmentDepartmentSelect = document.getElementById('equipmentDepartmentSelect');
@@ -7039,10 +8066,22 @@
 
             function closeEquipmentModal() {
                 if (!equipmentModal) return;
+                
+                // Убираем фокус с активного элемента перед установкой aria-hidden
+                const activeElement = document.activeElement;
+                if (activeElement && equipmentModal.contains(activeElement)) {
+                    activeElement.blur();
+                }
+                
                 equipmentModal.classList.remove('visible');
-                equipmentModal.setAttribute('aria-hidden', 'true');
                 document.body.classList.remove('modal-open');
                 closeEquipmentModalDropdown();
+                
+                // Устанавливаем aria-hidden после небольшой задержки, чтобы фокус успел убраться
+                setTimeout(() => {
+                    equipmentModal.setAttribute('aria-hidden', 'true');
+                }, 0);
+                
                 // Сброс формы
                 if (equipmentForm) {
                     equipmentForm.reset();
@@ -7162,6 +8201,14 @@
                     console.log('Initialized maintenance_frequency:', Object.keys(equipmentModalSelectData.maintenance_frequency).length, 'options');
                 }
                 
+                // Единицы измерения периода гарантии
+                equipmentModalSelectData.warranty_period_unit = {
+                    'days': 'Дней',
+                    'months': 'Месяцев',
+                    'years': 'Лет'
+                };
+                console.log('Initialized warranty_period_unit:', Object.keys(equipmentModalSelectData.warranty_period_unit).length, 'options');
+                
                 // Предприятия (для существующего оборудования)
                 const equipmentFacilitySelect = document.getElementById('equipmentFacilitySelect');
                 if (equipmentFacilitySelect) {
@@ -7233,8 +8280,8 @@
             
             // Создаём карту отделов по предприятиям для формы оборудования
             const equipmentFacilityDeptMap = {};
-            const equipmentDepartmentsData = {{ department_choices|tojson }};
-            if (equipmentDepartmentsData && Array.isArray(equipmentDepartmentsData)) {
+            // Используем уже объявленную переменную equipmentDepartmentsData
+            if (typeof equipmentDepartmentsData !== 'undefined' && Array.isArray(equipmentDepartmentsData)) {
                 equipmentDepartmentsData.forEach(dept => {
                     const facilityId = dept.facility_id ? String(dept.facility_id) : '';
                     if (!facilityId) return;
@@ -7605,7 +8652,8 @@
                     'facility_id_new': 'facility_id',
                     'department_id': 'department_id',
                     'department_id_new': 'department_id_new',
-                    'spare_part_type': 'spare_part_type'
+                    'spare_part_type': 'spare_part_type',
+                    'warranty_period_unit': 'warranty_period_unit'
                 };
                 
                 const dataKey = fieldMap[field] || field;
@@ -7703,7 +8751,8 @@
             // Обработчики для кнопок выпадающих списков (переменные уже определены выше)
             const equipmentFacilityBtn = document.getElementById('equipmentFacilityBtn');
             const equipmentFacilityBtnNew = document.getElementById('equipmentFacilityBtnNew');
-            const allEquipmentBtns = [equipmentTypeBtn, equipmentMaintenanceBtn, equipmentFacilityBtn, equipmentFacilityBtnNew, equipmentDepartmentBtn, equipmentDepartmentBtnNew, sparePartTypeBtn].filter(btn => btn !== null);
+            const warrantyPeriodUnitBtn = document.getElementById('warrantyPeriodUnitBtn');
+            const allEquipmentBtns = [equipmentTypeBtn, equipmentMaintenanceBtn, equipmentFacilityBtn, equipmentFacilityBtnNew, equipmentDepartmentBtn, equipmentDepartmentBtnNew, sparePartTypeBtn, warrantyPeriodUnitBtn].filter(btn => btn !== null);
             allEquipmentBtns.forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -7783,7 +8832,10 @@
                 equipmentMaintenanceSelect.addEventListener('change', (e) => {
                     if (e.target.value === 'custom') {
                         if (customMaintenanceRow) customMaintenanceRow.style.display = 'block';
-                        if (customMaintenanceFrequency) customMaintenanceFrequency.required = true;
+                        if (customMaintenanceFrequency) {
+                            customMaintenanceFrequency.required = true;
+                            customMaintenanceFrequency.focus();
+                        }
                     } else {
                         if (customMaintenanceRow) customMaintenanceRow.style.display = 'none';
                         if (customMaintenanceFrequency) {
@@ -7791,6 +8843,21 @@
                             customMaintenanceFrequency.value = '';
                         }
                     }
+                });
+            }
+            
+            // Валидация для поля периодичности ТО - только числа
+            if (customMaintenanceFrequency) {
+                customMaintenanceFrequency.addEventListener('input', (e) => {
+                    // Удаляем все символы, кроме цифр
+                    e.target.value = e.target.value.replace(/\D/g, '');
+                });
+                
+                customMaintenanceFrequency.addEventListener('paste', (e) => {
+                    e.preventDefault();
+                    const paste = (e.clipboardData || window.clipboardData).getData('text');
+                    const numbersOnly = paste.replace(/\D/g, '');
+                    e.target.value = numbersOnly;
                 });
             }
             
@@ -7869,15 +8936,40 @@
                     const formData = new FormData(equipmentForm);
                     const isExisting = selectedExistingEquipment !== null;
                     
+                    console.log('Проверка режима:', { isExisting, selectedExistingEquipment, isExistingFormVisible });
+                    
                     if (isExisting) {
                         // Режим существующего оборудования
+                        // Получаем данные напрямую из элементов формы для надежности
+                        const acquisitionDateInput = existingEquipmentForm ? existingEquipmentForm.querySelector('input[name="acquisition_date"]') : null;
+                        const locationInput = existingEquipmentForm ? existingEquipmentForm.querySelector('input[name="location"]') : null;
+                        const departmentSelect = existingEquipmentForm ? existingEquipmentForm.querySelector('select[name="department_id"]') : null;
+                        
+                        const acquisitionDate = acquisitionDateInput ? acquisitionDateInput.value.trim() : '';
+                        const location = locationInput ? locationInput.value.trim() : '';
+                        const departmentId = departmentSelect ? departmentSelect.value : null;
+                        
+                        const existingEquipmentIdValue = existingEquipmentId ? existingEquipmentId.value : formData.get('existing_equipment_id');
+                        const equipmentStatusValue = formData.get('equipment_status') || 'В работе';
+                        
                         const payload = {
-                            existing_equipment_id: formData.get('existing_equipment_id'),
-                            acquisition_date: formData.get('acquisition_date') || null,
-                            location: formData.get('location')?.trim() || null,
-                            department_id: formData.get('department_id') || null,
-                            equipment_status: formData.get('equipment_status') || 'В работе'
+                            existing_equipment_id: existingEquipmentIdValue,
+                            acquisition_date: acquisitionDate || null,
+                            location: location || null,
+                            department_id: departmentId || null,
+                            equipment_status: equipmentStatusValue
                         };
+                        
+                        // Отладочный вывод
+                        console.log('=== ОТПРАВКА ДАННЫХ РАЗМЕЩЕНИЯ ===');
+                        console.log('Payload:', JSON.stringify(payload, null, 2));
+                        console.log('Значения из формы:', {
+                            acquisitionDateInput: acquisitionDateInput?.value,
+                            locationInput: locationInput?.value,
+                            departmentSelect: departmentSelect?.value,
+                            existingEquipmentId: existingEquipmentIdValue
+                        });
+                        console.log('===================================');
                         
                         fetch('/admin/equipment', {
                             method: 'POST',
@@ -7966,6 +9058,27 @@
                     maintenanceFrequency = formData.get('custom_maintenance_frequency');
                 }
                 
+                // Преобразуем период гарантии в дни
+                let warrantyPeriodDays = null;
+                const warrantyValue = formData.get('warranty_period_value');
+                const warrantyUnit = formData.get('warranty_period_unit');
+                if (warrantyValue && warrantyUnit) {
+                    const value = parseInt(warrantyValue);
+                    if (!isNaN(value) && value > 0) {
+                        switch (warrantyUnit) {
+                            case 'days':
+                                warrantyPeriodDays = value;
+                                break;
+                            case 'months':
+                                warrantyPeriodDays = value * 30; // Приблизительно 30 дней в месяце
+                                break;
+                            case 'years':
+                                warrantyPeriodDays = value * 365; // Приблизительно 365 дней в году
+                                break;
+                        }
+                    }
+                }
+                
                 const payload = {
                     equipment_name: formData.get('equipment_name')?.trim(),
                     equipment_type: (formData.get('equipment_type') === '__custom__' 
@@ -7974,7 +9087,7 @@
                     image_path: imagePath,
                     characteristics: formData.get('characteristics')?.trim() || null,
                     acquisition_date: formData.get('acquisition_date') || null,
-                    guarantee_date: formData.get('guarantee_date') || null,
+                    warranty_period: warrantyPeriodDays,
                     maintenance_frequency: maintenanceFrequency || null,
                     department_id: formData.get('department_id_new') || formData.get('department_id') || null,
                     location: formData.get('location')?.trim() || null,
@@ -8039,16 +9152,26 @@
             }
 
             // Модальное окно удаления
-            function openDeleteEquipmentModal(equipmentId, equipmentRow) {
+            let deleteType = 'assignment'; // 'assignment' или 'equipment'
+            
+            function openDeleteEquipmentModal(id, equipmentRow, type = 'assignment') {
                 if (!deleteEquipmentModal) return;
                 
-                equipmentToDelete = equipmentId;
+                equipmentToDelete = id;
                 equipmentToDeleteRow = equipmentRow;
+                deleteType = type;
                 
                 const equipmentName = equipmentRow.querySelector('td:nth-child(2)')?.textContent?.trim() || '';
+                const location = equipmentRow.querySelector('td:nth-child(6)')?.textContent?.trim() || '';
                 const equipmentText = equipmentName || 'оборудование';
+                const locationText = location ? ` (${location})` : '';
+                
                 if (deleteEquipmentMessage) {
-                    deleteEquipmentMessage.innerHTML = `Вы уверены, что хотите удалить оборудование "${equipmentText}"?<br>Это действие нельзя будет отменить.`;
+                    if (type === 'assignment') {
+                        deleteEquipmentMessage.innerHTML = `Вы уверены, что хотите удалить размещение оборудования "${equipmentText}${locationText}"?<br>Само оборудование останется в базе данных, будет удалено только это размещение.<br>Это действие нельзя будет отменить.`;
+                    } else {
+                        deleteEquipmentMessage.innerHTML = `Вы уверены, что хотите удалить оборудование "${equipmentText}${locationText}"?<br>Будут удалены все размещения этого оборудования и само оборудование.<br>Это действие нельзя будет отменить.`;
+                    }
                 }
                 
                 deleteEquipmentModal.setAttribute('aria-hidden', 'false');
@@ -8059,9 +9182,19 @@
             function closeDeleteEquipmentModal() {
                 if (!deleteEquipmentModal) return;
                 
-                deleteEquipmentModal.setAttribute('aria-hidden', 'true');
+                // Убираем фокус с активного элемента перед установкой aria-hidden
+                const activeElement = document.activeElement;
+                if (activeElement && deleteEquipmentModal.contains(activeElement)) {
+                    activeElement.blur();
+                }
+                
                 deleteEquipmentModal.classList.remove('visible');
                 document.body.classList.remove('modal-open');
+                
+                // Устанавливаем aria-hidden после небольшой задержки, чтобы фокус успел убраться
+                setTimeout(() => {
+                    deleteEquipmentModal.setAttribute('aria-hidden', 'true');
+                }, 0);
                 
                 if (deleteEquipmentConfirm) {
                     deleteEquipmentConfirm.disabled = false;
@@ -8070,6 +9203,7 @@
                 
                 equipmentToDelete = null;
                 equipmentToDeleteRow = null;
+                deleteType = 'assignment';
             }
 
             [deleteEquipmentClose, deleteEquipmentCancel].forEach(btn => {
@@ -8094,7 +9228,12 @@
                     deleteEquipmentConfirm.textContent = 'Удаление...';
                     
                     try {
-                        const response = await fetch(`/admin/equipment/${equipmentToDelete}`, {
+                        // Выбираем правильный endpoint в зависимости от типа удаления
+                        const url = deleteType === 'assignment' 
+                            ? `/admin/equipment/assignment/${equipmentToDelete}`
+                            : `/admin/equipment/${equipmentToDelete}`;
+                        
+                        const response = await fetch(url, {
                             method: 'DELETE',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -8122,21 +9261,31 @@
                                 // Обновляем обработчики строк
                                 setupRowHandlers();
                                 setupEditableCells();
+                                setupEquipmentFacilityDepartmentHandlers();
                                 
                                 // Применяем чередование цветов после удаления
                                 applyEquipmentRowStriping();
                                 
-                                showEquipmentStatus('Оборудование удалено', 'success');
+                                const message = deleteType === 'assignment' 
+                                    ? 'Размещение оборудования удалено'
+                                    : 'Оборудование удалено';
+                                showEquipmentStatus(message, 'success');
                             }
                             closeDeleteEquipmentModal();
                         } else {
-                            showEquipmentStatus(data.message || 'Не удалось удалить оборудование', 'error');
+                            const errorMessage = deleteType === 'assignment'
+                                ? (data.message || 'Не удалось удалить размещение оборудования')
+                                : (data.message || 'Не удалось удалить оборудование');
+                            showEquipmentStatus(errorMessage, 'error');
                             deleteEquipmentConfirm.disabled = false;
                             deleteEquipmentConfirm.textContent = 'Удалить';
                         }
                     } catch (error) {
                         console.error('Ошибка при удалении оборудования:', error);
-                        showEquipmentStatus('Произошла ошибка при удалении оборудования', 'error');
+                        const errorMessage = deleteType === 'assignment'
+                            ? 'Произошла ошибка при удалении размещения оборудования'
+                            : 'Произошла ошибка при удалении оборудования';
+                        showEquipmentStatus(errorMessage, 'error');
                         deleteEquipmentConfirm.disabled = false;
                         deleteEquipmentConfirm.textContent = 'Удалить';
                     }
@@ -8160,6 +9309,7 @@
 
             // Применяем фильтры при загрузке
             applyEquipmentFilters();
+
             } catch (error) {
                 console.error('Ошибка при инициализации скрипта оборудования:', error);
             }

@@ -35,6 +35,9 @@ def list_equipment():
         emp_service = AdminEmployeeService()
         department_id = emp_service.get_user_department_id(user['user_id'])
     
+    # Обрабатываем запланированные перемещения перед загрузкой списка
+    service.process_scheduled_movements()
+    
     equipment = service.get_all(user_role=user['role'], department_id=department_id)
     
     # Подготовка данных для фильтров
@@ -245,6 +248,162 @@ def delete_equipment_assignment(equipment_assignment_id):
         current_app.logger.error(f'Ошибка удаления размещения {equipment_assignment_id}: {str(e)}', exc_info=True)
         return jsonify({'success': False, 'message': 'Не удалось удалить размещение оборудования.'}), 500
 
+@bp.route('/passport/<int:equipment_id>/spare-part', methods=['POST'])
+def add_spare_part(equipment_id):
+    """Добавить деталь к оборудованию"""
+    auth_check = check_auth()
+    if auth_check:
+        return auth_check
+    
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'message': 'Данные не получены.'}), 400
+        
+        spare_part_name = data.get('spare_part_name', '').strip()
+        spare_part_type = data.get('spare_part_type', '').strip()
+        
+        if not spare_part_name:
+            return jsonify({'success': False, 'message': 'Укажите название детали.'}), 400
+        
+        if not spare_part_type:
+            return jsonify({'success': False, 'message': 'Укажите тип детали.'}), 400
+        
+        service = AdminEquipmentService()
+        spare_part_id = service.add_spare_part(equipment_id, spare_part_name, spare_part_type)
+        
+        if spare_part_id:
+            # Получаем обновленный список деталей
+            spare_parts = service.get_spare_parts(equipment_id)
+            
+            return jsonify({
+                'success': True,
+                'message': 'Деталь успешно добавлена',
+                'spare_part_id': spare_part_id,
+                'spare_parts': spare_parts
+            })
+        else:
+            return jsonify({'success': False, 'message': 'Не удалось добавить деталь.'}), 500
+    except Exception as e:
+        current_app.logger.error(f'Ошибка добавления детали: {str(e)}', exc_info=True)
+        return jsonify({'success': False, 'message': 'Не удалось добавить деталь.'}), 500
+
+@bp.route('/spare-part/<int:spare_part_id>', methods=['PATCH'])
+def update_spare_part(spare_part_id):
+    """Обновить поле детали"""
+    auth_check = check_auth()
+    if auth_check:
+        return auth_check
+    
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'message': 'Данные не получены.'}), 400
+        
+        field = data.get('field')
+        value = data.get('value', '').strip()
+        
+        if not field:
+            return jsonify({'success': False, 'message': 'Не указано поле для обновления.'}), 400
+        
+        service = AdminEquipmentService()
+        service.update_spare_part_field(spare_part_id, field, value)
+        
+        # Получаем обновленную деталь для возврата актуального значения
+        spare_part = service.get_spare_part_by_id(spare_part_id)
+        if not spare_part:
+            return jsonify({'success': False, 'message': 'Деталь не найдена.'}), 404
+        
+        # Возвращаем значение в зависимости от поля
+        if field == 'name':
+            display_value = spare_part.get('name') or '—'
+        elif field == 'type':
+            display_value = spare_part.get('type') or '—'
+        else:
+            display_value = value
+        
+        return jsonify({'success': True, 'value': display_value})
+    except ValueError as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
+    except Exception as e:
+        current_app.logger.error(f'Ошибка обновления детали: {str(e)}', exc_info=True)
+        return jsonify({'success': False, 'message': 'Не удалось сохранить изменения.'}), 500
+
+@bp.route('/spare-part/<int:spare_part_id>', methods=['DELETE'])
+def delete_spare_part(spare_part_id):
+    """Удалить деталь"""
+    auth_check = check_auth()
+    if auth_check:
+        return auth_check
+    
+    try:
+        service = AdminEquipmentService()
+        service.delete_spare_part(spare_part_id)
+        return jsonify({'success': True, 'message': 'Деталь успешно удалена'})
+    except ValueError as e:
+        return jsonify({'success': False, 'message': str(e)}), 404
+    except Exception as e:
+        current_app.logger.error(f'Ошибка удаления детали: {str(e)}', exc_info=True)
+        return jsonify({'success': False, 'message': 'Не удалось удалить деталь.'}), 500
+
+@bp.route('/movement/<int:movement_id>', methods=['PATCH'])
+def update_movement(movement_id):
+    """Обновить поле перемещения"""
+    auth_check = check_auth()
+    if auth_check:
+        return auth_check
+    
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'message': 'Данные не получены.'}), 400
+        
+        field = data.get('field')
+        value = data.get('value', '').strip()
+        
+        if not field:
+            return jsonify({'success': False, 'message': 'Не указано поле для обновления.'}), 400
+        
+        service = AdminEquipmentService()
+        service.update_movement_field(movement_id, field, value)
+        
+        # Получаем обновленное перемещение для возврата актуального значения
+        movement = service.get_movement_by_id(movement_id)
+        if not movement:
+            return jsonify({'success': False, 'message': 'Перемещение не найдено.'}), 404
+        
+        # Возвращаем значение в зависимости от поля
+        if field == 'move_date':
+            from utils.formatters import format_date
+            display_value = format_date(movement.get('move_date')) or '—'
+        else:
+            display_value = value
+        
+        return jsonify({'success': True, 'value': display_value})
+    except ValueError as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
+    except Exception as e:
+        current_app.logger.error(f'Ошибка обновления перемещения: {str(e)}', exc_info=True)
+        return jsonify({'success': False, 'message': 'Не удалось сохранить изменения.'}), 500
+
+@bp.route('/movement/<int:movement_id>', methods=['DELETE'])
+def delete_movement(movement_id):
+    """Удаление записи о перемещении оборудования"""
+    auth_check = check_auth()
+    if auth_check:
+        return auth_check
+    
+    try:
+        service = AdminEquipmentService()
+        service.delete_movement(movement_id)
+        return jsonify({'success': True, 'message': 'Перемещение успешно удалено'})
+    except ValueError as e:
+        current_app.logger.error(f'Ошибка валидации при удалении перемещения {movement_id}: {str(e)}')
+        return jsonify({'success': False, 'message': str(e)}), 400
+    except Exception as e:
+        current_app.logger.error(f'Ошибка удаления перемещения {movement_id}: {str(e)}', exc_info=True)
+        return jsonify({'success': False, 'message': 'Не удалось удалить перемещение.'}), 500
+
 @bp.route('/passport/<int:equipment_id>', methods=['GET'])
 def equipment_passport(equipment_id):
     """Страница паспорта оборудования"""
@@ -279,10 +438,25 @@ def equipment_passport(equipment_id):
     if equipment.get('equipment_assignment_id'):
         movement_history = service.get_movement_history(equipment['equipment_assignment_id'])
     
+    # Подготовка данных для фильтров
+    from_location_options = sorted({m['from_location'] for m in movement_history if m.get('from_location') and m.get('from_location') != '—'})
+    to_location_options = sorted({m['to_location'] for m in movement_history if m.get('to_location') and m.get('to_location') != '—'})
+    
+    # Получаем список деталей для оборудования
+    spare_parts = []
+    equipment_id_for_parts = equipment.get('equipment_id') or equipment.get('id')
+    if equipment_id_for_parts:
+        spare_parts = service.get_spare_parts(equipment_id_for_parts)
+    
+    # Получаем типы деталей для фильтра и добавления
+    spare_part_types = service.get_spare_part_types()
+    
     return render_template('admin.html',
                          section='equipment_passport',
                          equipment=equipment,
                          movement_history=movement_history,
+                         spare_parts=spare_parts,
+                         spare_part_types=spare_part_types,
                          user=session,
                          get_role_translation=get_role_translation,
                          format_phone=format_phone,
@@ -290,7 +464,79 @@ def equipment_passport(equipment_id):
                          format_characteristics=format_characteristics,
                          role_labels={},  # Пустой словарь для оборудования
                          department_choices=department_choices,
-                         facility_choices=facility_choices)
+                         facility_choices=facility_choices,
+                         from_location_options=from_location_options,
+                         to_location_options=to_location_options)
+
+@bp.route('/passport/<int:equipment_id>/movement', methods=['POST'])
+def create_movement(equipment_id):
+    """Создать запись о перемещении оборудования"""
+    auth_check = check_auth()
+    if auth_check:
+        return auth_check
+    
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'message': 'Данные не получены.'}), 400
+        
+        service = AdminEquipmentService()
+        equipment = service.get_by_id(equipment_id)
+        
+        if not equipment or not equipment.get('equipment_assignment_id'):
+            return jsonify({'success': False, 'message': 'Оборудование не найдено или не имеет размещения.'}), 404
+        
+        movement_id, location_updated = service.create_movement(equipment['equipment_assignment_id'], data)
+        
+        # Получаем обновленную историю перемещений
+        movement_history = service.get_movement_history(equipment['equipment_assignment_id'])
+        
+        return jsonify({
+            'success': True,
+            'message': 'Перемещение успешно добавлено',
+            'movement_id': movement_id,
+            'movement_history': movement_history,
+            'location_updated': location_updated
+        })
+    except ValueError as e:
+        current_app.logger.error(f'Ошибка валидации при создании перемещения: {str(e)}')
+        return jsonify({'success': False, 'message': str(e)}), 400
+    except Exception as e:
+        current_app.logger.error(f'Ошибка создания перемещения: {str(e)}', exc_info=True)
+        return jsonify({'success': False, 'message': 'Не удалось создать перемещение.'}), 500
+
+@bp.route('/<int:equipment_id>/movement', methods=['POST'])
+def create_movement_from_table(equipment_id):
+    """Создать запись о перемещении оборудования из таблицы"""
+    auth_check = check_auth()
+    if auth_check:
+        return auth_check
+    
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'message': 'Данные не получены.'}), 400
+        
+        service = AdminEquipmentService()
+        equipment = service.get_by_id(equipment_id)
+        
+        if not equipment or not equipment.get('equipment_assignment_id'):
+            return jsonify({'success': False, 'message': 'Оборудование не найдено или не имеет размещения.'}), 404
+        
+        movement_id, location_updated = service.create_movement(equipment['equipment_assignment_id'], data)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Перемещение успешно добавлено',
+            'movement_id': movement_id,
+            'location_updated': location_updated
+        })
+    except ValueError as e:
+        current_app.logger.error(f'Ошибка валидации при создании перемещения: {str(e)}')
+        return jsonify({'success': False, 'message': str(e)}), 400
+    except Exception as e:
+        current_app.logger.error(f'Ошибка создания перемещения: {str(e)}', exc_info=True)
+        return jsonify({'success': False, 'message': 'Не удалось создать перемещение.'}), 500
 
 @bp.route('/passport/<int:equipment_id>/upload-image', methods=['POST'])
 def upload_equipment_image(equipment_id):

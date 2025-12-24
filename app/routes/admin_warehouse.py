@@ -42,6 +42,9 @@ def list_warehouse():
     spare_part_choices = service.get_spare_parts()
     warehouse_choices = service.get_warehouses()
     
+    # Получаем список типов деталей
+    spare_part_types = service.get_spare_part_types()
+    
     # Получаем список предприятий для формы
     from services.admin_employee_service import AdminEmployeeService
     emp_service = AdminEmployeeService()
@@ -70,7 +73,8 @@ def list_warehouse():
                          spare_part_options=spare_part_options,
                          spare_part_choices=spare_part_choices,
                          warehouse_choices=warehouse_choices,
-                         facility_choices=facility_choices)
+                         facility_choices=facility_choices,
+                         spare_part_types=spare_part_types)
 
 @bp.route('', methods=['POST'])
 def create_part():
@@ -146,6 +150,12 @@ def update_part_field(part_id):
             part = service.get_by_id(part_id)
             if part:
                 display_value = part.get('spare_part_name') or '—'
+                return jsonify({'success': True, 'value': display_value})
+        elif field == 'spare_part_type':
+            # При обновлении типа детали возвращаем обновлённое значение
+            part = service.get_by_id(part_id)
+            if part:
+                display_value = part.get('spare_part_type') or '—'
                 return jsonify({'success': True, 'value': display_value})
         elif field == 'quantity':
             # При обновлении количества возвращаем число

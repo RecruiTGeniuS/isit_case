@@ -13,6 +13,7 @@ class AdminWarehouseService:
                     psq.quantity,
                     sp.spare_part_id,
                     sp.spare_part_name,
+                    sp.spare_part_type,
                     w.warehouse_id,
                     w.warehouse_type,
                     w.warehouse_address,
@@ -49,6 +50,7 @@ class AdminWarehouseService:
                     psq.quantity,
                     sp.spare_part_id,
                     sp.spare_part_name,
+                    sp.spare_part_type,
                     w.warehouse_id,
                     w.warehouse_type,
                     w.warehouse_address,
@@ -82,6 +84,17 @@ class AdminWarehouseService:
                 for row in cur.fetchall()
             ]
     
+    def get_spare_part_types(self):
+        """Получить список типов деталей"""
+        with get_db_cursor() as cur:
+            cur.execute("""
+                SELECT DISTINCT spare_part_type 
+                FROM spare_part 
+                WHERE spare_part_type IS NOT NULL 
+                ORDER BY spare_part_type
+            """)
+            return [row[0] for row in cur.fetchall()]
+    
     def create(self, data):
         """Создать новую запись на складе"""
         with get_db_cursor(commit=True) as cur:
@@ -91,15 +104,24 @@ class AdminWarehouseService:
             """, (data.get('spare_part_name').strip(),))
             existing_part = cur.fetchone()
             
+            spare_part_type = data.get('spare_part_type', '').strip() or None
+            
             if existing_part:
                 spare_part_id = existing_part[0]
+                # Обновляем тип детали, если он указан
+                if spare_part_type:
+                    cur.execute("""
+                        UPDATE spare_part 
+                        SET spare_part_type = %s 
+                        WHERE spare_part_id = %s
+                    """, (spare_part_type, spare_part_id))
             else:
                 # Создаем новую запчасть
                 cur.execute("""
-                    INSERT INTO spare_part (spare_part_name)
-                    VALUES (%s)
+                    INSERT INTO spare_part (spare_part_name, spare_part_type)
+                    VALUES (%s, %s)
                     RETURNING spare_part_id
-                """, (data.get('spare_part_name').strip(),))
+                """, (data.get('spare_part_name').strip(), spare_part_type))
                 spare_part_id = cur.fetchone()[0]
             
             # Проверяем, существует ли уже запись для этой запчасти на этом складе
@@ -165,6 +187,7 @@ class AdminWarehouseService:
             'warehouse_id': 'warehouse_id',
             'facility': 'facility',  # Специальная обработка для предприятия
             'spare_part_name': 'spare_part_name',  # Название детали
+            'spare_part_type': 'spare_part_type',  # Тип детали
             'quantity': 'quantity'  # Количество
         }
         
@@ -193,6 +216,32 @@ class AdminWarehouseService:
                     SET spare_part_name = %s 
                     WHERE spare_part_id = %s
                 """, (spare_part_name, spare_part_id))
+                if cur.rowcount == 0:
+                    raise ValueError('Деталь не найдена')
+            return
+        
+        # Для spare_part_type обновляем тип детали
+        if field == 'spare_part_type':
+            spare_part_type = value.strip() if isinstance(value, str) else None
+            if not spare_part_type or spare_part_type == '—':
+                spare_part_type = None
+            
+            # Получаем текущую запись, чтобы узнать spare_part_id
+            part = self.get_by_id(part_stock_quantity_id)
+            if not part:
+                raise ValueError('Запись не найдена')
+            
+            spare_part_id = part.get('spare_part_id')
+            if not spare_part_id:
+                raise ValueError('Не найден ID детали')
+            
+            # Обновляем тип детали
+            with get_db_cursor(commit=True) as cur:
+                cur.execute("""
+                    UPDATE spare_part 
+                    SET spare_part_type = %s 
+                    WHERE spare_part_id = %s
+                """, (spare_part_type, spare_part_id))
                 if cur.rowcount == 0:
                     raise ValueError('Деталь не найдена')
             return
@@ -281,12 +330,13 @@ class AdminWarehouseService:
             'quantity': row[1],
             'spare_part_id': row[2],
             'spare_part_name': row[3] or '—',
-            'warehouse_id': row[4],
-            'warehouse_type': row[5] or '—',
-            'warehouse_address': row[6] or '—',
-            'department_id': row[7],
-            'department_name': row[8],
-            'facility_id': row[9],
-            'facility_name': row[10] or '—',
+            'spare_part_type': row[4] or '—',
+            'warehouse_id': row[5],
+            'warehouse_type': row[6] or '—',
+            'warehouse_address': row[7] or '—',
+            'department_id': row[8],
+            'department_name': row[9],
+            'facility_id': row[10],
+            'facility_name': row[11] or '—',
         }
 

@@ -530,6 +530,9 @@ html.dark-theme .admin-content {
 .content-header {
     margin-bottom: 24px;
     flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .content-header h2 {

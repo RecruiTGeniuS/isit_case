@@ -126,6 +126,37 @@
     margin-top: 6px;
 }
 
+/* Компактное модальное окно для подтверждения удаления перемещения */
+#deleteMovementModal .modal-window {
+    width: min(680px, 90%);
+    padding: 24px;
+    gap: 16px;
+    border: 1px solid rgba(245, 90, 100, 0.4);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Тускло-красная разделительная линия под заголовком в окне подтверждения удаления перемещения */
+#deleteMovementModal .modal-header {
+    padding-bottom: 16px;
+    border-bottom: 2px solid rgba(245, 90, 100, 0.4);
+    margin-left: -24px;
+    margin-right: -24px;
+    padding-left: 24px;
+    padding-right: 24px;
+    margin-bottom: 0;
+}
+
+/* Увеличенный отступ между строками в сообщении об удалении перемещения */
+#deleteMovementModal #deleteMovementMessage {
+    line-height: 1.8;
+}
+
+#deleteMovementModal #deleteMovementMessage br {
+    line-height: 1.8;
+    display: block;
+    margin-top: 6px;
+}
+
 .modal-header {
     display: flex;
     justify-content: space-between;
@@ -179,6 +210,98 @@
     padding-left: 20px;
 }
 
+/* Стили для модального окна добавления перемещения */
+#addMovementModal .modal-header {
+    padding-bottom: 16px;
+    border-bottom: 2px solid rgba(221, 158, 0, 0.4);
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom: 0;
+}
+
+#addMovementModal .modal-window {
+    border: 1px solid rgba(221, 158, 0, 0.4);
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-right: 20px;
+    padding-left: 20px;
+}
+
+/* Убеждаемся, что поля локаций имеют стандартный цвет и правильную ширину */
+/* Поля локаций должны иметь такую же ширину, как modal-select-wrapper выше */
+/* Убеждаемся, что modal-field в обоих контейнерах ведет себя одинаково */
+#addMovementModal .movement-container .movement-from-section .modal-field,
+#addMovementModal .movement-container .movement-to-section .modal-field {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: visible !important;
+}
+
+#addMovementModal .movement-container:last-of-type .movement-from-section .modal-field input[type="text"],
+#addMovementModal .movement-container:last-of-type .movement-to-section .modal-field input[type="text"],
+#addMovementModal #movementFromLocationInput,
+#addMovementModal #movementToLocationInput {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    border: 1px solid #dcdcdc !important;
+    border-color: #dcdcdc !important;
+    background: white !important;
+    background-color: white !important;
+    color: #333 !important;
+    box-sizing: border-box !important;
+    padding: 10px 12px !important;
+    font-size: 14px !important;
+    border-radius: 10px !important;
+}
+
+/* Убираем желтый цвет при любых состояниях */
+#addMovementModal .movement-container:last-of-type .movement-from-section .modal-field input[type="text"]:not(:focus),
+#addMovementModal .movement-container:last-of-type .movement-to-section .modal-field input[type="text"]:not(:focus),
+#addMovementModal #movementFromLocationInput:not(:focus),
+#addMovementModal #movementToLocationInput:not(:focus) {
+    border-color: #dcdcdc !important;
+}
+
+#addMovementModal .movement-container:last-of-type .movement-from-section .modal-field input[type="text"]:focus,
+#addMovementModal .movement-container:last-of-type .movement-to-section .modal-field input[type="text"]:focus,
+#addMovementModal #movementFromLocationInput:focus,
+#addMovementModal #movementToLocationInput:focus {
+    outline: none !important;
+    border-color: rgba(221, 158, 0, 0.4) !important;
+    box-shadow: none !important;
+}
+
+html.dark-theme #addMovementModal .movement-container:last-of-type .movement-from-section .modal-field input[type="text"],
+html.dark-theme #addMovementModal .movement-container:last-of-type .movement-to-section .modal-field input[type="text"],
+html.dark-theme #addMovementModal #movementFromLocationInput,
+html.dark-theme #addMovementModal #movementToLocationInput {
+    background: #1f1f1f !important;
+    background-color: #1f1f1f !important;
+    border-color: #3a3a3a !important;
+    color: #f5f5f5 !important;
+}
+
+html.dark-theme #addMovementModal .movement-container:last-of-type .movement-from-section .modal-field input[type="text"]:not(:focus),
+html.dark-theme #addMovementModal .movement-container:last-of-type .movement-to-section .modal-field input[type="text"]:not(:focus),
+html.dark-theme #addMovementModal #movementFromLocationInput:not(:focus),
+html.dark-theme #addMovementModal #movementToLocationInput:not(:focus) {
+    border-color: #3a3a3a !important;
+}
+
+html.dark-theme #addMovementModal .movement-container:last-of-type .movement-from-section .modal-field input[type="text"]:focus,
+html.dark-theme #addMovementModal .movement-container:last-of-type .movement-to-section .modal-field input[type="text"]:focus,
+html.dark-theme #addMovementModal #movementFromLocationInput:focus,
+html.dark-theme #addMovementModal #movementToLocationInput:focus {
+    border-color: rgba(221, 158, 0, 0.4) !important;
+}
+
 /* Жёлтая разделительная линия под заголовком в окне добавления детали на складе */
 #partModal .modal-header {
     padding-bottom: 16px;
@@ -197,6 +320,44 @@
     padding-bottom: 20px;
     padding-right: 20px;
     padding-left: 20px;
+}
+
+/* Стили для модального окна добавления детали в паспорте */
+#addSparePartModal .modal-header {
+    padding-bottom: 16px;
+    border-bottom: 2px solid rgba(221, 158, 0, 0.4);
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom: 0;
+}
+
+#addSparePartModal .modal-window {
+    border: 1px solid rgba(221, 158, 0, 0.4);
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-right: 20px;
+    padding-left: 20px;
+}
+
+/* Стили для модального окна удаления детали */
+#deleteSparePartModal .modal-window {
+    width: min(680px, 90%);
+    padding: 24px;
+    gap: 16px;
+    border: 1px solid rgba(245, 90, 100, 0.4);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+#deleteSparePartModal .modal-header {
+    padding-bottom: 16px;
+    border-bottom: 2px solid rgba(245, 90, 100, 0.4);
+    margin-left: -24px;
+    margin-right: -24px;
+    padding-left: 24px;
+    padding-right: 24px;
+    margin-bottom: 0;
 }
 
 /* Уменьшаем расстояние между нижней разделительной линией и кнопками */
@@ -421,6 +582,15 @@ html.dark-theme .modal-close-btn:focus-visible {
     resize: vertical;
 }
 
+/* Исключаем поля локаций из общих стилей - они имеют свои специфичные стили */
+#addMovementModal .movement-from-section .modal-field input[type="text"],
+#addMovementModal .movement-to-section .modal-field input[type="text"],
+#addMovementModal #movementFromLocationInput,
+#addMovementModal #movementToLocationInput {
+    border: 1px solid #dcdcdc !important;
+    border-color: #dcdcdc !important;
+}
+
 .modal-field textarea {
     min-height: 80px;
     overflow-y: auto;
@@ -561,6 +731,14 @@ html.dark-theme .number-input-btn:active {
     outline: none !important;
     border-color: rgba(221, 158, 0, 0.4) !important;
     box-shadow: none !important;
+}
+
+/* Исключаем поля локаций из общих стилей фокуса - они имеют свои специфичные стили */
+#addMovementModal .movement-from-section .modal-field input[type="text"]:not(:focus),
+#addMovementModal .movement-to-section .modal-field input[type="text"]:not(:focus),
+#addMovementModal #movementFromLocationInput:not(:focus),
+#addMovementModal #movementToLocationInput:not(:focus) {
+    border-color: #dcdcdc !important;
 }
 
 .modal-field input::placeholder {
@@ -803,6 +981,10 @@ html.dark-theme #deleteWarehouseModal .modal-window {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
+html.dark-theme #deleteMovementModal .modal-window {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
 html.dark-theme .modal-header h3 {
     color: #f5f5f5;
 }
@@ -821,6 +1003,10 @@ html:not(.dark-theme) #employeeModal .modal-window {
 }
 
 html:not(.dark-theme) #equipmentModal .modal-window {
+    border-width: 2px;
+}
+
+html:not(.dark-theme) #addSparePartModal .modal-window {
     border-width: 2px;
 }
 
@@ -900,6 +1086,140 @@ html.dark-theme .custom-input-field:focus {
 
 html.dark-theme .custom-input-field::placeholder {
     color: #666;
+}
+
+/* Стили для модального окна добавления перемещения */
+.movement-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    width: 100%;
+    margin: 16px 0;
+}
+
+.movement-from-section,
+.movement-to-section {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Гарантируем одинаковую ширину секций для всех movement-container в модальном окне добавления перемещения */
+/* Используем CSS Grid для точного контроля ширины колонок */
+#addMovementModal .movement-container {
+    display: grid !important;
+    grid-template-columns: 1fr auto 1fr !important;
+    align-items: flex-start !important;
+    gap: 24px !important;
+    width: 100% !important;
+    margin: 16px 0 !important;
+}
+
+/* Обе секции занимают одинаковую ширину благодаря grid-template-columns: 1fr 1fr */
+#addMovementModal .movement-container .movement-from-section,
+#addMovementModal .movement-container .movement-to-section {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+
+/* Стрелка в средней колонке */
+#addMovementModal .movement-container .movement-arrow {
+    grid-column: 2 !important;
+    flex-shrink: 0 !important;
+    width: auto !important;
+}
+
+/* Убеждаемся, что modal-field в обоих контейнерах ведет себя одинаково */
+#addMovementModal .movement-container .movement-from-section .modal-field,
+#addMovementModal .movement-container .movement-to-section .modal-field {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Убеждаемся, что modal-select-wrapper и input имеют одинаковую ширину - ограничиваем их ширину */
+#addMovementModal .movement-container .modal-select-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* Поля локаций должны иметь такую же ширину, как modal-select-wrapper выше */
+#addMovementModal .movement-container .movement-from-section .modal-field input[type="text"],
+#addMovementModal .movement-container .movement-to-section .modal-field input[type="text"],
+#addMovementModal #movementFromLocationInput,
+#addMovementModal #movementToLocationInput {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* Выделение заголовков "Откуда перемещено" и "Куда перемещено" - только для обязательных полей */
+.movement-from-section .modal-field > span[data-required],
+.movement-to-section .modal-field > span[data-required] {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: var(--color-primary, #dd9e00) !important;
+    margin-bottom: 8px;
+}
+
+/* Для полей локаций - серый цвет (не имеют data-required) */
+.movement-from-section .modal-field > span:not([data-required]),
+.movement-to-section .modal-field > span:not([data-required]) {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: var(--text-light, #666) !important;
+    margin-bottom: 8px;
+}
+
+html.dark-theme .movement-from-section .modal-field > span[data-required],
+html.dark-theme .movement-to-section .modal-field > span[data-required] {
+    color: #dd9e00 !important;
+}
+
+html.dark-theme .movement-from-section .modal-field > span:not([data-required]),
+html.dark-theme .movement-to-section .modal-field > span:not([data-required]) {
+    color: var(--text-light, #888) !important;
+}
+
+.movement-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 32px;
+    color: var(--color-primary, #dd9e00);
+    padding: 0 8px;
+}
+
+.movement-arrow svg {
+    width: 32px;
+    height: 32px;
+}
+
+/* Стили для полей локаций удалены - используются более специфичные стили с #addMovementModal выше */
+
+@media (max-width: 768px) {
+    .movement-container {
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    .movement-arrow {
+        margin-top: 0;
+        transform: rotate(90deg);
+        padding: 8px 0;
+    }
+}
+
+html.dark-theme .movement-arrow {
+    color: #dd9e00;
 }
 
 html.dark-theme .modal-form input[readonly] {
@@ -1589,3 +1909,5 @@ html.dark-theme #sparePartTypesList::-webkit-scrollbar-thumb {
 html.dark-theme #sparePartTypesList::-webkit-scrollbar-thumb:hover {
     background: var(--color-primary);
 }
+
+

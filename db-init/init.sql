@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict VGXlL2Eui4cG0qMWb3oHp6ZX3VH8SDopU8q868BBMtQh6JkU2dpR5WSTW2kRWH5
+\restrict kD3lfgLkB32h3aLaBX5r5JfXABXz2255EBYmuzH7Dc1bVehtvfJaeCae8poqopq
 
 -- Dumped from database version 16.11 (Debian 16.11-1.pgdg13+1)
 -- Dumped by pg_dump version 16.11 (Debian 16.11-1.pgdg13+1)
@@ -188,7 +188,9 @@ CREATE TABLE public.equipment_movement (
     equipment_assignment_id integer,
     from_department_id integer,
     to_department_id integer,
-    move_date date
+    move_date date,
+    from_location character varying(255),
+    to_location character varying(255)
 );
 
 
@@ -780,7 +782,7 @@ INSERT INTO public.equipment_assignment VALUES (2, 141, 7, '2023-05-22', 'Шах
 INSERT INTO public.equipment_assignment VALUES (3, 142, 7, '2023-08-10', 'Вентиляционная выработка', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (4, 143, 7, '2023-11-05', 'Транспортная галерея', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (6, 142, 8, '2023-06-20', 'Буровая площадка №1', 'В работе', NULL);
-INSERT INTO public.equipment_assignment VALUES (7, 145, 8, '2023-09-12', 'Буровая площадка №2', 'В работе', NULL);
+INSERT INTO public.equipment_assignment VALUES (26, 145, 7, '2023-11-30', 'АО "Серверный Горнорудный Комбинат" Горный участок', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (8, 146, 8, '2023-12-18', 'Зона подготовки зарядов', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (10, 149, 8, '2024-04-25', 'Склад ВВ', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (12, 150, 9, '2023-10-20', 'Цех измельчения', 'В работе', NULL);
@@ -793,7 +795,6 @@ INSERT INTO public.equipment_assignment VALUES (20, 144, 11, '2023-09-10', 'По
 INSERT INTO public.equipment_assignment VALUES (21, 157, 11, '2023-12-01', 'Подстанция №2', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (23, 159, 11, '2024-06-20', 'Распределительный щит', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (24, 140, 18, '2023-05-10', 'Карьер сектор А', 'В работе', NULL);
-INSERT INTO public.equipment_assignment VALUES (26, 145, 18, '2023-11-30', 'Погрузочная площадка', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (27, 150, 18, '2024-03-10', 'Дробильный комплекс', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (28, 160, 18, '2024-06-05', 'Склад руды', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (29, 140, 19, '2023-06-15', 'Штольня №1', 'В работе', NULL);
@@ -869,6 +870,7 @@ INSERT INTO public.equipment_assignment VALUES (87, 179, 44, '2024-09-20', 'Ск
 INSERT INTO public.equipment_assignment VALUES (97, 183, 7, '2024-04-20', 'Вентиляционная выработка №2', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (100, 186, 9, '2024-02-25', 'Цех дробления линия 2', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (101, 187, 9, '2024-05-30', 'Флотация секция В', 'В работе', NULL);
+INSERT INTO public.equipment_assignment VALUES (7, 145, 7, '2023-09-12', 'АО "Серверный Горнорудный Комбинат" Горный участок', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (103, 189, 10, '2024-06-25', 'Погрузочная площадка №2', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (104, 190, 11, '2024-04-15', 'Подстанция №3', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (105, 191, 11, '2024-07-20', 'Кабельная галерея №2', 'В работе', NULL);
@@ -882,8 +884,8 @@ INSERT INTO public.equipment_assignment VALUES (112, 198, 21, '2024-08-20', 'А�
 INSERT INTO public.equipment_assignment VALUES (113, 199, 21, '2024-11-25', 'Сортировочная станция №2', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (114, 200, 26, '2024-09-10', 'Шахта №4 уровень -250м', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (50, 167, 27, '2024-04-05', 'Зона подготовки зарядов', 'В работе', NULL);
-INSERT INTO public.equipment_assignment VALUES (125, 167, 7, '2025-12-20', 'Гараж 3', 'В работе', NULL);
-INSERT INTO public.equipment_assignment VALUES (128, 167, 8, '2025-12-22', 'Гараж 3', 'В работе', NULL);
+INSERT INTO public.equipment_assignment VALUES (125, 167, 18, '2025-12-20', 'АО "Полярный Рудник" Участок добычи', 'В работе', NULL);
+INSERT INTO public.equipment_assignment VALUES (128, 167, 19, '2025-12-22', 'АО "Полярный Рудник" Проходческий участок', 'В работе', NULL);
 
 
 --
@@ -2648,6 +2650,26 @@ INSERT INTO public.spare_part VALUES (326, 200, 'Оптический узел',
 INSERT INTO public.spare_part VALUES (327, 200, 'Контроллер', 'Электронный блок MM-200');
 INSERT INTO public.spare_part VALUES (320, 197, 'Барабан', 'Барабан сушилки DRY-200111');
 INSERT INTO public.spare_part VALUES (1, NULL, NULL, 'Болт М8');
+INSERT INTO public.spare_part VALUES (11, 145, 'Щековой узел', 'тест 1');
+INSERT INTO public.spare_part VALUES (12, 145, 'Тест 2', 'тест 2');
+INSERT INTO public.spare_part VALUES (13, 145, 'Тест 3', 'тест 3');
+INSERT INTO public.spare_part VALUES (14, 145, 'Электродвигатель', 'тест 3');
+INSERT INTO public.spare_part VALUES (15, 145, 'Тест 3', 'тест 3');
+INSERT INTO public.spare_part VALUES (16, 145, 'Щековой узел', 'Болт М8');
+INSERT INTO public.spare_part VALUES (17, 145, 'Щековой узел', 'Болт М8');
+INSERT INTO public.spare_part VALUES (18, 145, 'Щековой узел', 'Болт М8');
+INSERT INTO public.spare_part VALUES (19, 145, 'Щековой узел', 'Болт М8');
+INSERT INTO public.spare_part VALUES (20, 145, 'Щековой узел', 'Болт М8');
+INSERT INTO public.spare_part VALUES (21, 145, 'Щековой узел', 'Болт М8');
+INSERT INTO public.spare_part VALUES (22, 145, 'Щековой узел', 'Болт М8');
+INSERT INTO public.spare_part VALUES (23, 145, 'Щековой узел', 'Болт М8');
+INSERT INTO public.spare_part VALUES (24, 145, 'Щековой узел', 'Болт М8');
+INSERT INTO public.spare_part VALUES (25, 145, 'Щековой узел', 'Болт М8');
+INSERT INTO public.spare_part VALUES (26, 145, 'Щековой узел', 'Болт М8');
+INSERT INTO public.spare_part VALUES (27, 145, 'Щековой узел', 'Болт М8');
+INSERT INTO public.spare_part VALUES (28, 145, 'Щековой узел', 'Болт М8');
+INSERT INTO public.spare_part VALUES (29, 145, 'Щековой узел', 'Болт М8');
+INSERT INTO public.spare_part VALUES (30, 145, 'Щековой узел', 'Болт М8');
 
 
 --
@@ -2746,7 +2768,7 @@ SELECT pg_catalog.setval('public.repair_task_repair_task_id_seq', 1, false);
 -- Name: spare_part_spare_part_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('public.spare_part_spare_part_id_seq', 10, true);
+SELECT pg_catalog.setval('public.spare_part_spare_part_id_seq', 30, true);
 
 
 --
@@ -3039,5 +3061,5 @@ ALTER TABLE ONLY public.warehouse
 -- PostgreSQL database dump complete
 --
 
-\unrestrict VGXlL2Eui4cG0qMWb3oHp6ZX3VH8SDopU8q868BBMtQh6JkU2dpR5WSTW2kRWH5
+\unrestrict kD3lfgLkB32h3aLaBX5r5JfXABXz2255EBYmuzH7Dc1bVehtvfJaeCae8poqopq
 

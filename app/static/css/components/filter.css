@@ -305,12 +305,20 @@ html.dark-theme .filter-options-list::-webkit-scrollbar-thumb:hover {
     color: #555;
 }
 
-.filter-group select {
+.filter-group select,
+.filter-group input.filter-input {
     padding: 8px 10px;
     border-radius: 6px;
     border: 1px solid #ddd;
     font-size: 14px;
     background: #fff;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.filter-group input.filter-input:focus {
+    outline: none;
+    border-color: #dd9e00;
 }
 
 .reset-filter-btn {
@@ -360,10 +368,15 @@ html.dark-theme .filter-options-list::-webkit-scrollbar-thumb:hover {
     color: #bbb;
 }
 
-.dark-theme .filter-group select {
+.dark-theme .filter-group select,
+.dark-theme .filter-group input.filter-input {
     background: #202020;
     border-color: #3a3a3a;
     color: #e0e0e0;
+}
+
+.dark-theme .filter-group input.filter-input:focus {
+    border-color: #dd9e00;
 }
 
 .dark-theme .reset-filter-btn {

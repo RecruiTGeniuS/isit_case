@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict kD3lfgLkB32h3aLaBX5r5JfXABXz2255EBYmuzH7Dc1bVehtvfJaeCae8poqopq
+\restrict NR4M1yN4js1xBgjRMNOBc3CPxgFQc9vFhr5bvgHqXLHYXpLgN1AaVSNjxCaItQx
 
 -- Dumped from database version 16.11 (Debian 16.11-1.pgdg13+1)
 -- Dumped by pg_dump version 16.11 (Debian 16.11-1.pgdg13+1)
@@ -782,7 +782,6 @@ INSERT INTO public.equipment_assignment VALUES (2, 141, 7, '2023-05-22', 'Шах
 INSERT INTO public.equipment_assignment VALUES (3, 142, 7, '2023-08-10', 'Вентиляционная выработка', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (4, 143, 7, '2023-11-05', 'Транспортная галерея', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (6, 142, 8, '2023-06-20', 'Буровая площадка №1', 'В работе', NULL);
-INSERT INTO public.equipment_assignment VALUES (26, 145, 7, '2023-11-30', 'АО "Серверный Горнорудный Комбинат" Горный участок', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (8, 146, 8, '2023-12-18', 'Зона подготовки зарядов', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (10, 149, 8, '2024-04-25', 'Склад ВВ', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (12, 150, 9, '2023-10-20', 'Цех измельчения', 'В работе', NULL);
@@ -790,7 +789,6 @@ INSERT INTO public.equipment_assignment VALUES (13, 151, 9, '2024-01-15', 'Фл�
 INSERT INTO public.equipment_assignment VALUES (14, 152, 9, '2024-03-20', 'Склад концентрата', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (16, 147, 10, '2023-08-25', 'Транспортный цех', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (17, 154, 10, '2023-11-18', 'Ремонтная зона', 'В работе', NULL);
-INSERT INTO public.equipment_assignment VALUES (18, 155, 10, '2024-02-05', 'Погрузочная площадка', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (20, 144, 11, '2023-09-10', 'Подстанция №1', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (21, 157, 11, '2023-12-01', 'Подстанция №2', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (23, 159, 11, '2024-06-20', 'Распределительный щит', 'В работе', NULL);
@@ -841,7 +839,6 @@ INSERT INTO public.equipment_assignment VALUES (82, 153, 43, '2024-04-10', 'Сг
 INSERT INTO public.equipment_assignment VALUES (83, 177, 43, '2024-07-20', 'Фильтр-пресс', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (84, 154, 44, '2023-11-20', 'Фильтр-пресс №1', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (85, 155, 44, '2024-02-28', 'Фильтр-пресс №2', 'В работе', NULL);
-INSERT INTO public.equipment_assignment VALUES (86, 178, 44, '2024-06-15', 'Сушильная печь', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (88, 157, 45, '2024-01-05', 'Лаборатория №1', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (90, 159, 45, '2024-07-20', 'Измерительная комната', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (91, 180, 45, '2024-10-25', 'Архив результатов', 'В работе', NULL);
@@ -870,11 +867,8 @@ INSERT INTO public.equipment_assignment VALUES (87, 179, 44, '2024-09-20', 'Ск
 INSERT INTO public.equipment_assignment VALUES (97, 183, 7, '2024-04-20', 'Вентиляционная выработка №2', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (100, 186, 9, '2024-02-25', 'Цех дробления линия 2', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (101, 187, 9, '2024-05-30', 'Флотация секция В', 'В работе', NULL);
-INSERT INTO public.equipment_assignment VALUES (7, 145, 7, '2023-09-12', 'АО "Серверный Горнорудный Комбинат" Горный участок', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (103, 189, 10, '2024-06-25', 'Погрузочная площадка №2', 'В работе', NULL);
-INSERT INTO public.equipment_assignment VALUES (104, 190, 11, '2024-04-15', 'Подстанция №3', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (105, 191, 11, '2024-07-20', 'Кабельная галерея №2', 'В работе', NULL);
-INSERT INTO public.equipment_assignment VALUES (106, 192, 18, '2024-05-10', 'Карьер сектор В', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (107, 193, 18, '2024-08-15', 'Дробильный комплекс №2', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (108, 194, 19, '2024-06-20', 'Штольня №3', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (109, 195, 19, '2024-09-25', 'Вентиляционная выработка №2', 'В работе', NULL);
@@ -883,15 +877,15 @@ INSERT INTO public.equipment_assignment VALUES (111, 197, 20, '2024-10-15', 'П�
 INSERT INTO public.equipment_assignment VALUES (112, 198, 21, '2024-08-20', 'Автопарк секция 2', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (113, 199, 21, '2024-11-25', 'Сортировочная станция №2', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (114, 200, 26, '2024-09-10', 'Шахта №4 уровень -250м', 'В работе', NULL);
-INSERT INTO public.equipment_assignment VALUES (50, 167, 27, '2024-04-05', 'Зона подготовки зарядов', 'В работе', NULL);
-INSERT INTO public.equipment_assignment VALUES (125, 167, 18, '2025-12-20', 'АО "Полярный Рудник" Участок добычи', 'В работе', NULL);
-INSERT INTO public.equipment_assignment VALUES (128, 167, 19, '2025-12-22', 'АО "Полярный Рудник" Проходческий участок', 'В работе', NULL);
+INSERT INTO public.equipment_assignment VALUES (106, 192, 7, '2024-05-10', 'Карьер сектор B', 'В работе', NULL);
 
 
 --
 -- Data for Name: equipment_movement; Type: TABLE DATA; Schema: public; Owner: user
 --
 
+INSERT INTO public.equipment_movement VALUES (6, 106, 18, 7, '2025-12-23', 'Карьер сектор В', 'Карьер сектор А');
+INSERT INTO public.equipment_movement VALUES (7, 106, 7, 7, '2025-12-24', 'Карьер сектор А', 'Карьер сектор B');
 
 
 --
@@ -2733,7 +2727,7 @@ SELECT pg_catalog.setval('public.equipment_equipment_id_seq', 3, true);
 -- Name: equipment_movement_equipment_movement_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('public.equipment_movement_equipment_movement_id_seq', 1, false);
+SELECT pg_catalog.setval('public.equipment_movement_equipment_movement_id_seq', 7, true);
 
 
 --
@@ -3061,5 +3055,5 @@ ALTER TABLE ONLY public.warehouse
 -- PostgreSQL database dump complete
 --
 
-\unrestrict kD3lfgLkB32h3aLaBX5r5JfXABXz2255EBYmuzH7Dc1bVehtvfJaeCae8poqopq
+\unrestrict NR4M1yN4js1xBgjRMNOBc3CPxgFQc9vFhr5bvgHqXLHYXpLgN1AaVSNjxCaItQx
 

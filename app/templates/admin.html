@@ -152,6 +152,14 @@
             <!-- Боковое меню -->
             <aside class="admin-sidebar">
                 <nav class="sidebar-nav">
+                    <a href="{{ url_for('admin_statistics.list_statistics') }}" class="nav-item {% if section == 'statistics' %}active{% endif %}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                        <span>Статистика</span>
+                    </a>
                     <a href="{{ url_for('admin_employees.list_employees') }}" class="nav-item {% if section == 'employees' %}active{% endif %}">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -190,14 +198,6 @@
                             <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
                         </svg>
                         <span>Задачи</span>
-                    </a>
-                    <a href="{{ url_for('admin_statistics.list_statistics') }}" class="nav-item {% if section == 'statistics' %}active{% endif %}">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="20" x2="18" y2="10"></line>
-                            <line x1="12" y1="20" x2="12" y2="4"></line>
-                            <line x1="6" y1="20" x2="6" y2="14"></line>
-                        </svg>
-                        <span>Статистика</span>
                     </a>
                 </nav>
             </aside>
@@ -16886,6 +16886,10 @@
                     
                     if (result.success) {
                         const data = result.data;
+                        console.log('Statistics data:', data);
+                        console.log('PTO data:', data.pto);
+                        console.log('PTO by_status:', data.pto?.by_status);
+                        console.log('PTO by_month:', data.pto?.by_month);
                         updateMetrics(data);
                         createCharts(data);
                         
@@ -16951,17 +16955,35 @@
             // Создание диаграмм
             function createCharts(data) {
                 // ПТО по статусам (круговая)
-                if (data.pto?.by_status) {
+                if (data.pto && data.pto.by_status && Object.keys(data.pto.by_status).length > 0) {
                     const ctx = document.getElementById('ptoStatusChart');
                     if (ctx) {
                         if (charts.ptoStatus) charts.ptoStatus.destroy();
+                        console.log('Creating PTO status chart with data:', data.pto.by_status);
+                        
+                        // Создаем массив цветов с учетом статусов
+                        const labels = Object.keys(data.pto.by_status);
+                        const ptoColors = labels.map(label => {
+                            if (label === 'Просрочено') {
+                                return '#ef4444'; // Красный цвет для просроченных
+                            } else if (label === 'Выполнено') {
+                                return colors.success; // Зеленый
+                            } else if (label === 'В процессе') {
+                                return colors.info; // Синий
+                            } else if (label === 'Ожидает ПТО') {
+                                return colors.warning; // Желтый
+                            } else {
+                                return colors.primary; // По умолчанию
+                            }
+                        });
+                        
                         charts.ptoStatus = new Chart(ctx, {
                             type: 'doughnut',
                             data: {
-                                labels: Object.keys(data.pto.by_status),
+                                labels: labels,
                                 datasets: [{
                                     data: Object.values(data.pto.by_status),
-                                    backgroundColor: chartColors.slice(0, Object.keys(data.pto.by_status).length)
+                                    backgroundColor: ptoColors
                                 }]
                             },
                             options: {
@@ -16974,11 +16996,15 @@
                                 }
                             }
                         });
+                    } else {
+                        console.warn('ptoStatusChart canvas element not found');
                     }
+                } else {
+                    console.warn('PTO by_status data is missing or empty:', data.pto?.by_status);
                 }
                 
                 // Задачи по статусам (круговая)
-                if (data.tasks?.by_status) {
+                if (data.tasks && data.tasks.by_status && Object.keys(data.tasks.by_status).length > 0) {
                     const ctx = document.getElementById('tasksStatusChart');
                     if (ctx) {
                         if (charts.tasksStatus) charts.tasksStatus.destroy();
@@ -17005,10 +17031,11 @@
                 }
                 
                 // ПТО по месяцам (столбчатая)
-                if (data.pto?.by_month) {
+                if (data.pto && data.pto.by_month && Object.keys(data.pto.by_month).length > 0) {
                     const ctx = document.getElementById('ptoMonthlyChart');
                     if (ctx) {
                         if (charts.ptoMonthly) charts.ptoMonthly.destroy();
+                        console.log('Creating PTO monthly chart with data:', data.pto.by_month);
                         charts.ptoMonthly = new Chart(ctx, {
                             type: 'bar',
                             data: {
@@ -17034,7 +17061,11 @@
                                 }
                             }
                         });
+                    } else {
+                        console.warn('ptoMonthlyChart canvas element not found');
                     }
+                } else {
+                    console.warn('PTO by_month data is missing or empty:', data.pto?.by_month);
                 }
                 
                 // Задачи по месяцам (столбчатая)

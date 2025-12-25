@@ -158,6 +158,14 @@ html.dark-theme .context-menu-item.danger:hover {
     padding-right: 6px !important;
 }
 
+/* Расширение столбца "Тип" в таблице оборудования (3-й столбец) */
+#equipmentTable th:nth-child(3),
+#equipmentTable td:nth-child(3) {
+    width: 200px !important;
+    max-width: 200px !important;
+    min-width: 180px !important;
+}
+
 /* Расширение столбца "Отдел" в таблице оборудования */
 #equipmentTable th:nth-child(5),
 #equipmentTable td.department-cell {

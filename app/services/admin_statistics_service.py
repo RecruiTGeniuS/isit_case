@@ -1,6 +1,6 @@
 """Сервис для работы со статистикой (админ-панель)"""
 from core.database import get_db_cursor
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 
 class AdminStatisticsService:
@@ -9,83 +9,126 @@ class AdminStatisticsService:
     def get_pto_statistics(self, user_role=None, department_id=None):
         """Статистика по ПТО"""
         with get_db_cursor() as cur:
-            # Общая статистика по статусам ПТО
-            # Используем подзапрос для правильной группировки
-            query = """
-                SELECT 
-                    status,
-                    COUNT(*) as count
-                FROM (
+                # Общая статистика по статусам ПТО
+                # Упрощенный запрос без подзапроса для отладки
+                base_query = "FROM maintenance_plan mp"
+                where_clause = "WHERE 1=1"
+                params = []
+                
+                if user_role == 'repair_head' and department_id:
+                    base_query += """
+                        LEFT JOIN equipment_assignment ea ON mp.equipment_id = ea.equipment_id
+                        LEFT JOIN department d ON ea.department_id = d.department_id
+                    """
+                    where_clause += " AND d.department_id = %s"
+                    params.append(department_id)
+                
+                # Получаем все записи и обрабатываем в Python
+                query = f"""
                     SELECT 
-                        CASE 
-                            WHEN mp.maintenance_status IS NULL THEN 'Ожидает ПТО'
-                            WHEN LOWER(mp.maintenance_status) LIKE '%выполнено%' 
-                                 OR LOWER(mp.maintenance_status) LIKE '%завершено%' 
-                                 OR LOWER(mp.maintenance_status) LIKE '%completed%' 
-                                 OR LOWER(mp.maintenance_status) LIKE '%success%' THEN 'Выполнено'
-                            WHEN LOWER(mp.maintenance_status) LIKE '%в процессе%' 
-                                 OR LOWER(mp.maintenance_status) LIKE '%in_progress%' 
-                                 OR LOWER(mp.maintenance_status) LIKE '%in process%' THEN 'В процессе'
-                            WHEN mp.maintenance_start_date < CURRENT_DATE 
-                                 AND (mp.maintenance_status IS NULL 
-                                      OR LOWER(mp.maintenance_status) LIKE '%ожидает%') THEN 'Просрочено'
-                            ELSE COALESCE(mp.maintenance_status, 'Ожидает ПТО')
-                        END as status
+                        mp.maintenance_status,
+                        mp.maintenance_start_date,
+                        COUNT(*) as count
+                    {base_query}
+                    {where_clause}
+                    GROUP BY mp.maintenance_status, mp.maintenance_start_date
+                """
+                
+                cur.execute(query, params)
+                rows = cur.fetchall()
+                print(f"PTO status query returned {len(rows)} rows")
+                
+                status_data = {}
+                for row in rows:
+                    raw_status = row[0] if row[0] else None
+                    maint_date = row[1] if row[1] else None
+                    count = row[2] if row[2] else 0
+                    
+                    # Определяем нормализованный статус
+                    if raw_status is None:
+                        if maint_date and maint_date < date.today():
+                            status = 'Просрочено'
+                        else:
+                            status = 'Ожидает ПТО'
+                    else:
+                        status_lower = raw_status.lower()
+                        if any(word in status_lower for word in ['выполнено', 'завершено', 'completed', 'success']):
+                            status = 'Выполнено'
+                        elif any(word in status_lower for word in ['в процессе', 'in_progress', 'in process', 'процессе']):
+                            status = 'В процессе'
+                        elif maint_date and maint_date < date.today() and any(word in status_lower for word in ['ожидает', 'pending']):
+                            status = 'Просрочено'
+                        elif any(word in status_lower for word in ['ожидает', 'pending']):
+                            status = 'Ожидает ПТО'
+                        else:
+                            # Если статус с некорректной кодировкой, пытаемся угадать
+                            status = 'Ожидает ПТО'  # По умолчанию
+                    
+                    status_data[status] = status_data.get(status, 0) + count
+                
+                print(f"Normalized status_data: {status_data}")
+                
+                # Статистика по месяцам
+                month_query = """
+                    SELECT 
+                        TO_CHAR(maintenance_start_date, 'YYYY-MM') as month,
+                        COUNT(*) as count
                     FROM maintenance_plan mp
-                    LEFT JOIN equipment_assignment ea ON mp.equipment_id = ea.equipment_id
-                    LEFT JOIN department d ON ea.department_id = d.department_id
-                    WHERE 1=1
-            """
-            params = []
+                """
+                month_params = []
+                if user_role == 'repair_head' and department_id:
+                    month_query += """
+                        LEFT JOIN equipment_assignment ea ON mp.equipment_id = ea.equipment_id
+                        LEFT JOIN department d ON ea.department_id = d.department_id
+                        WHERE maintenance_start_date >= CURRENT_DATE - INTERVAL '12 months'
+                        AND d.department_id = %s
+                    """
+                    month_params.append(department_id)
+                else:
+                    month_query += " WHERE maintenance_start_date >= CURRENT_DATE - INTERVAL '12 months'"
             
-            if user_role == 'repair_head' and department_id:
-                query += " AND d.department_id = %s"
-                params.append(department_id)
-            
-            query += """
-                ) as statuses
-                GROUP BY status
-                ORDER BY count DESC
-            """
-            
-            cur.execute(query, params)
-            status_data = {row[0]: row[1] for row in cur.fetchall()}
-            
-            # Статистика по месяцам
-            month_query = """
-                SELECT 
-                    TO_CHAR(maintenance_start_date, 'YYYY-MM') as month,
-                    COUNT(*) as count
-                FROM maintenance_plan mp
-                LEFT JOIN equipment_assignment ea ON mp.equipment_id = ea.equipment_id
-                LEFT JOIN department d ON ea.department_id = d.department_id
-                WHERE maintenance_start_date >= CURRENT_DATE - INTERVAL '12 months'
-            """
-            month_params = []
-            if user_role == 'repair_head' and department_id:
-                month_query += " AND d.department_id = %s"
-                month_params.append(department_id)
-            month_query += " GROUP BY month ORDER BY month"
-            cur.execute(month_query, month_params)
-            
-            monthly_data = {row[0]: row[1] for row in cur.fetchall()}
-            
-            return {
-                'by_status': status_data,
-                'by_month': monthly_data,
-                'total': sum(status_data.values())
-            }
+                month_query += " GROUP BY month ORDER BY month"
+                cur.execute(month_query, month_params)
+                
+                month_rows = cur.fetchall()
+                print(f"PTO monthly query returned {len(month_rows)} rows")
+                monthly_data = {}
+                for row in month_rows:
+                    month = row[0] if row[0] else 'Unknown'
+                    count = row[1] if row[1] else 0
+                    print(f"Month: {month}, count: {count}")
+                    monthly_data[month] = count
+                
+                result = {
+                    'by_status': status_data,
+                    'by_month': monthly_data,
+                    'total': sum(status_data.values())
+                }
+                
+                # Отладочный вывод
+                print(f"PTO statistics result: {result}")
+                print(f"PTO by_status: {status_data}")
+                print(f"PTO by_month: {monthly_data}")
+                print(f"PTO total: {result['total']}")
+                
+                return result
     
     def get_tasks_statistics(self, user_role=None, department_id=None):
         """Статистика по задачам на ремонт"""
         with get_db_cursor() as cur:
             query = """
                 SELECT 
-                    COALESCE(rt.repair_task_status, 'В процессе') as status,
-                    COUNT(*) as count
+                    rt.repair_task_id,
+                    rt.repair_task_status,
+                    COALESCE(employee_counts.assigned_count, 0) as assigned_employees_count
                 FROM repair_task rt
                 LEFT JOIN equipment_assignment ea ON rt.equipment_assignment_id = ea.equipment_assignment_id
                 LEFT JOIN department d ON ea.department_id = d.department_id
+                LEFT JOIN (
+                    SELECT repair_task_id, COUNT(employee_id) as assigned_count
+                    FROM repair_task_employee
+                    GROUP BY repair_task_id
+                ) employee_counts ON rt.repair_task_id = employee_counts.repair_task_id
                 WHERE 1=1
             """
             params = []
@@ -94,10 +137,22 @@ class AdminStatisticsService:
                 query += " AND d.department_id = %s"
                 params.append(department_id)
             
-            query += " GROUP BY status ORDER BY count DESC"
-            
             cur.execute(query, params)
-            status_data = {row[0]: row[1] for row in cur.fetchall()}
+            rows = cur.fetchall()
+            
+            # Обрабатываем данные и определяем статус с учетом назначенных сотрудников
+            status_data = {}
+            for row in rows:
+                original_status = row[1] if row[1] else 'В процессе'
+                assigned_count = row[2] if row[2] else 0
+                
+                # Определяем статус: если нет назначенных сотрудников и статус не "Завершено"/"Завершена", то "Ожидают назначения"
+                if assigned_count == 0 and original_status not in ['Завершено', 'Завершена']:
+                    status = 'Ожидают назначения'
+                else:
+                    status = original_status
+                
+                status_data[status] = status_data.get(status, 0) + 1
             
             # Статистика по месяцам
             month_query = """
@@ -317,10 +372,20 @@ class AdminStatisticsService:
     def get_equipment_statistics(self, user_role=None, department_id=None):
         """Статистика по оборудованию"""
         with get_db_cursor() as cur:
+            # Сначала получаем список equipment_id, у которых есть ПТО со статусом 'в процессе'
+            cur.execute("""
+                SELECT DISTINCT equipment_id
+                FROM maintenance_plan
+                WHERE maintenance_status ILIKE '%в процессе%'
+                   OR maintenance_status ILIKE '%in_progress%'
+                   OR maintenance_status ILIKE '%in process%'
+            """)
+            pto_in_process_equipment_ids = {row[0] for row in cur.fetchall()}
+            
             query = """
                 SELECT 
-                    COALESCE(ea.equipment_status, 'Не указан') as status,
-                    COUNT(*) as count
+                    e.equipment_id,
+                    COALESCE(ea.equipment_status, 'Не указан') as status
                 FROM equipment e
                 INNER JOIN equipment_assignment ea ON e.equipment_id = ea.equipment_id
                 LEFT JOIN department d ON ea.department_id = d.department_id
@@ -332,10 +397,22 @@ class AdminStatisticsService:
                 query += " AND d.department_id = %s"
                 params.append(department_id)
             
-            query += " GROUP BY ea.equipment_status ORDER BY count DESC"
-            
             cur.execute(query, params)
-            by_status = {row[0]: row[1] for row in cur.fetchall()}
+            rows = cur.fetchall()
+            
+            # Обрабатываем данные и учитываем статус "На ПТО"
+            by_status = {}
+            for row in rows:
+                equipment_id = row[0]
+                original_status = row[1] if row[1] else 'Не указан'
+                
+                # Если оборудование имеет ПТО в процессе, устанавливаем статус "На ПТО"
+                if equipment_id in pto_in_process_equipment_ids:
+                    status = 'На ПТО'
+                else:
+                    status = original_status
+                
+                by_status[status] = by_status.get(status, 0) + 1
             
             return {
                 'by_status': by_status,

@@ -10,13 +10,15 @@ bp = Blueprint('admin', __name__, url_prefix='/admin')
 @bp.route('')
 @bp.route('/')
 def dashboard():
-    """Главная страница админки - редирект на сотрудников"""
+    """Главная страница админки - редирект на статистику"""
     if 'user_id' not in session:
         return redirect(url_for('auth.login'))
     
-    section = request.args.get('section', 'employees')
+    section = request.args.get('section', 'statistics')
     
-    if section == 'employees':
+    if section == 'statistics':
+        return redirect(url_for('admin_statistics.list_statistics'))
+    elif section == 'employees':
         return redirect(url_for('admin_employees.list_employees'))
     elif section == 'equipment':
         return redirect(url_for('admin_equipment.list_equipment'))
@@ -24,12 +26,10 @@ def dashboard():
         return redirect(url_for('admin_warehouse.list_warehouse'))
     elif section == 'pto':
         return redirect(url_for('admin_pto.list_pto'))
-    elif section == 'statistics':
-        return redirect(url_for('admin_statistics.list_statistics'))
     elif section == 'tasks':
         return redirect(url_for('admin_tasks.list_tasks'))
     else:
-        return redirect(url_for('admin_employees.list_employees'))
+        return redirect(url_for('admin_statistics.list_statistics'))
 
 @bp.route('/upload-avatar', methods=["POST"])
 def upload_avatar():

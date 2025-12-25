@@ -72,6 +72,11 @@ def get_statistics_data():
         service = AdminStatisticsService()
         statistics = service.get_all_statistics(user_role=user['role'], department_id=department_id)
         
+        # Отладочный вывод
+        print(f"PTO statistics: {statistics.get('pto', {})}")
+        print(f"PTO by_status: {statistics.get('pto', {}).get('by_status', {})}")
+        print(f"PTO by_month: {statistics.get('pto', {}).get('by_month', {})}")
+        
         return jsonify({'success': True, 'data': statistics})
     except Exception as e:
         import traceback

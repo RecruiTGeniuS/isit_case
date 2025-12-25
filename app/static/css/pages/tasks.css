@@ -5,12 +5,29 @@
     transition: background-color 0.2s ease;
 }
 
+/* Чередование цветов строк (zebra striping) */
+#tasksTable tbody tr.task-row:nth-child(even) {
+    background-color: #fdf9f0;
+}
+
+#tasksTable tbody tr.task-row:nth-child(odd) {
+    background-color: var(--bg-white);
+}
+
+html.dark-theme #tasksTable tbody tr.task-row:nth-child(even) {
+    background-color: #2f2a26;
+}
+
+html.dark-theme #tasksTable tbody tr.task-row:nth-child(odd) {
+    background-color: #22201d;
+}
+
 .task-row:hover {
-    background-color: rgba(221, 158, 0, 0.1);
+    background-color: rgba(221, 158, 0, 0.1) !important;
 }
 
 html.dark-theme .task-row:hover {
-    background-color: rgba(221, 158, 0, 0.15);
+    background-color: rgba(221, 158, 0, 0.15) !important;
 }
 
 /* Переключатель статуса */

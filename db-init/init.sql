@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict qNSK4GqA5r0f3vkvUp91KMEW4DtCf39LoIXcILqH6PfLDBFkulwZ7LfJQ0V5AWF
+\restrict KCkA6L1uVDm0KhkpOcJCUCg7JJfALNavaNp3M0cnxz5sWuBsXdRAw4gZf4N5Klo
 
 -- Dumped from database version 16.11 (Debian 16.11-1.pgdg13+1)
 -- Dumped by pg_dump version 16.11 (Debian 16.11-1.pgdg13+1)
@@ -871,14 +871,14 @@ INSERT INTO public.equipment_assignment VALUES (103, 189, 10, '2024-06-25', 'П�
 INSERT INTO public.equipment_assignment VALUES (105, 191, 11, '2024-07-20', 'Кабельная галерея №2', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (107, 193, 18, '2024-08-15', 'Дробильный комплекс №2', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (108, 194, 19, '2024-06-20', 'Штольня №3', 'В работе', NULL);
-INSERT INTO public.equipment_assignment VALUES (109, 195, 19, '2024-09-25', 'Вентиляционная выработка №2', 'В работе', NULL);
-INSERT INTO public.equipment_assignment VALUES (110, 196, 20, '2024-07-10', 'Вентиляционная камера №3', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (112, 198, 21, '2024-08-20', 'Автопарк секция 2', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (113, 199, 21, '2024-11-25', 'Сортировочная станция №2', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (114, 200, 26, '2024-09-10', 'Шахта №4 уровень -250м', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (106, 192, 7, '2024-05-10', 'Карьер сектор B', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (111, 197, 20, '2024-10-15', 'Пылеулавливающая установка №2', 'В ремонте', NULL);
 INSERT INTO public.equipment_assignment VALUES (48, 145, 27, '2023-10-15', 'Буровая площадка №2', 'В ремонте', NULL);
+INSERT INTO public.equipment_assignment VALUES (110, 196, 20, '2024-07-10', 'Вентиляционная камера №3', 'В ремонте', NULL);
+INSERT INTO public.equipment_assignment VALUES (109, 195, 19, '2024-09-25', 'Вентиляционная выработка №2', 'В ремонте', NULL);
 
 
 --
@@ -923,6 +923,44 @@ INSERT INTO public.maintenance_plan VALUES (10, 169, NULL, '2025-12-07', 'Вып
 INSERT INTO public.maintenance_plan VALUES (11, 173, NULL, '2025-12-02', 'Выполнено', NULL);
 INSERT INTO public.maintenance_plan VALUES (12, 142, NULL, '2025-12-06', 'В процессе', NULL);
 INSERT INTO public.maintenance_plan VALUES (1, 157, NULL, '2025-12-25', 'Ожидает ПТО', NULL);
+INSERT INTO public.maintenance_plan VALUES (13, 166, NULL, '2025-12-25', '?? ????????????????', NULL);
+INSERT INTO public.maintenance_plan VALUES (14, 167, NULL, '2025-12-26', '?????????????? ??????', NULL);
+INSERT INTO public.maintenance_plan VALUES (15, 168, NULL, '2025-12-27', '?? ????????????????', NULL);
+INSERT INTO public.maintenance_plan VALUES (16, 169, NULL, '2025-12-28', '??????????????????', NULL);
+INSERT INTO public.maintenance_plan VALUES (17, 170, NULL, '2025-12-29', '?????????????? ??????', NULL);
+INSERT INTO public.maintenance_plan VALUES (18, 171, NULL, '2025-12-30', '?? ????????????????', NULL);
+INSERT INTO public.maintenance_plan VALUES (19, 140, NULL, '2025-12-31', '?????????????? ??????', NULL);
+INSERT INTO public.maintenance_plan VALUES (20, 140, NULL, '2026-01-01', '?????????????? ??????', NULL);
+INSERT INTO public.maintenance_plan VALUES (21, 141, NULL, '2026-01-02', '?? ????????????????', NULL);
+INSERT INTO public.maintenance_plan VALUES (22, 142, NULL, '2026-01-03', '??????????????????', NULL);
+INSERT INTO public.maintenance_plan VALUES (23, 143, NULL, '2026-01-04', '?????????????? ??????', NULL);
+INSERT INTO public.maintenance_plan VALUES (24, 144, NULL, '2026-01-05', '?? ????????????????', NULL);
+INSERT INTO public.maintenance_plan VALUES (25, 145, NULL, '2026-01-06', '?????????????? ??????', NULL);
+INSERT INTO public.maintenance_plan VALUES (26, 146, NULL, '2026-01-07', '?? ????????????????', NULL);
+INSERT INTO public.maintenance_plan VALUES (27, 147, NULL, '2026-01-08', '??????????????????', NULL);
+INSERT INTO public.maintenance_plan VALUES (28, 149, NULL, '2026-01-09', '?????????????? ??????', NULL);
+INSERT INTO public.maintenance_plan VALUES (29, 150, NULL, '2026-01-10', '?? ????????????????', NULL);
+INSERT INTO public.maintenance_plan VALUES (30, 151, NULL, '2026-01-11', '?????????????? ??????', NULL);
+INSERT INTO public.maintenance_plan VALUES (31, 152, NULL, '2026-01-12', '?? ????????????????', NULL);
+INSERT INTO public.maintenance_plan VALUES (32, 153, NULL, '2026-01-13', '??????????????????', NULL);
+INSERT INTO public.maintenance_plan VALUES (33, 154, NULL, '2026-01-14', '?????????????? ??????', NULL);
+INSERT INTO public.maintenance_plan VALUES (34, 155, NULL, '2026-01-15', '?? ????????????????', NULL);
+INSERT INTO public.maintenance_plan VALUES (35, 156, NULL, '2026-01-16', '?????????????? ??????', NULL);
+INSERT INTO public.maintenance_plan VALUES (36, 157, NULL, '2026-01-17', '?? ????????????????', NULL);
+INSERT INTO public.maintenance_plan VALUES (37, 159, NULL, '2026-01-18', '??????????????????', NULL);
+INSERT INTO public.maintenance_plan VALUES (38, 160, NULL, '2026-01-19', '?????????????? ??????', NULL);
+INSERT INTO public.maintenance_plan VALUES (39, 161, NULL, '2026-01-20', '?? ????????????????', NULL);
+INSERT INTO public.maintenance_plan VALUES (40, 162, NULL, '2026-01-21', '?????????????? ??????', NULL);
+INSERT INTO public.maintenance_plan VALUES (41, 163, NULL, '2026-01-22', '?? ????????????????', NULL);
+INSERT INTO public.maintenance_plan VALUES (42, 164, NULL, '2026-01-23', '??????????????????', NULL);
+INSERT INTO public.maintenance_plan VALUES (43, 165, NULL, '2026-01-24', '?????????????? ??????', NULL);
+INSERT INTO public.maintenance_plan VALUES (44, 166, NULL, '2026-01-25', '?? ????????????????', NULL);
+INSERT INTO public.maintenance_plan VALUES (45, 167, NULL, '2026-01-26', '?????????????? ??????', NULL);
+INSERT INTO public.maintenance_plan VALUES (46, 168, NULL, '2026-01-27', '?? ????????????????', NULL);
+INSERT INTO public.maintenance_plan VALUES (47, 169, NULL, '2026-01-28', '??????????????????', NULL);
+INSERT INTO public.maintenance_plan VALUES (48, 170, NULL, '2026-01-29', '?????????????? ??????', NULL);
+INSERT INTO public.maintenance_plan VALUES (49, 171, NULL, '2026-01-30', '?? ????????????????', NULL);
+INSERT INTO public.maintenance_plan VALUES (50, 140, NULL, '2026-01-31', '?????????????? ??????', NULL);
 
 
 --
@@ -2536,6 +2574,8 @@ INSERT INTO public.repair_spare_part VALUES (217, 9);
 INSERT INTO public.repair_task VALUES (7, 8, NULL, 'тест', 'тест', '2025-12-25', 'Завершена', '2025-12-25', '2025-12-25', 'тест');
 INSERT INTO public.repair_task VALUES (3, 77, NULL, 'тест 2', 'тест 2', '2025-12-25', 'Завершена', '2025-12-25', '2025-12-25', 'тест 2');
 INSERT INTO public.repair_task VALUES (9, 49, NULL, 'тест', 'тест', '2025-12-25', 'Завершена', '2025-12-25', '2025-12-25', 'тест');
+INSERT INTO public.repair_task VALUES (10, 110, NULL, 'тест', 'тест', '2025-12-25', 'В процессе', NULL, NULL, NULL);
+INSERT INTO public.repair_task VALUES (11, 109, NULL, 'тест', 'тест', '2025-12-25', 'В процессе', '2025-12-25', NULL, NULL);
 
 
 --
@@ -2546,6 +2586,8 @@ INSERT INTO public.repair_task_employee VALUES (3, 3);
 INSERT INTO public.repair_task_employee VALUES (66, 7);
 INSERT INTO public.repair_task_employee VALUES (61, 7);
 INSERT INTO public.repair_task_employee VALUES (91, 9);
+INSERT INTO public.repair_task_employee VALUES (78, 11);
+INSERT INTO public.repair_task_employee VALUES (80, 11);
 
 
 --
@@ -2771,7 +2813,7 @@ SELECT pg_catalog.setval('public.facility_facility_id_seq', 6, true);
 -- Name: maintenance_plan_maintenance_plan_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('public.maintenance_plan_maintenance_plan_id_seq', 12, true);
+SELECT pg_catalog.setval('public.maintenance_plan_maintenance_plan_id_seq', 50, true);
 
 
 --
@@ -2785,7 +2827,7 @@ SELECT pg_catalog.setval('public.part_stock_quantity_part_stock_quantity_id_seq'
 -- Name: repair_task_repair_task_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('public.repair_task_repair_task_id_seq', 9, true);
+SELECT pg_catalog.setval('public.repair_task_repair_task_id_seq', 11, true);
 
 
 --
@@ -3085,5 +3127,5 @@ ALTER TABLE ONLY public.warehouse
 -- PostgreSQL database dump complete
 --
 
-\unrestrict qNSK4GqA5r0f3vkvUp91KMEW4DtCf39LoIXcILqH6PfLDBFkulwZ7LfJQ0V5AWF
+\unrestrict KCkA6L1uVDm0KhkpOcJCUCg7JJfALNavaNp3M0cnxz5sWuBsXdRAw4gZf4N5Klo
 

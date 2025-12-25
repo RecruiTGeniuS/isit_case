@@ -219,7 +219,7 @@ html.dark-theme .pto-calendar-day.selected {
 }
 
 .pto-day-number {
-    font-size: 16px;
+    font-size: 22px;
     font-weight: 700;
     margin-bottom: var(--spacing-xs);
     color: var(--text-dark);
@@ -330,10 +330,12 @@ html.dark-theme .pto-table-container::-webkit-scrollbar-thumb:hover {
 
 .pto-table-container .data-table th,
 .pto-table-container .data-table td {
-    padding: var(--spacing-sm) var(--spacing-md);
+    padding: 12px var(--spacing-md) !important;
     text-align: left;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    min-height: 48px;
+    vertical-align: middle;
 }
 
 .pto-table-container .data-table thead {
@@ -353,14 +355,32 @@ html.dark-theme .pto-table-container .data-table thead {
 
 .pto-table-container .data-table tbody tr {
     transition: background-color 0.2s ease;
+    min-height: 48px;
+}
+
+/* Чередование цветов строк (zebra striping) */
+.pto-table-container .data-table tbody tr:nth-child(even) {
+    background-color: #fdf9f0;
+}
+
+.pto-table-container .data-table tbody tr:nth-child(odd) {
+    background-color: var(--bg-white);
+}
+
+html.dark-theme .pto-table-container .data-table tbody tr:nth-child(even) {
+    background-color: #2f2a26;
+}
+
+html.dark-theme .pto-table-container .data-table tbody tr:nth-child(odd) {
+    background-color: #22201d;
 }
 
 .pto-table-container .data-table tbody tr:hover {
-    background: var(--color-primary-light);
+    background: var(--color-primary-light) !important;
 }
 
 html.dark-theme .pto-table-container .data-table tbody tr:hover {
-    background: rgba(221, 158, 0, 0.1);
+    background: rgba(221, 158, 0, 0.1) !important;
 }
 
 .pto-table-empty {

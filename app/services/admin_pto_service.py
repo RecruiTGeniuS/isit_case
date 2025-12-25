@@ -133,27 +133,42 @@ class AdminPTOService:
                     
                     # Определяем цвет индикатора
                     today = date.today()
-                    if maint_date > today:
-                        # Планируемое ПТО (еще не наступило)
-                        indicator_color = 'yellow'
-                        status_display = 'Ожидает ПТО'
-                    elif status:
+                    status_lower = (status or '').lower()
+                    is_past = maint_date < today
+                    
+                    if status:
                         # Есть запись в maintenance_plan
-                        status_lower = status.lower()
                         if any(word in status_lower for word in ['успешно', 'завершено', 'completed', 'success', 'выполнено', 'готово']):
                             indicator_color = 'green'
-                            status_display = 'Завершено успешно'
+                            status_display = 'Выполнено'
+                        elif any(word in status_lower for word in ['в процессе', 'in_progress', 'in process', 'процессе']):
+                            indicator_color = 'blue'
+                            status_display = 'В процессе'
                         elif any(word in status_lower for word in ['не', 'failed', 'провал', 'ошибка', 'error', 'отменено', 'cancelled']):
                             indicator_color = 'red'
                             status_display = 'Не завершилось успешно'
+                        elif any(word in status_lower for word in ['ожидает', 'pending', 'waiting']) and is_past:
+                            # Прошлые задачи со статусом "Ожидает ПТО" - красный
+                            indicator_color = 'red'
+                            status_display = 'Ожидает ПТО'
                         else:
-                            # Неизвестный статус - считаем ожидающим
+                            # Неизвестный статус
                             indicator_color = 'yellow'
                             status_display = status
                     else:
-                        # Прошло, но нет записи - считаем ожидающим
-                        indicator_color = 'yellow'
-                        status_display = 'Ожидает ПТО'
+                        # Нет записи в maintenance_plan
+                        if maint_date < today:
+                            # Просрочено - не выполнено в запланированный день и не в процессе
+                            indicator_color = 'red'
+                            status_display = 'Просрочено'
+                        elif maint_date == today:
+                            # Сегодня
+                            indicator_color = 'yellow'
+                            status_display = 'Ожидает ПТО'
+                        else:
+                            # Планируемое ПТО (еще не наступило)
+                            indicator_color = 'yellow'
+                            status_display = 'Ожидает ПТО'
                     
                     if date_str not in maintenance_data:
                         maintenance_data[date_str] = []
@@ -256,14 +271,79 @@ class AdminPTOService:
                     else:
                         status_display = 'Ожидает ПТО'
                     
+                    # Определяем статус для отображения
+                    today = date.today()
+                    status_lower = (status or '').lower()
+                    
+                    if status:
+                        if any(word in status_lower for word in ['успешно', 'завершено', 'completed', 'success', 'выполнено', 'готово']):
+                            status_display = 'Выполнено'
+                        elif any(word in status_lower for word in ['в процессе', 'in_progress', 'in process', 'процессе']):
+                            status_display = 'В процессе'
+                        elif any(word in status_lower for word in ['не', 'failed', 'провал', 'ошибка', 'error', 'отменено', 'cancelled']):
+                            status_display = 'Не завершилось успешно'
+                        else:
+                            status_display = status
+                    else:
+                        if target_date < today:
+                            status_display = 'Просрочено'
+                        elif target_date == today:
+                            status_display = 'Ожидает ПТО'
+                        else:
+                            status_display = 'Ожидает ПТО'
+                    
                     result.append({
                         'equipment_assignment_id': assignment_id,
                         'equipment_id': equipment_id,
                         'equipment_name': equipment_name,
                         'department_name': department_name,
                         'location': location or '',
-                        'status': status_display
+                        'status': status_display,
+                        'maintenance_date': target_date.strftime('%Y-%m-%d')
                     })
         
         return result
+    
+    def update_maintenance_status(self, equipment_id, maintenance_date, status):
+        """
+        Обновляет или создает запись о статусе ПТО
+        
+        Args:
+            equipment_id: ID оборудования
+            maintenance_date: Дата ПТО в формате 'YYYY-MM-DD'
+            status: Новый статус
+        """
+        if isinstance(maintenance_date, str):
+            maintenance_date = datetime.strptime(maintenance_date, '%Y-%m-%d').date()
+        
+        with get_db_cursor(commit=True) as cur:
+            # Проверяем, есть ли уже запись
+            cur.execute("""
+                SELECT maintenance_plan_id
+                FROM maintenance_plan
+                WHERE equipment_id = %s
+                    AND maintenance_start_date = %s
+                ORDER BY maintenance_plan_id DESC
+                LIMIT 1
+            """, (equipment_id, maintenance_date))
+            
+            existing = cur.fetchone()
+            
+            if existing:
+                # Обновляем существующую запись
+                cur.execute("""
+                    UPDATE maintenance_plan
+                    SET maintenance_status = %s
+                    WHERE maintenance_plan_id = %s
+                """, (status, existing[0]))
+            else:
+                # Создаем новую запись
+                cur.execute("""
+                    INSERT INTO maintenance_plan (
+                        equipment_id,
+                        maintenance_start_date,
+                        maintenance_status
+                    )
+                    VALUES (%s, %s, %s)
+                """, (equipment_id, maintenance_date, status))
 

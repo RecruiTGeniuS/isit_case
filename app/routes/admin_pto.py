@@ -77,6 +77,26 @@ def get_date_data():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@bp.route('/api/update-status', methods=['POST'])
+def update_status():
+    """Обновить статус ПТО"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    data = request.get_json()
+    equipment_id = data.get('equipment_id')
+    maintenance_date = data.get('maintenance_date')
+    status = data.get('status')
+    
+    if not equipment_id or not maintenance_date or not status:
+        return jsonify({'error': 'Missing required parameters'}), 400
+    
+    try:
+        pto_service.update_maintenance_status(equipment_id, maintenance_date, status)
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 
 

@@ -14091,7 +14091,8 @@
                         const grouped = {
                             green: [],
                             red: [],
-                            yellow: []
+                            yellow: [],
+                            blue: []
                         };
                         
                         maintenanceData[dateStr].forEach(item => {
@@ -14114,8 +14115,8 @@
                         dayElement.appendChild(indicators);
                     }
                     
-                    // Обработчик двойного клика
-                    dayElement.addEventListener('dblclick', () => {
+                    // Обработчик одинарного клика
+                    dayElement.addEventListener('click', () => {
                         if (!isOtherMonth) {
                             selectedDate = new Date(date);
                             loadTableData(selectedDate);
@@ -14124,6 +14125,37 @@
                     });
                     
                     return dayElement;
+                }
+                
+                // Определение цвета индикатора по статусу и дате
+                function getStatusIndicatorColor(status, maintenanceDate) {
+                    const statusLower = (status || '').toLowerCase();
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    
+                    // Проверяем, является ли дата прошедшей
+                    let isPastDate = false;
+                    if (maintenanceDate) {
+                        const maintDate = new Date(maintenanceDate);
+                        maintDate.setHours(0, 0, 0, 0);
+                        isPastDate = maintDate < today;
+                    }
+                    
+                    if (statusLower.includes('выполнено') || statusLower.includes('завершено') || 
+                        statusLower.includes('completed') || statusLower.includes('success')) {
+                        return 'green';
+                    } else if (statusLower.includes('в процессе') || statusLower.includes('in_progress') || 
+                               statusLower.includes('in process')) {
+                        return 'blue';
+                    } else if (statusLower.includes('просрочено') || statusLower.includes('провал') || 
+                               statusLower.includes('failed') || statusLower.includes('error')) {
+                        return 'red';
+                    } else if (statusLower.includes('ожидает') && isPastDate) {
+                        // Прошлые задачи со статусом "Ожидает ПТО" - красный
+                        return 'red';
+                    } else {
+                        return 'yellow';
+                    }
                 }
                 
                 // Отрисовка таблицы
@@ -14135,14 +14167,166 @@
                         return;
                     }
                     
-                    tableBody.innerHTML = data.map(item => `
-                        <tr>
+                    tableBody.innerHTML = data.map(item => {
+                        const status = item.status || 'Ожидает ПТО';
+                        const maintenanceDate = item.maintenance_date || formatDateForAPI(selectedDate);
+                        const indicatorColor = getStatusIndicatorColor(status, maintenanceDate);
+                        return `
+                        <tr class="pto-table-row" 
+                            data-equipment-id="${item.equipment_id}" 
+                            data-equipment-assignment-id="${item.equipment_assignment_id}"
+                            data-maintenance-date="${maintenanceDate}"
+                            data-current-status="${escapeHtml(status)}">
                             <td>${escapeHtml(item.equipment_name)}</td>
                             <td>${escapeHtml(item.department_name)}</td>
                             <td>${escapeHtml(item.location)}</td>
-                            <td>${escapeHtml(item.status)}</td>
+                            <td class="pto-status-cell">
+                                <span class="pto-table-status-indicator ${indicatorColor}"></span>
+                                <span class="pto-status-text">${escapeHtml(status)}</span>
+                            </td>
                         </tr>
-                    `).join('');
+                    `;
+                    }).join('');
+                    
+                    // Добавляем обработчики клика для контекстного меню
+                    const rows = tableBody.querySelectorAll('.pto-table-row');
+                    rows.forEach(row => {
+                        row.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            showPTOContextMenu(e, row);
+                        });
+                    });
+                }
+                
+                // Контекстное меню для изменения статуса ПТО
+                let ptoContextMenu = null;
+                
+                function showPTOContextMenu(event, row) {
+                    // Удаляем предыдущее меню, если есть
+                    if (ptoContextMenu) {
+                        ptoContextMenu.remove();
+                        ptoContextMenu = null;
+                    }
+                    
+                    const currentStatus = row.dataset.currentStatus || '';
+                    const statusMap = {
+                        'В процессе': 'in_progress',
+                        'Выполнено': 'completed',
+                        'Ожидает ПТО': 'pending',
+                        'Просрочено': 'pending'
+                    };
+                    const currentStatusKey = statusMap[currentStatus] || '';
+                    
+                    // Создаем контекстное меню
+                    ptoContextMenu = document.createElement('div');
+                    ptoContextMenu.className = 'pto-context-menu';
+                    ptoContextMenu.innerHTML = `
+                        <div class="pto-context-menu-item ${currentStatusKey === 'in_progress' ? 'active' : ''}" data-status="in_progress">
+                            <span class="pto-status-indicator blue"></span>
+                            В процессе
+                        </div>
+                        <div class="pto-context-menu-item ${currentStatusKey === 'completed' ? 'active' : ''}" data-status="completed">
+                            <span class="pto-status-indicator green"></span>
+                            Выполнено
+                        </div>
+                        <div class="pto-context-menu-item ${currentStatusKey === 'pending' ? 'active' : ''}" data-status="pending">
+                            <span class="pto-status-indicator yellow"></span>
+                            Ожидает ПТО
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(ptoContextMenu);
+                    
+                    // Позиционируем меню
+                    const rect = row.getBoundingClientRect();
+                    const menuRect = ptoContextMenu.getBoundingClientRect();
+                    let top = rect.bottom + window.scrollY;
+                    let left = rect.left + window.scrollX;
+                    
+                    // Проверяем, не выходит ли меню за границы экрана
+                    if (top + menuRect.height > window.innerHeight + window.scrollY) {
+                        top = rect.top + window.scrollY - menuRect.height;
+                    }
+                    if (left + menuRect.width > window.innerWidth + window.scrollX) {
+                        left = rect.right + window.scrollX - menuRect.width;
+                    }
+                    
+                    ptoContextMenu.style.top = `${top}px`;
+                    ptoContextMenu.style.left = `${left}px`;
+                    
+                    // Обработчики выбора статуса
+                    const menuItems = ptoContextMenu.querySelectorAll('.pto-context-menu-item');
+                    menuItems.forEach(item => {
+                        item.addEventListener('click', async (e) => {
+                            e.stopPropagation();
+                            const status = item.dataset.status;
+                            await updatePTOStatus(row, status);
+                            hidePTOContextMenu();
+                        });
+                    });
+                    
+                    // Закрываем меню при клике вне его
+                    setTimeout(() => {
+                        document.addEventListener('click', hidePTOContextMenu, { once: true });
+                    }, 0);
+                }
+                
+                function hidePTOContextMenu() {
+                    if (ptoContextMenu) {
+                        ptoContextMenu.remove();
+                        ptoContextMenu = null;
+                    }
+                }
+                
+                // Обновление статуса ПТО
+                async function updatePTOStatus(row, status) {
+                    const equipmentId = row.dataset.equipmentId;
+                    const maintenanceDate = row.dataset.maintenanceDate;
+                    
+                    const statusMap = {
+                        'in_progress': 'В процессе',
+                        'completed': 'Выполнено',
+                        'pending': 'Ожидает ПТО'
+                    };
+                    
+                    const statusText = statusMap[status] || status;
+                    
+                    try {
+                        const response = await fetch('/admin/pto/api/update-status', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                equipment_id: parseInt(equipmentId),
+                                maintenance_date: maintenanceDate,
+                                status: statusText
+                            })
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error('Ошибка обновления статуса');
+                        }
+                        
+                        // Обновляем отображение
+                        const statusCell = row.querySelector('.pto-status-cell');
+                        if (statusCell) {
+                            const maintenanceDate = row.dataset.maintenanceDate;
+                            const indicatorColor = getStatusIndicatorColor(statusText, maintenanceDate);
+                            statusCell.innerHTML = `
+                                <span class="pto-table-status-indicator ${indicatorColor}"></span>
+                                <span class="pto-status-text">${escapeHtml(statusText)}</span>
+                            `;
+                        }
+                        row.dataset.currentStatus = statusText;
+                        
+                        // Перезагружаем календарь для обновления индикаторов
+                        loadCalendarData();
+                        
+                    } catch (error) {
+                        console.error('Ошибка при обновлении статуса ПТО:', error);
+                        alert('Не удалось обновить статус ПТО');
+                    }
                 }
                 
                 // Экранирование HTML

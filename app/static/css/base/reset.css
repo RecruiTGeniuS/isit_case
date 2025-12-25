@@ -32,11 +32,17 @@ body.admin-page {
     font-family: Arial, sans-serif;
     height: 100vh;
     overflow: hidden;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
 }
 
 html.admin-page {
     overflow: hidden;
+    overflow-x: hidden;
     height: 100vh;
+    width: 100%;
+    max-width: 100%;
 }
 
 body.modal-open {

@@ -3,8 +3,12 @@
 .pto-container {
     display: flex;
     gap: var(--spacing-lg);
-    height: calc(100vh - 200px);
+    height: calc(100vh - 180px);
     min-height: 600px;
+    max-height: calc(100vh - 180px);
+    align-items: stretch;
+    overflow-x: hidden;
+    width: 100%;
 }
 
 .pto-calendar-section {
@@ -16,6 +20,7 @@
     box-shadow: var(--shadow-md);
     padding: var(--spacing-lg);
     overflow: hidden;
+    min-width: 0;
 }
 
 html.dark-theme .pto-calendar-section {
@@ -108,13 +113,15 @@ html.dark-theme .pto-year-select {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    min-height: 0;
 }
 
 .pto-calendar-weekdays {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: var(--spacing-xs);
+    gap: 2px;
     margin-bottom: var(--spacing-sm);
+    flex-shrink: 0;
 }
 
 .pto-weekday {
@@ -132,15 +139,23 @@ html.dark-theme .pto-weekday {
 
 .pto-calendar-grid {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: var(--spacing-xs);
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 2px;
     flex: 1;
-    overflow-y: auto;
+    overflow: hidden;
+    min-height: 0;
+    grid-auto-rows: minmax(0, 1fr);
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    align-items: stretch;
+    width: 100%;
+}
+
+.pto-calendar-grid::-webkit-scrollbar {
+    display: none;
 }
 
 .pto-calendar-day {
-    aspect-ratio: 1;
-    min-height: 80px;
     background: var(--bg-light);
     border: 1px solid var(--border-light);
     border-radius: var(--radius-sm);
@@ -149,14 +164,20 @@ html.dark-theme .pto-weekday {
     flex-direction: column;
     align-items: flex-start;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     position: relative;
+    overflow: hidden;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    box-sizing: border-box;
+    aspect-ratio: 1;
+    isolation: isolate;
 }
 
 .pto-calendar-day:hover {
     background: var(--color-primary-light);
     border-color: var(--color-primary);
-    transform: translateY(-2px);
     box-shadow: var(--shadow-sm);
 }
 
@@ -179,6 +200,7 @@ html.dark-theme .pto-calendar-day:hover {
     border: 2px solid var(--color-primary);
     background: var(--color-primary-light);
     font-weight: 600;
+    box-sizing: border-box;
 }
 
 html.dark-theme .pto-calendar-day.today {
@@ -217,8 +239,142 @@ html.dark-theme .pto-day-number {
     gap: 4px;
     width: 100%;
     margin-top: auto;
+    overflow: hidden;
+    max-height: calc(100% - 25px);
 }
 
+/* Секция с таблицей */
+.pto-table-section {
+    flex: 0 0 40%;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    min-width: 0;
+}
+
+html.dark-theme .pto-table-section {
+    background: var(--bg-dark-secondary);
+}
+
+.pto-table-header {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--border-light);
+    background: var(--bg-light);
+    flex-shrink: 0;
+}
+
+html.dark-theme .pto-table-header {
+    background: var(--bg-dark);
+    border-bottom-color: var(--border-medium);
+}
+
+.pto-table-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+html.dark-theme .pto-table-header h3 {
+    color: var(--text-dark);
+}
+
+.pto-table-container {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: auto;
+    min-height: 0;
+    position: relative;
+}
+
+.pto-table-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.pto-table-container::-webkit-scrollbar-track {
+    background: var(--bg-light);
+    border-radius: 4px;
+}
+
+.pto-table-container::-webkit-scrollbar-thumb {
+    background: var(--border-medium);
+    border-radius: 4px;
+}
+
+.pto-table-container::-webkit-scrollbar-thumb:hover {
+    background: var(--text-medium);
+}
+
+html.dark-theme .pto-table-container::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+
+html.dark-theme .pto-table-container::-webkit-scrollbar-thumb {
+    background: var(--border-medium);
+}
+
+html.dark-theme .pto-table-container::-webkit-scrollbar-thumb:hover {
+    background: var(--text-medium);
+}
+
+.pto-table-container .data-table {
+    width: 100%;
+    min-width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.pto-table-container .data-table th,
+.pto-table-container .data-table td {
+    padding: var(--spacing-sm) var(--spacing-md);
+    text-align: left;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.pto-table-container .data-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--bg-light);
+}
+
+html.dark-theme .pto-table-container .data-table thead {
+    background: var(--bg-dark);
+}
+
+.pto-table-container .data-table thead th {
+    background: inherit;
+}
+
+.pto-table-container .data-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.pto-table-container .data-table tbody tr:hover {
+    background: var(--color-primary-light);
+}
+
+html.dark-theme .pto-table-container .data-table tbody tr:hover {
+    background: rgba(221, 158, 0, 0.1);
+}
+
+.pto-table-empty {
+    padding: var(--spacing-xl);
+    text-align: center;
+    color: var(--text-light);
+    font-size: 14px;
+}
+
+html.dark-theme .pto-table-empty {
+    color: var(--text-light);
+}
+
+/* Улучшение отображения индикаторов в днях календаря */
 .pto-indicator {
     width: 20px;
     height: 20px;
@@ -250,96 +406,53 @@ html.dark-theme .pto-day-number {
     font-size: 11px;
 }
 
-/* Секция с таблицей */
-.pto-table-section {
-    flex: 0 0 40%;
-    display: flex;
-    flex-direction: column;
-    background: var(--bg-white);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-    overflow: hidden;
-}
-
-html.dark-theme .pto-table-section {
-    background: var(--bg-dark-secondary);
-}
-
-.pto-table-header {
-    padding: var(--spacing-lg);
-    border-bottom: 1px solid var(--border-light);
-    background: var(--bg-light);
-}
-
-html.dark-theme .pto-table-header {
-    background: var(--bg-dark);
-    border-bottom-color: var(--border-medium);
-}
-
-.pto-table-header h3 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--text-dark);
-}
-
-html.dark-theme .pto-table-header h3 {
-    color: var(--text-dark);
-}
-
-.pto-table-container {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: auto;
-}
-
-.pto-table-container .data-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.pto-table-container .data-table thead {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-.pto-table-container .data-table tbody tr {
-    transition: background-color 0.2s ease;
-}
-
-.pto-table-container .data-table tbody tr:hover {
-    background: var(--color-primary-light);
-}
-
-html.dark-theme .pto-table-container .data-table tbody tr:hover {
-    background: rgba(221, 158, 0, 0.1);
-}
-
-.pto-table-empty {
-    padding: var(--spacing-xl);
-    text-align: center;
-    color: var(--text-light);
-    font-size: 14px;
-}
-
-html.dark-theme .pto-table-empty {
-    color: var(--text-light);
-}
-
 /* Адаптивность */
 @media (max-width: 1200px) {
     .pto-container {
         flex-direction: column;
         height: auto;
+        max-height: none;
     }
     
     .pto-calendar-section {
         flex: 1;
+        min-height: 500px;
     }
     
     .pto-table-section {
         flex: 1;
         min-height: 400px;
+    }
+    
+    .pto-calendar-grid {
+        overflow-y: auto;
+        -ms-overflow-style: none;
+        scrollbar-width: thin;
+    }
+    
+    .pto-calendar-grid::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .pto-calendar-grid::-webkit-scrollbar-track {
+        background: var(--bg-light);
+        border-radius: 3px;
+    }
+    
+    .pto-calendar-grid::-webkit-scrollbar-thumb {
+        background: var(--border-medium);
+        border-radius: 3px;
+    }
+    
+    .pto-calendar-grid::-webkit-scrollbar-thumb:hover {
+        background: var(--text-medium);
+    }
+    
+    html.dark-theme .pto-calendar-grid::-webkit-scrollbar-track {
+        background: var(--bg-dark);
+    }
+    
+    html.dark-theme .pto-calendar-grid::-webkit-scrollbar-thumb {
+        background: var(--border-medium);
     }
 }

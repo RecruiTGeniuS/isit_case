@@ -517,10 +517,13 @@ html.dark-theme .nav-item.active {
     flex: 1;
     padding: 24px;
     overflow-y: hidden;
+    overflow-x: hidden;
     background: #fafafa;
     display: flex;
     flex-direction: column;
     min-height: 0;
+    width: 100%;
+    max-width: 100%;
 }
 
 html.dark-theme .admin-content {

@@ -184,6 +184,12 @@ html.dark-theme .context-menu-item.danger:hover {
     justify-content: flex-start !important;
 }
 
+/* Выравнивание столбца "Расположение" по левому краю (6-й столбец) */
+#equipmentTable th:nth-child(6),
+#equipmentTable td:nth-child(6)[data-field="location"] {
+    text-align: left !important;
+}
+
 /* Стили для ячейки статуса в таблице оборудования */
 /* Переопределяем правила из table.css для столбца статуса */
 #equipmentTable th:last-child,
@@ -229,10 +235,11 @@ html.dark-theme .context-menu-item.danger:hover {
     color: #fff !important;
 }
 
-/* Статус "На ремонте" - жёлтый (приглушённый) */
+/* Статус "На ремонте" / "В ремонте" - жёлтый (приглушённый) */
 #equipmentTable td:last-child .status-badge.status-in-repair {
-    background: rgba(234, 179, 8, 0.6) !important;
-    color: #fff !important;
+    background: rgba(234, 179, 8, 0.8) !important;
+    color: #1f2937 !important;
+    font-weight: 600 !important;
 }
 
 /* Стили для тёмной темы */
@@ -251,8 +258,9 @@ html.dark-theme #equipmentTable td:last-child .status-badge.status-in-pto {
 }
 
 html.dark-theme #equipmentTable td:last-child .status-badge.status-in-repair {
-    background: rgba(202, 138, 4, 0.6) !important;
-    color: #fff !important;
+    background: rgba(234, 179, 8, 0.9) !important;
+    color: #1f2937 !important;
+    font-weight: 600 !important;
 }
 
 /* Кнопка "Назад" на странице паспорта */

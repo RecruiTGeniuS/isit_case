@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict NR4M1yN4js1xBgjRMNOBc3CPxgFQc9vFhr5bvgHqXLHYXpLgN1AaVSNjxCaItQx
+\restrict 8PXfDkugaVGfeEpxIbVSec9Hw8ZTV2DwvasEb7LQDbp6bxZC6cc8Mes4BOhy6h1
 
 -- Dumped from database version 16.11 (Debian 16.11-1.pgdg13+1)
 -- Dumped by pg_dump version 16.11 (Debian 16.11-1.pgdg13+1)
@@ -708,6 +708,7 @@ INSERT INTO public.employee VALUES (72, 34, 'Заведующий складом
 INSERT INTO public.employee VALUES (84, 32, 'Заведующий складом', 'Алексеев', 'Игорь', 'Дмитриевич', '+7 (911) 101-01-30', 'ialekseev@nmz.ru', 'store_keeper', 'login', 'pass030', NULL);
 INSERT INTO public.employee VALUES (55, 51, 'Администратор ТОиР', 'Смирнов', 'Иван', 'Викторович', '+7 (911) 101-01-01', 'smirnov@nmz.ru', 'maintenance_admin', 'smirnov', 'admin', NULL);
 INSERT INTO public.employee VALUES (87, 28, 'Начальник обогатительной фабрики', 'Захаров', 'Дмитрий', 'Павлович', '+7 (911) 101-01-33', 'dzakharov@nmz.ru', 'dept_head', 'dzakharov', 'pass033', NULL);
+INSERT INTO public.employee VALUES (3, 39, 'Сотрудник ремонтной службы', 'Ершов', 'Валерий', 'Михайлович', '+7 (812) 223-14-12', 'test@mail.ru', 'repair_worker', 'ershv', 'pass2980', NULL);
 
 
 --
@@ -782,7 +783,9 @@ INSERT INTO public.equipment_assignment VALUES (2, 141, 7, '2023-05-22', 'Шах
 INSERT INTO public.equipment_assignment VALUES (3, 142, 7, '2023-08-10', 'Вентиляционная выработка', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (4, 143, 7, '2023-11-05', 'Транспортная галерея', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (6, 142, 8, '2023-06-20', 'Буровая площадка №1', 'В работе', NULL);
+INSERT INTO public.equipment_assignment VALUES (48, 145, 27, '2023-10-15', 'Буровая площадка №2', 'В ремонте', NULL);
 INSERT INTO public.equipment_assignment VALUES (8, 146, 8, '2023-12-18', 'Зона подготовки зарядов', 'В работе', NULL);
+INSERT INTO public.equipment_assignment VALUES (77, 159, 38, '2024-05-25', 'Конференц-зал', 'В ремонте', NULL);
 INSERT INTO public.equipment_assignment VALUES (10, 149, 8, '2024-04-25', 'Склад ВВ', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (12, 150, 9, '2023-10-20', 'Цех измельчения', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (13, 151, 9, '2024-01-15', 'Флотация секция А', 'В работе', NULL);
@@ -810,7 +813,6 @@ INSERT INTO public.equipment_assignment VALUES (43, 141, 26, '2023-07-25', 'Ша
 INSERT INTO public.equipment_assignment VALUES (45, 144, 26, '2024-01-30', 'Транспортная галерея', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (46, 166, 26, '2024-04-25', 'Контрольный пункт', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (47, 142, 27, '2023-06-30', 'Буровая площадка №1', 'В работе', NULL);
-INSERT INTO public.equipment_assignment VALUES (48, 145, 27, '2023-10-15', 'Буровая площадка №2', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (49, 146, 27, '2024-01-10', 'Склад ВВ', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (51, 143, 28, '2023-08-10', 'Цех дробления', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (52, 151, 28, '2023-11-25', 'Цех измельчения', 'В работе', NULL);
@@ -831,7 +833,6 @@ INSERT INTO public.equipment_assignment VALUES (70, 173, 36, '2024-06-10', 'Пе
 INSERT INTO public.equipment_assignment VALUES (72, 157, 37, '2024-01-10', 'Лаборатория химического анализа', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (74, 159, 37, '2024-07-15', 'Измерительная комната', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (75, 175, 37, '2024-10-20', 'Склад образцов', 'В работе', NULL);
-INSERT INTO public.equipment_assignment VALUES (77, 159, 38, '2024-05-25', 'Конференц-зал', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (78, 160, 38, '2024-08-10', 'Серверная', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (79, 176, 38, '2024-11-15', 'Архив документации', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (80, 151, 43, '2023-10-15', 'Дробильное отделение', 'В работе', NULL);
@@ -873,11 +874,11 @@ INSERT INTO public.equipment_assignment VALUES (107, 193, 18, '2024-08-15', 'Д�
 INSERT INTO public.equipment_assignment VALUES (108, 194, 19, '2024-06-20', 'Штольня №3', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (109, 195, 19, '2024-09-25', 'Вентиляционная выработка №2', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (110, 196, 20, '2024-07-10', 'Вентиляционная камера №3', 'В работе', NULL);
-INSERT INTO public.equipment_assignment VALUES (111, 197, 20, '2024-10-15', 'Пылеулавливающая установка №2', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (112, 198, 21, '2024-08-20', 'Автопарк секция 2', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (113, 199, 21, '2024-11-25', 'Сортировочная станция №2', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (114, 200, 26, '2024-09-10', 'Шахта №4 уровень -250м', 'В работе', NULL);
 INSERT INTO public.equipment_assignment VALUES (106, 192, 7, '2024-05-10', 'Карьер сектор B', 'В работе', NULL);
+INSERT INTO public.equipment_assignment VALUES (111, 197, 20, '2024-10-15', 'Пылеулавливающая установка №2', 'В ремонте', NULL);
 
 
 --
@@ -2510,12 +2511,19 @@ INSERT INTO public.part_stock_quantity VALUES (439, 129, 320, 24);
 -- Data for Name: repair_task; Type: TABLE DATA; Schema: public; Owner: user
 --
 
+INSERT INTO public.repair_task VALUES (2, 111, NULL, 'тест', 'тест 2', '2025-12-24', 'В процессе', NULL, NULL, NULL);
+INSERT INTO public.repair_task VALUES (1, 48, NULL, 'тест', 'тест', '2025-12-24', 'В процессе', '2025-12-25', NULL, NULL);
+INSERT INTO public.repair_task VALUES (3, 77, NULL, 'тест 2', 'тест 2', '2025-12-25', 'В процессе', '2025-12-25', NULL, NULL);
 
 
 --
 -- Data for Name: repair_task_employee; Type: TABLE DATA; Schema: public; Owner: user
 --
 
+INSERT INTO public.repair_task_employee VALUES (78, 2);
+INSERT INTO public.repair_task_employee VALUES (80, 2);
+INSERT INTO public.repair_task_employee VALUES (91, 1);
+INSERT INTO public.repair_task_employee VALUES (3, 3);
 
 
 --
@@ -2706,7 +2714,7 @@ SELECT pg_catalog.setval('public.department_department_id_seq', 48, true);
 -- Name: employee_employee_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('public.employee_employee_id_seq', 2, true);
+SELECT pg_catalog.setval('public.employee_employee_id_seq', 3, true);
 
 
 --
@@ -2755,7 +2763,7 @@ SELECT pg_catalog.setval('public.part_stock_quantity_part_stock_quantity_id_seq'
 -- Name: repair_task_repair_task_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('public.repair_task_repair_task_id_seq', 1, false);
+SELECT pg_catalog.setval('public.repair_task_repair_task_id_seq', 3, true);
 
 
 --
@@ -3055,5 +3063,5 @@ ALTER TABLE ONLY public.warehouse
 -- PostgreSQL database dump complete
 --
 
-\unrestrict NR4M1yN4js1xBgjRMNOBc3CPxgFQc9vFhr5bvgHqXLHYXpLgN1AaVSNjxCaItQx
+\unrestrict 8PXfDkugaVGfeEpxIbVSec9Hw8ZTV2DwvasEb7LQDbp6bxZC6cc8Mes4BOhy6h1
 

@@ -675,7 +675,7 @@
                                         {% if eq.equipment_status %}
                                             {% if eq.equipment_status == 'В работе' %}
                                             <span class="status-badge status-in-work">{{ eq.equipment_status }}</span>
-                                            {% elif eq.equipment_status == 'На ремонте' %}
+                                            {% elif eq.equipment_status == 'На ремонте' or eq.equipment_status == 'В ремонте' %}
                                             <span class="status-badge status-in-repair">{{ eq.equipment_status }}</span>
                                             {% elif eq.equipment_status == 'На ПТО' %}
                                             <span class="status-badge status-in-pto">{{ eq.equipment_status }}</span>
@@ -1469,27 +1469,71 @@
                     <div class="content-header">
                         <h2>Задачи на ремонт</h2>
                     </div>
+                    <div class="table-controls">
+                        <div class="search-box">
+                            <input type="text" id="tasksSearch" placeholder="Введите текст для поиска">
+                            <button type="button" class="search-button" tabindex="-1">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="table-actions">
+                            <button type="button" class="filter-btn" id="tasksFilterBtn">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="3 4 21 4 14 14 14 20 10 22 10 14 3 4"></polygon>
+                                </svg>
+                                Фильтр
+                            </button>
+                            <div class="filter-dropdown" id="tasksFilterDropdown">
+                                <div class="filter-group">
+                                    <label>Статус задачи</label>
+                                    <select id="tasksStatusFilter">
+                                        <option value="">Все задачи</option>
+                                        <option value="active">В процессе</option>
+                                        <option value="completed">Завершено</option>
+                                    </select>
+                                </div>
+                                <button type="button" class="reset-filter-btn" id="tasksResetFilters">Сбросить фильтры</button>
+                            </div>
+                        </div>
+                    </div>
                     <div class="table-container">
                         <table class="data-table" id="tasksTable">
                             <thead>
                                 <tr>
                                     <th class="number-column">№</th>
                                     <th>Тема задачи</th>
-                                    <th>Номер задачи</th>
-                                    <th>Дедлайн</th>
+                                    <th>Оборудование</th>
+                                    <th>Отдел</th>
+                                    <th>Предприятие</th>
+                                    <th>Статус</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for task in tasks %}
-                                <tr class="task-row" data-task-id="{{ task.id }}" style="cursor: pointer;">
+                                <tr class="task-row" data-task-id="{{ task.id }}" data-status="{{ 'completed' if task.status == 'Завершено' else 'active' }}" style="cursor: pointer;">
                                     <td class="number-column">{{ loop.index }}</td>
                                     <td>{{ task.heading or '—' }}</td>
-                                    <td>{{ task.id }}</td>
-                                    <td>{{ task.end_date or '—' }}</td>
+                                    <td>{{ task.equipment_name or '—' }}</td>
+                                    <td>{{ task.department_name or '—' }}</td>
+                                    <td>{{ task.facility_name or '—' }}</td>
+                                    <td>
+                                        {% if task.status == 'Завершено' %}
+                                        <span class="status-badge status-completed">{{ task.status }}</span>
+                                        {% elif task.status == 'Ожидают назначения' %}
+                                        <span class="status-badge status-pending">{{ task.status }}</span>
+                                        {% elif task.status == 'В процессе' %}
+                                        <span class="status-badge status-in-progress">{{ task.status }}</span>
+                                        {% else %}
+                                        <span class="status-badge status-in-progress">{{ task.status or 'В процессе' }}</span>
+                                        {% endif %}
+                                    </td>
                                 </tr>
                                 {% else %}
                                 <tr>
-                                    <td colspan="4" style="text-align: center; padding: 20px; color: var(--text-medium);">Нет задач на ремонт</td>
+                                    <td colspan="6" style="text-align: center; padding: 20px; color: var(--text-medium);">Нет задач на ремонт</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -2343,38 +2387,52 @@
         <form class="modal-form" id="createTaskForm">
             <div class="modal-section">
                 <h4 class="modal-section-title">Данные задачи</h4>
-                <div class="modal-row modal-row--halves">
-                    <label class="modal-field">
-                        <span data-required="*">Назначить на Отдел</span>
-                        <div class="modal-select-wrapper">
-                            <button type="button" class="modal-select-btn" id="modalTaskDepartmentBtn" data-field="department_id" aria-haspopup="listbox" aria-expanded="false">
-                                <span class="modal-select-label">Выберите отдел</span>
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <polyline points="6 9 12 15 18 9"></polyline>
-                                </svg>
-                            </button>
-                            <select name="department_id" id="taskDepartmentSelect" required style="display: none;">
-                                <option value="">Выберите отдел</option>
-                                {% for dept in department_choices %}
-                                <option value="{{ dept.id }}" data-facility-id="{{ dept.facility_id }}">{{ dept.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </label>
+                <div class="modal-row modal-row--thirds">
                     <label class="modal-field">
                         <span data-required="*">Предприятие</span>
-                        <div class="modal-select-wrapper">
+                        <input type="text" id="taskFacilityDisplay" readonly style="display: none;">
+                        <div class="modal-select-wrapper" id="taskFacilitySelectWrapper">
                             <button type="button" class="modal-select-btn" id="modalTaskFacilityBtn" data-field="facility_id" aria-haspopup="listbox" aria-expanded="false">
                                 <span class="modal-select-label">Выберите предприятие</span>
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                     <polyline points="6 9 12 15 18 9"></polyline>
                                 </svg>
                             </button>
-                            <select name="facility_id" id="taskFacilitySelect" required style="display: none;">
+                            <select name="facility_id" id="taskFacilitySelect" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10; font-size: 16px;">
                                 <option value="">Выберите предприятие</option>
                                 {% for fac in facility_choices %}
                                 <option value="{{ fac.id }}">{{ fac.name }}</option>
                                 {% endfor %}
+                            </select>
+                        </div>
+                    </label>
+                    <label class="modal-field">
+                        <span data-required="*">Отдел</span>
+                        <input type="text" id="taskDepartmentDisplay" readonly style="display: none;">
+                        <div class="modal-select-wrapper" id="taskDepartmentSelectWrapper">
+                            <button type="button" class="modal-select-btn" id="modalTaskDepartmentBtn" data-field="department_id" aria-haspopup="listbox" aria-expanded="false" disabled>
+                                <span class="modal-select-label">Сначала выберите предприятие</span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </button>
+                            <select name="department_id" id="taskDepartmentSelect" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10; font-size: 16px;" disabled>
+                                <option value="">Сначала выберите предприятие</option>
+                            </select>
+                        </div>
+                    </label>
+                    <label class="modal-field">
+                        <span data-required="*">Оборудование</span>
+                        <input type="text" id="taskEquipmentDisplayReadonly" readonly style="display: none;">
+                        <div class="modal-select-wrapper" id="taskEquipmentSelectWrapper">
+                            <button type="button" class="modal-select-btn" id="modalTaskEquipmentBtn" data-field="equipment_assignment_id" aria-haspopup="listbox" aria-expanded="false" disabled>
+                                <span class="modal-select-label">Сначала выберите отдел</span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </button>
+                            <select name="equipment_assignment_id" id="taskEquipmentSelect" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10; font-size: 16px;" disabled>
+                                <option value="">Сначала выберите отдел</option>
                             </select>
                         </div>
                     </label>
@@ -2387,14 +2445,8 @@
                 </div>
                 <div class="modal-row">
                     <label class="modal-field">
-                        <span data-required="*">Сообщение</span>
+                        <span data-required="*">Описание проблемы</span>
                         <textarea name="repair_task_description" id="taskDescription" rows="6" required></textarea>
-                    </label>
-                </div>
-                <div class="modal-row">
-                    <label class="modal-field">
-                        <span data-required="">Дедлайн</span>
-                        <input type="date" name="repair_task_end_date" id="taskEndDate">
                     </label>
                 </div>
             </div>
@@ -2424,45 +2476,35 @@
         </div>
         <div class="modal-body">
             <div class="modal-section">
-                <div class="modal-row">
-                    <label class="modal-field">
-                        <span>Номер задачи</span>
-                        <input type="text" id="taskDetailsId" readonly style="background: #f5f5f5;">
-                    </label>
-                </div>
-                <div class="modal-row">
-                    <label class="modal-field">
-                        <span>Тема задачи</span>
-                        <input type="text" id="taskDetailsHeading" readonly style="background: #f5f5f5;">
-                    </label>
-                </div>
-                <div class="modal-row">
-                    <label class="modal-field">
-                        <span>Сообщение</span>
-                        <textarea id="taskDetailsDescription" rows="6" readonly style="background: #f5f5f5;"></textarea>
-                    </label>
-                </div>
-                <div class="modal-row modal-row--halves">
-                    <label class="modal-field">
-                        <span>Дедлайн</span>
-                        <input type="text" id="taskDetailsEndDate" readonly style="background: #f5f5f5;">
-                    </label>
-                    <label class="modal-field">
-                        <span>Предприятие</span>
-                        <input type="text" id="taskDetailsFacility" readonly style="background: #f5f5f5;">
-                    </label>
-                </div>
-                <div class="modal-row">
-                    <label class="modal-field">
-                        <span>Статус задачи</span>
-                        <div class="status-toggle-wrapper">
-                            <label class="status-toggle">
-                                <input type="checkbox" id="taskStatusToggle">
-                                <span class="status-toggle-slider"></span>
-                                <span class="status-toggle-label" id="taskStatusLabel">В процессе</span>
-                            </label>
-                        </div>
-                    </label>
+                <div class="task-details-list">
+                    <div class="detail-item">
+                        <div class="detail-label">Тема задачи</div>
+                        <div class="detail-value" id="taskDetailsHeading">—</div>
+                    </div>
+                    <div class="detail-item detail-item-full">
+                        <div class="detail-label">Описание проблемы</div>
+                        <div class="detail-value" id="taskDetailsDescription">—</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Предприятие</div>
+                        <div class="detail-value" id="taskDetailsFacility">—</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Отдел</div>
+                        <div class="detail-value" id="taskDetailsDepartment">—</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Оборудование</div>
+                        <div class="detail-value" id="taskDetailsEquipment">—</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Дата создания</div>
+                        <div class="detail-value" id="taskDetailsCreationDate">—</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Дата завершения</div>
+                        <div class="detail-value" id="taskDetailsEndDate">—</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -6830,8 +6872,13 @@
 
             // Создаем контекстное меню
             function createContextMenu() {
-                if (equipmentContextMenu) return equipmentContextMenu;
+                console.log('createContextMenu вызвана');
+                if (equipmentContextMenu) {
+                    console.log('Контекстное меню уже существует, возвращаем его');
+                    return equipmentContextMenu;
+                }
                 
+                console.log('Создание нового контекстного меню');
                 equipmentContextMenu = document.createElement('div');
                 equipmentContextMenu.className = 'context-menu';
                 equipmentContextMenu.innerHTML = `
@@ -6851,6 +6898,15 @@
                         </svg>
                         Переместить
                     </button>
+                    <button type="button" class="context-menu-item" id="equipmentCreateTaskBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="12" y1="18" x2="12" y2="12"></line>
+                            <line x1="9" y1="15" x2="15" y2="15"></line>
+                        </svg>
+                        Создать задачу на ремонт
+                    </button>
                     <button type="button" class="context-menu-item danger" id="equipmentDeleteBtn">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="3 6 5 6 21 6"></polyline>
@@ -6863,7 +6919,15 @@
                 
                 const passportBtn = document.getElementById('equipmentPassportBtn');
                 const moveBtn = document.getElementById('equipmentMoveBtn');
+                const createTaskBtn = document.getElementById('equipmentCreateTaskBtn');
                 const deleteBtn = document.getElementById('equipmentDeleteBtn');
+                
+                console.log('Кнопки контекстного меню:', {
+                    passportBtn: !!passportBtn,
+                    moveBtn: !!moveBtn,
+                    createTaskBtn: !!createTaskBtn,
+                    deleteBtn: !!deleteBtn
+                });
                 
                 if (passportBtn) {
                     passportBtn.addEventListener('click', () => {
@@ -7469,6 +7533,130 @@
                     });
                 }
                 
+                if (createTaskBtn) {
+                    console.log('Привязка обработчика к кнопке createTaskBtn');
+                    createTaskBtn.addEventListener('click', (e) => {
+                        console.log('Клик по кнопке "Создать задачу на ремонт"');
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (selectedEquipmentRow) {
+                            console.log('selectedEquipmentRow найден:', selectedEquipmentRow);
+                            const equipmentAssignmentId = selectedEquipmentRow.dataset.equipmentAssignmentId;
+                            const equipmentId = selectedEquipmentRow.dataset.equipmentId;
+                            const departmentCell = selectedEquipmentRow.querySelector('.department-cell');
+                            const facilityCell = selectedEquipmentRow.querySelector('.facility-cell');
+                            const departmentId = departmentCell?.dataset.departmentId;
+                            const facilityId = departmentCell?.dataset.facilityId;
+                            const facilityName = facilityCell?.querySelector('.role-cell-label')?.textContent.trim() || 
+                                                departmentCell?.dataset.facilityName || 
+                                                selectedEquipmentRow.dataset.facility || '';
+                            
+                            console.log('Данные из строки оборудования:', {
+                                equipmentAssignmentId,
+                                equipmentId,
+                                departmentId,
+                                facilityId,
+                                facilityName
+                            });
+                            
+                            if (equipmentAssignmentId && departmentId) {
+                                // Открываем модальное окно создания задачи
+                                const createTaskModal = document.getElementById('createTaskModal');
+                                if (!createTaskModal) {
+                                    showEquipmentStatus('Модальное окно создания задачи не найдено', 'error');
+                                    hideContextMenu();
+                                    return;
+                                }
+                                
+                                // Сохраняем данные для создания задачи
+                                createTaskModal.dataset.equipmentAssignmentId = equipmentAssignmentId;
+                                createTaskModal.dataset.equipmentId = equipmentId;
+                                createTaskModal.dataset.departmentId = departmentId;
+                                createTaskModal.dataset.facilityId = facilityId || '';
+                                
+                                console.log('Данные сохранены в dataset модального окна:', {
+                                    equipmentAssignmentId: createTaskModal.dataset.equipmentAssignmentId,
+                                    equipmentId: createTaskModal.dataset.equipmentId,
+                                    departmentId: createTaskModal.dataset.departmentId,
+                                    facilityId: createTaskModal.dataset.facilityId
+                                });
+                                
+                                // Сбрасываем форму
+                                const taskForm = document.getElementById('createTaskForm');
+                                if (taskForm) taskForm.reset();
+                                
+                                // Скрываем селекторы и показываем поля только для чтения
+                                const taskDepartmentDisplay = document.getElementById('taskDepartmentDisplay');
+                                const taskDepartmentSelectWrapper = document.getElementById('taskDepartmentSelectWrapper');
+                                const taskFacilityDisplay = document.getElementById('taskFacilityDisplay');
+                                const taskFacilitySelectWrapper = document.getElementById('taskFacilitySelectWrapper');
+                                const taskEquipmentDisplay = document.getElementById('taskEquipmentDisplay');
+                                const taskEquipmentSelectWrapper = document.getElementById('taskEquipmentSelectWrapper');
+                                // Показываем отдел в режиме только для чтения
+                                if (taskDepartmentDisplay && departmentCell) {
+                                    const deptLabel = departmentCell.querySelector('.role-cell-label');
+                                    taskDepartmentDisplay.value = deptLabel ? deptLabel.textContent.trim() : departmentCell.textContent.trim();
+                                    taskDepartmentDisplay.style.display = 'block';
+                                }
+                                
+                                if (taskDepartmentSelectWrapper) {
+                                    taskDepartmentSelectWrapper.style.display = 'none';
+                                }
+                                
+                                // Показываем предприятие в режиме только для чтения
+                                if (taskFacilityDisplay && facilityName) {
+                                    taskFacilityDisplay.value = facilityName;
+                                    taskFacilityDisplay.style.display = 'block';
+                                }
+                                
+                                if (taskFacilitySelectWrapper) {
+                                    taskFacilitySelectWrapper.style.display = 'none';
+                                }
+                                
+                                // Показываем оборудование в режиме только для чтения
+                                const equipmentNameCell = selectedEquipmentRow.querySelector('td:nth-child(2)');
+                                const taskEquipmentDisplayReadonly = document.getElementById('taskEquipmentDisplayReadonly');
+                                if (taskEquipmentDisplayReadonly && equipmentNameCell) {
+                                    taskEquipmentDisplayReadonly.value = equipmentNameCell.textContent.trim();
+                                    taskEquipmentDisplayReadonly.style.display = 'block';
+                                }
+                                
+                                if (taskEquipmentSelectWrapper) {
+                                    taskEquipmentSelectWrapper.style.display = 'none';
+                                }
+                                
+                                // Устанавливаем значения в скрытые поля для отправки формы
+                                const taskDepartmentSelect = document.getElementById('taskDepartmentSelect');
+                                if (taskDepartmentSelect) {
+                                    taskDepartmentSelect.value = departmentId;
+                                }
+                                
+                                const taskEquipmentSelect = document.getElementById('taskEquipmentSelect');
+                                if (taskEquipmentSelect) {
+                                    taskEquipmentSelect.value = equipmentAssignmentId;
+                                }
+                                
+                                // Открываем модальное окно
+                                createTaskModal.classList.add('visible');
+                                document.body.classList.add('modal-open');
+                                
+                                // Устанавливаем aria-hidden после небольшой задержки
+                                setTimeout(() => {
+                                    createTaskModal.setAttribute('aria-hidden', 'false');
+                                    // Устанавливаем фокус на первое редактируемое поле
+                                    const firstInput = taskForm ? taskForm.querySelector('input:not([readonly]), textarea') : null;
+                                    if (firstInput) {
+                                        firstInput.focus();
+                                    }
+                                }, 0);
+                            } else {
+                                showEquipmentStatus('Не удалось определить оборудование или отдел для создания задачи', 'error');
+                            }
+                        }
+                        hideContextMenu();
+                    });
+                }
+                
                 if (deleteBtn) {
                     deleteBtn.addEventListener('click', () => {
                         if (selectedEquipmentRow) {
@@ -7493,11 +7681,13 @@
             }
 
             function showContextMenu(event, row) {
+                console.log('showContextMenu вызвана', { event, row });
                 event.preventDefault();
                 event.stopPropagation();
                 
                 const menu = createContextMenu();
                 selectedEquipmentRow = row;
+                console.log('selectedEquipmentRow установлен:', selectedEquipmentRow);
                 
                 const tableContainer = document.querySelector('.table-container');
                 if (!tableContainer) return;
@@ -7606,9 +7796,12 @@
                 
                 // ПКМ - выделение строки и показ контекстного меню
                 tbody.addEventListener('contextmenu', (e) => {
+                    console.log('Обработчик contextmenu вызван для оборудования');
                     // Проверяем, что клик был по строке, а не по редактируемой ячейке
                     const contextRow = e.target.closest('tr');
+                    console.log('contextRow:', contextRow);
                     if (contextRow && !e.target.closest('.editable-cell[contenteditable="true"]')) {
+                        console.log('Показываем контекстное меню');
                         e.preventDefault();
                         // Убираем выделение с других строк
                         getAllEquipmentRows().forEach(r => r.classList.remove('selected'));
@@ -7616,6 +7809,11 @@
                         contextRow.classList.add('selected');
                         selectedEquipmentRow = contextRow;
                         showContextMenu(e, contextRow);
+                    } else {
+                        console.log('Контекстное меню не показано:', {
+                            hasContextRow: !!contextRow,
+                            isEditableCell: !!e.target.closest('.editable-cell[contenteditable="true"]')
+                        });
                     }
                 });
             }
@@ -14012,7 +14210,6 @@
             const createTaskModalCancel = document.getElementById('createTaskModalCancel');
             const createTaskForm = document.getElementById('createTaskForm');
             const createTaskFormError = document.getElementById('createTaskFormError');
-            const taskRows = document.querySelectorAll('.task-row');
             const taskDetailsModal = document.getElementById('taskDetailsModal');
             const taskDetailsModalClose = document.getElementById('taskDetailsModalClose');
             const taskDetailsModalCancel = document.getElementById('taskDetailsModalCancel');
@@ -14024,12 +14221,103 @@
             if (createTaskBtn) {
                 createTaskBtn.addEventListener('click', () => {
                     if (createTaskModal) {
-                        createTaskModal.classList.add('visible');
-                        createTaskModal.setAttribute('aria-hidden', 'false');
-                        document.body.classList.add('modal-open');
+                        // Очищаем dataset при открытии из кнопки (не из контекстного меню)
+                        delete createTaskModal.dataset.equipmentAssignmentId;
+                        delete createTaskModal.dataset.equipmentId;
+                        delete createTaskModal.dataset.departmentId;
+                        delete createTaskModal.dataset.facilityId;
+                        
+                        // Показываем селекторы и скрываем поля только для чтения
+                        const taskDepartmentDisplay = document.getElementById('taskDepartmentDisplay');
+                        const taskDepartmentSelectWrapper = document.getElementById('taskDepartmentSelectWrapper');
+                        const taskFacilitySelectWrapper = document.getElementById('taskFacilitySelectWrapper');
+                        const taskFacilityDisplay = document.getElementById('taskFacilityDisplay');
+                        const taskEquipmentDisplay = document.getElementById('taskEquipmentDisplay');
+                        const taskEquipmentSelectWrapper = document.getElementById('taskEquipmentSelectWrapper');
+                        if (taskDepartmentDisplay) {
+                            taskDepartmentDisplay.style.display = 'none';
+                        }
+                        
+                        if (taskDepartmentSelectWrapper) {
+                            taskDepartmentSelectWrapper.style.display = 'block';
+                        }
+                        
+                        if (taskFacilityDisplay) {
+                            taskFacilityDisplay.style.display = 'none';
+                        }
+                        
+                        if (taskFacilitySelectWrapper) {
+                            taskFacilitySelectWrapper.style.display = 'block';
+                        }
+                        
+                        if (taskEquipmentDisplay) {
+                            taskEquipmentDisplay.style.display = 'none';
+                        }
+                        
+                        if (taskEquipmentSelectWrapper) {
+                            taskEquipmentSelectWrapper.style.display = 'block';
+                        }
+                        
+                        if (taskEquipmentDisplayReadonly) {
+                            taskEquipmentDisplayReadonly.style.display = 'none';
+                        }
+                        
+                        // Сбрасываем форму и каскадные селекторы
                         if (createTaskForm) {
                             createTaskForm.reset();
+                            
+                            // Сбрасываем каскадные селекторы
+                            const taskFacilitySelect = document.getElementById('taskFacilitySelect');
+                            const taskDepartmentSelect = document.getElementById('taskDepartmentSelect');
+                            const taskEquipmentSelect = document.getElementById('taskEquipmentSelect');
+                            
+                            if (taskFacilitySelect) {
+                                taskFacilitySelect.value = '';
+                                const modalTaskFacilityBtn = document.getElementById('modalTaskFacilityBtn');
+                                if (modalTaskFacilityBtn) {
+                                    const label = modalTaskFacilityBtn.querySelector('.modal-select-label');
+                                    if (label) label.textContent = 'Выберите предприятие';
+                                }
+                            }
+                            
+                            if (taskDepartmentSelect) {
+                                taskDepartmentSelect.value = '';
+                                taskDepartmentSelect.innerHTML = '<option value="">Сначала выберите предприятие</option>';
+                                taskDepartmentSelect.disabled = true;
+                                const modalTaskDepartmentBtn = document.getElementById('modalTaskDepartmentBtn');
+                                if (modalTaskDepartmentBtn) {
+                                    modalTaskDepartmentBtn.disabled = true;
+                                    const label = modalTaskDepartmentBtn.querySelector('.modal-select-label');
+                                    if (label) label.textContent = 'Сначала выберите предприятие';
+                                }
+                            }
+                            
+                            if (taskEquipmentSelect) {
+                                taskEquipmentSelect.value = '';
+                                taskEquipmentSelect.innerHTML = '<option value="">Сначала выберите отдел</option>';
+                                taskEquipmentSelect.disabled = true;
+                                const modalTaskEquipmentBtn = document.getElementById('modalTaskEquipmentBtn');
+                                if (modalTaskEquipmentBtn) {
+                                    modalTaskEquipmentBtn.disabled = true;
+                                    const label = modalTaskEquipmentBtn.querySelector('.modal-select-label');
+                                    if (label) label.textContent = 'Сначала выберите отдел';
+                                }
+                            }
                         }
+                        
+                        createTaskModal.classList.add('visible');
+                        document.body.classList.add('modal-open');
+                        
+                        // Устанавливаем aria-hidden после небольшой задержки
+                        setTimeout(() => {
+                            createTaskModal.setAttribute('aria-hidden', 'false');
+                            // Устанавливаем фокус на первое редактируемое поле
+                            const firstInput = createTaskForm ? createTaskForm.querySelector('input:not([readonly]), textarea, .modal-select-btn') : null;
+                            if (firstInput) {
+                                firstInput.focus();
+                            }
+                        }, 0);
+                        
                         if (createTaskFormError) {
                             createTaskFormError.textContent = '';
                         }
@@ -14037,95 +14325,461 @@
                 });
             }
 
-            // Закрытие модального окна создания задачи
+            // Функция закрытия модального окна создания задачи
+            function closeCreateTaskModal() {
+                if (!createTaskModal) return;
+                
+                // Очищаем dataset при закрытии
+                delete createTaskModal.dataset.equipmentAssignmentId;
+                delete createTaskModal.dataset.equipmentId;
+                delete createTaskModal.dataset.departmentId;
+                delete createTaskModal.dataset.facilityId;
+                
+                // Восстанавливаем селекторы
+                const taskDepartmentDisplay = document.getElementById('taskDepartmentDisplay');
+                const taskDepartmentSelectWrapper = document.getElementById('taskDepartmentSelectWrapper');
+                const taskFacilityDisplay = document.getElementById('taskFacilityDisplay');
+                const taskFacilitySelectWrapper = document.getElementById('taskFacilitySelectWrapper');
+                if (taskDepartmentDisplay) {
+                    taskDepartmentDisplay.style.display = 'none';
+                }
+                
+                if (taskDepartmentSelectWrapper) {
+                    taskDepartmentSelectWrapper.style.display = 'block';
+                }
+                
+                if (taskFacilityDisplay) {
+                    taskFacilityDisplay.style.display = 'none';
+                }
+                
+                if (taskFacilitySelectWrapper) {
+                    taskFacilitySelectWrapper.style.display = 'block';
+                }
+                
+                if (taskEquipmentDisplayReadonly) {
+                    taskEquipmentDisplayReadonly.style.display = 'none';
+                }
+                
+                const taskEquipmentDisplay = document.getElementById('taskEquipmentDisplay');
+                const taskEquipmentSelectWrapper = document.getElementById('taskEquipmentSelectWrapper');
+                
+                if (taskEquipmentDisplay) {
+                    taskEquipmentDisplay.style.display = 'none';
+                }
+                
+                if (taskEquipmentSelectWrapper) {
+                    taskEquipmentSelectWrapper.style.display = 'block';
+                }
+                
+                // Сбрасываем каскадные селекторы
+                const taskFacilitySelect = document.getElementById('taskFacilitySelect');
+                const taskDepartmentSelect = document.getElementById('taskDepartmentSelect');
+                const taskEquipmentSelect = document.getElementById('taskEquipmentSelect');
+                
+                if (taskFacilitySelect) {
+                    taskFacilitySelect.value = '';
+                    const modalTaskFacilityBtn = document.getElementById('modalTaskFacilityBtn');
+                    if (modalTaskFacilityBtn) {
+                        const label = modalTaskFacilityBtn.querySelector('.modal-select-label');
+                        if (label) label.textContent = 'Выберите предприятие';
+                    }
+                }
+                
+                if (taskDepartmentSelect) {
+                    taskDepartmentSelect.value = '';
+                    taskDepartmentSelect.innerHTML = '<option value="">Сначала выберите предприятие</option>';
+                    taskDepartmentSelect.disabled = true;
+                    const modalTaskDepartmentBtn = document.getElementById('modalTaskDepartmentBtn');
+                    if (modalTaskDepartmentBtn) {
+                        modalTaskDepartmentBtn.disabled = true;
+                        const label = modalTaskDepartmentBtn.querySelector('.modal-select-label');
+                        if (label) label.textContent = 'Сначала выберите предприятие';
+                    }
+                }
+                
+                if (taskEquipmentSelect) {
+                    taskEquipmentSelect.value = '';
+                    taskEquipmentSelect.innerHTML = '<option value="">Сначала выберите отдел</option>';
+                    taskEquipmentSelect.disabled = true;
+                    const modalTaskEquipmentBtn = document.getElementById('modalTaskEquipmentBtn');
+                    if (modalTaskEquipmentBtn) {
+                        modalTaskEquipmentBtn.disabled = true;
+                        const label = modalTaskEquipmentBtn.querySelector('.modal-select-label');
+                        if (label) label.textContent = 'Сначала выберите отдел';
+                    }
+                }
+                
+                // Убираем фокус с активного элемента перед установкой aria-hidden
+                const activeElement = document.activeElement;
+                if (activeElement && createTaskModal.contains(activeElement)) {
+                    activeElement.blur();
+                }
+                
+                createTaskModal.classList.remove('visible');
+                document.body.classList.remove('modal-open');
+                
+                // Устанавливаем aria-hidden после небольшой задержки
+                setTimeout(() => {
+                    createTaskModal.setAttribute('aria-hidden', 'true');
+                }, 0);
+            }
+
+            // Закрытие модального окна создания задачи по крестику и кнопке "Отмена"
             [createTaskModalClose, createTaskModalCancel].forEach(btn => {
                 if (btn) {
-                    btn.addEventListener('click', () => {
-                        if (createTaskModal) {
-                            createTaskModal.classList.remove('visible');
-                            createTaskModal.setAttribute('aria-hidden', 'true');
-                            document.body.classList.remove('modal-open');
-                        }
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        closeCreateTaskModal();
                     });
                 }
             });
 
-            // Синхронизация отдела и предприятия
-            const taskDepartmentSelect = document.getElementById('taskDepartmentSelect');
-            const taskFacilitySelect = document.getElementById('taskFacilitySelect');
+            // Закрытие модального окна создания задачи при клике вне его
+            if (createTaskModal) {
+                createTaskModal.addEventListener('click', (e) => {
+                    if (e.target === createTaskModal) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        closeCreateTaskModal();
+                    }
+                });
+            }
+
+
+            // Кастомные dropdown'ы для модального окна создания задачи
+            let taskModalDropdown = document.getElementById('modalDropdown');
+            if (!taskModalDropdown) {
+                taskModalDropdown = document.createElement('div');
+                taskModalDropdown.className = 'role-dropdown';
+                taskModalDropdown.id = 'modalDropdown';
+                document.body.appendChild(taskModalDropdown);
+            }
             
-            if (taskDepartmentSelect && taskFacilitySelect) {
-                taskDepartmentSelect.addEventListener('change', () => {
-                    const selectedOption = taskDepartmentSelect.options[taskDepartmentSelect.selectedIndex];
-                    const facilityId = selectedOption.dataset.facilityId;
+            let currentTaskModalSelect = null;
+            let taskDropdownJustOpened = false;
+            let taskModalSelectData = {
+                facility: {},
+                department: {},
+                equipment: {}
+            };
+            
+            // Инициализация данных для предприятий
+            const facilityChoices = {{ facility_choices | tojson }};
+            facilityChoices.forEach(fac => {
+                taskModalSelectData.facility[fac.id] = fac.name;
+            });
+            
+            // Функция заполнения dropdown для задач
+            function populateTaskModalDropdown(field, options) {
+                if (!taskModalDropdown || !options || Object.keys(options).length === 0) {
+                    return;
+                }
+                
+                taskModalDropdown.innerHTML = '';
+                Object.entries(options).forEach(([value, label]) => {
+                    const option = document.createElement('button');
+                    option.type = 'button';
+                    option.className = 'role-dropdown-option';
+                    option.dataset.value = value;
+                    option.textContent = label || value || '—';
+                    option.addEventListener('click', () => {
+                        if (!currentTaskModalSelect) return;
+                        const btn = currentTaskModalSelect;
+                        const select = btn.parentElement.querySelector('select');
+                        const labelSpan = btn.querySelector('.modal-select-label');
+                        
+                        if (select && labelSpan) {
+                            select.value = value;
+                            labelSpan.textContent = label;
+                            btn.setAttribute('aria-expanded', 'false');
+                            
+                            // Триггерим change событие
+                            select.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                        closeTaskModalDropdown();
+                    });
+                    taskModalDropdown.appendChild(option);
+                });
+            }
+            
+            // Функция позиционирования dropdown для задач
+            function positionTaskModalDropdown(btn) {
+                if (!btn || !taskModalDropdown) return;
+                const rect = btn.getBoundingClientRect();
+                const dropdownHeight = taskModalDropdown.offsetHeight || 200;
+                const viewportHeight = window.innerHeight;
+                const spaceBelow = viewportHeight - rect.bottom;
+                const spaceAbove = rect.top;
+                const openUpward = spaceBelow < dropdownHeight && spaceAbove > spaceBelow;
+                
+                taskModalDropdown.style.position = 'fixed';
+                if (openUpward) {
+                    taskModalDropdown.style.bottom = `${viewportHeight - rect.top + 6}px`;
+                    taskModalDropdown.style.top = 'auto';
+                } else {
+                    taskModalDropdown.style.top = `${rect.bottom + 6}px`;
+                    taskModalDropdown.style.bottom = 'auto';
+                }
+                taskModalDropdown.style.left = `${rect.left}px`;
+                taskModalDropdown.style.width = `${rect.width}px`;
+                taskModalDropdown.style.minWidth = `${rect.width}px`;
+                taskModalDropdown.style.maxWidth = `${rect.width}px`;
+            }
+            
+            // Функция открытия dropdown для задач
+            function openTaskModalDropdown(btn) {
+                if (!btn || btn.disabled) return;
+                const field = btn.dataset.field;
+                if (!field) return;
+                
+                let options = {};
+                
+                if (field === 'facility_id') {
+                    options = taskModalSelectData.facility;
+                } else if (field === 'department_id') {
+                    const facilityId = taskFacilitySelect?.value;
                     if (facilityId) {
-                        taskFacilitySelect.value = facilityId;
-                        // Обновляем кастомную кнопку предприятия
-                        const modalTaskFacilityBtn = document.getElementById('modalTaskFacilityBtn');
-                        if (modalTaskFacilityBtn) {
-                            const label = modalTaskFacilityBtn.querySelector('.modal-select-label');
-                            if (label) {
-                                label.textContent = taskFacilitySelect.options[taskFacilitySelect.selectedIndex].text;
+                        const departments = {{ department_choices | tojson }};
+                        const facilityDepartments = departments.filter(d => d.facility_id == facilityId);
+                        facilityDepartments.forEach(dept => {
+                            options[dept.id] = dept.name;
+                        });
+                    }
+                } else if (field === 'equipment_assignment_id') {
+                    // Оборудование загружается динамически через API
+                    return;
+                }
+                
+                if (Object.keys(options).length === 0) {
+                    return;
+                }
+                
+                currentTaskModalSelect = btn;
+                populateTaskModalDropdown(field, options);
+                
+                requestAnimationFrame(() => {
+                    positionTaskModalDropdown(btn);
+                    taskModalDropdown.classList.add('visible');
+                    btn.setAttribute('aria-expanded', 'true');
+                    // Устанавливаем флаг, чтобы не закрыть dropdown сразу после открытия
+                    taskDropdownJustOpened = true;
+                    setTimeout(() => {
+                        taskDropdownJustOpened = false;
+                    }, 100);
+                });
+            }
+            
+            // Функция закрытия dropdown для задач
+            function closeTaskModalDropdown() {
+                if (!taskModalDropdown) return;
+                taskModalDropdown.classList.remove('visible');
+                if (currentTaskModalSelect) {
+                    currentTaskModalSelect.setAttribute('aria-expanded', 'false');
+                    currentTaskModalSelect = null;
+                }
+                taskDropdownJustOpened = false;
+            }
+            
+            // Каскадная логика выбора: Предприятие -> Отдел -> Оборудование
+            const taskFacilitySelect = document.getElementById('taskFacilitySelect');
+            const taskDepartmentSelect = document.getElementById('taskDepartmentSelect');
+            const taskEquipmentSelect = document.getElementById('taskEquipmentSelect');
+            const modalTaskFacilityBtn = document.getElementById('modalTaskFacilityBtn');
+            const modalTaskDepartmentBtn = document.getElementById('modalTaskDepartmentBtn');
+            const modalTaskEquipmentBtn = document.getElementById('modalTaskEquipmentBtn');
+            
+            // Обработчики клика для кастомных кнопок выпадающих списков задач
+            [modalTaskFacilityBtn, modalTaskDepartmentBtn].forEach(btn => {
+                if (btn) {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (btn.disabled) return;
+                        
+                        if (currentTaskModalSelect === btn && taskModalDropdown.classList.contains('visible')) {
+                            closeTaskModalDropdown();
+                        } else {
+                            closeTaskModalDropdown();
+                            // Используем setTimeout, чтобы обработчик клика на document не сработал раньше
+                            setTimeout(() => {
+                                openTaskModalDropdown(btn);
+                            }, 0);
+                        }
+                    });
+                }
+            });
+            
+            // Обработчик для оборудования (использует нативный select, так как данные загружаются через API)
+            if (modalTaskEquipmentBtn) {
+                modalTaskEquipmentBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (modalTaskEquipmentBtn.disabled) return;
+                    
+                    const select = modalTaskEquipmentBtn.parentElement.querySelector('select');
+                    if (!select || select.disabled) return;
+                    
+                    setTimeout(() => {
+                        select.focus();
+                        select.click();
+                    }, 10);
+                });
+            }
+            
+            // Закрытие dropdown при клике вне его
+            document.addEventListener('click', (e) => {
+                // Игнорируем клики, если dropdown только что открылся
+                if (taskDropdownJustOpened) {
+                    return;
+                }
+                
+                if (taskModalDropdown && taskModalDropdown.classList.contains('visible')) {
+                    if (!taskModalDropdown.contains(e.target) && 
+                        !e.target.closest('.modal-select-btn[data-field="facility_id"]') &&
+                        !e.target.closest('.modal-select-btn[data-field="department_id"]')) {
+                        closeTaskModalDropdown();
+                    }
+                }
+            }, true); // Используем capture phase
+            
+            // Загружаем отделы при выборе предприятия
+            if (taskFacilitySelect) {
+                taskFacilitySelect.addEventListener('change', async () => {
+                    const facilityId = taskFacilitySelect.value;
+                    
+                    // Обновляем данные для dropdown отделов
+                    const departments = {{ department_choices | tojson }};
+                    const facilityDepartments = departments.filter(d => d.facility_id == facilityId);
+                    taskModalSelectData.department = {};
+                    facilityDepartments.forEach(dept => {
+                        taskModalSelectData.department[dept.id] = dept.name;
+                    });
+                    
+                    // Сбрасываем отдел и оборудование
+                    taskDepartmentSelect.value = '';
+                    taskDepartmentSelect.innerHTML = '<option value="">Сначала выберите предприятие</option>';
+                    taskDepartmentSelect.disabled = true;
+                    if (modalTaskDepartmentBtn) {
+                        modalTaskDepartmentBtn.disabled = true;
+                        const label = modalTaskDepartmentBtn.querySelector('.modal-select-label');
+                        if (label) label.textContent = 'Сначала выберите предприятие';
+                    }
+                    
+                    taskEquipmentSelect.value = '';
+                    taskEquipmentSelect.innerHTML = '<option value="">Сначала выберите отдел</option>';
+                    taskEquipmentSelect.disabled = true;
+                    if (modalTaskEquipmentBtn) {
+                        modalTaskEquipmentBtn.disabled = true;
+                        const label = modalTaskEquipmentBtn.querySelector('.modal-select-label');
+                        if (label) label.textContent = 'Сначала выберите отдел';
+                    }
+                    
+                    if (!facilityId) return;
+                    
+                    // Обновляем select для формы
+                    taskDepartmentSelect.innerHTML = '<option value="">Выберите отдел</option>';
+                    facilityDepartments.forEach(dept => {
+                        const option = document.createElement('option');
+                        option.value = dept.id;
+                        option.textContent = dept.name;
+                        option.dataset.facilityId = dept.facility_id;
+                        taskDepartmentSelect.appendChild(option);
+                    });
+                    
+                    taskDepartmentSelect.disabled = false;
+                    if (modalTaskDepartmentBtn) {
+                        modalTaskDepartmentBtn.disabled = false;
+                    }
+                });
+            }
+            
+            // Загружаем оборудование при выборе отдела
+            if (taskDepartmentSelect) {
+                taskDepartmentSelect.addEventListener('change', async () => {
+                    const departmentId = taskDepartmentSelect.value;
+                    
+                    // Сбрасываем оборудование
+                    taskEquipmentSelect.value = '';
+                    taskEquipmentSelect.innerHTML = '<option value="">Сначала выберите отдел</option>';
+                    taskEquipmentSelect.disabled = true;
+                    if (modalTaskEquipmentBtn) {
+                        modalTaskEquipmentBtn.disabled = true;
+                        const label = modalTaskEquipmentBtn.querySelector('.modal-select-label');
+                        if (label) label.textContent = 'Сначала выберите отдел';
+                    }
+                    
+                    if (!departmentId) return;
+                    
+                    // Загружаем оборудование отдела
+                    try {
+                        const response = await fetch(`{{ url_for("admin_tasks.get_equipment_by_department", department_id=0) }}`.replace('0', departmentId));
+                        const result = await response.json();
+                        
+                        if (result.success && result.equipment) {
+                            taskEquipmentSelect.innerHTML = '<option value="">Выберите оборудование</option>';
+                            result.equipment.forEach(eq => {
+                                const option = document.createElement('option');
+                                option.value = eq.equipment_assignment_id;
+                                option.textContent = `${eq.equipment_name}${eq.equipment_type ? ' (' + eq.equipment_type + ')' : ''}${eq.location ? ' - ' + eq.location : ''}`;
+                                taskEquipmentSelect.appendChild(option);
+                            });
+                            
+                            taskEquipmentSelect.disabled = false;
+                            taskEquipmentSelect.style.pointerEvents = 'auto';
+                            taskEquipmentSelect.style.cursor = 'pointer';
+                            if (modalTaskEquipmentBtn) {
+                                modalTaskEquipmentBtn.disabled = false;
                             }
                         }
+                    } catch (error) {
+                        console.error('Ошибка при загрузке оборудования:', error);
                     }
+                });
+            }
+            
+            
+            // Обновление кастомных кнопок при изменении select
+            if (taskFacilitySelect && modalTaskFacilityBtn) {
+                taskFacilitySelect.addEventListener('change', () => {
+                    const selectedOption = taskFacilitySelect.options[taskFacilitySelect.selectedIndex];
+                    const label = modalTaskFacilityBtn.querySelector('.modal-select-label');
+                    if (label) {
+                        label.textContent = selectedOption ? selectedOption.textContent : 'Выберите предприятие';
+                    }
+                    modalTaskFacilityBtn.setAttribute('aria-expanded', 'false');
+                });
+            }
+            
+            if (taskDepartmentSelect && modalTaskDepartmentBtn) {
+                taskDepartmentSelect.addEventListener('change', () => {
+                    const selectedOption = taskDepartmentSelect.options[taskDepartmentSelect.selectedIndex];
+                    const label = modalTaskDepartmentBtn.querySelector('.modal-select-label');
+                    if (label) {
+                        label.textContent = selectedOption ? selectedOption.textContent : 'Сначала выберите предприятие';
+                    }
+                    modalTaskDepartmentBtn.setAttribute('aria-expanded', 'false');
+                });
+            }
+            
+            if (taskEquipmentSelect && modalTaskEquipmentBtn) {
+                taskEquipmentSelect.addEventListener('change', () => {
+                    const selectedOption = taskEquipmentSelect.options[taskEquipmentSelect.selectedIndex];
+                    const label = modalTaskEquipmentBtn.querySelector('.modal-select-label');
+                    if (label) {
+                        label.textContent = selectedOption ? selectedOption.textContent : 'Сначала выберите отдел';
+                    }
+                    modalTaskEquipmentBtn.setAttribute('aria-expanded', 'false');
                 });
             }
 
             // Обработка отправки формы создания задачи
-            if (createTaskForm) {
-                createTaskForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    if (createTaskFormError) {
-                        createTaskFormError.textContent = '';
-                    }
-
-                    const formData = new FormData(createTaskForm);
-                    const departmentId = formData.get('department_id');
-                    
-                    if (!departmentId) {
-                        if (createTaskFormError) {
-                            createTaskFormError.textContent = 'Выберите отдел';
-                        }
-                        return;
-                    }
-                    
-                    const data = {
-                        department_id: departmentId,
-                        heading: formData.get('heading'),
-                        repair_task_description: formData.get('repair_task_description'),
-                        repair_task_end_date: formData.get('repair_task_end_date') || null
-                    };
-
-                    try {
-                        const response = await fetch('{{ url_for("admin_tasks.create_task") }}', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(data)
-                        });
-
-                        const result = await response.json();
-
-                        if (result.success) {
-                            location.reload();
-                        } else {
-                            if (createTaskFormError) {
-                                createTaskFormError.textContent = result.message || 'Ошибка при создании задачи';
-                            }
-                        }
-                    } catch (error) {
-                        console.error('Ошибка:', error);
-                        if (createTaskFormError) {
-                            createTaskFormError.textContent = 'Ошибка при создании задачи';
-                        }
-                    }
-                });
-            }
+            // (перенесено в глобальный блок в конце страницы для работы на всех страницах)
 
             // Двойной клик на задачу для просмотра деталей
-            taskRows.forEach(row => {
+            const tasksTableForEvents = document.getElementById('tasksTable');
+            const taskRowsForEvents = tasksTableForEvents ? Array.from(tasksTableForEvents.querySelectorAll('tbody tr.task-row')) : [];
+            taskRowsForEvents.forEach(row => {
                 row.addEventListener('dblclick', async () => {
                     const taskId = row.dataset.taskId;
                     if (!taskId) return;
@@ -14138,28 +14792,35 @@
                             const task = result.task;
                             currentTaskId = task.id;
 
-                            // Заполняем поля модального окна
-                            document.getElementById('taskDetailsId').value = task.id || '';
-                            document.getElementById('taskDetailsHeading').value = task.heading || '';
-                            document.getElementById('taskDetailsDescription').value = task.description || '';
-                            document.getElementById('taskDetailsEndDate').value = task.end_date || '—';
-                            document.getElementById('taskDetailsFacility').value = task.facility_name || '—';
+                            console.log('Загружена задача для просмотра:', task);
 
-                            // Устанавливаем статус
-                            const isCompleted = task.status === 'Завершено';
-                            if (taskStatusToggle) {
-                                taskStatusToggle.checked = isCompleted;
-                            }
-                            if (taskStatusLabel) {
-                                taskStatusLabel.textContent = isCompleted ? 'Завершено' : 'В процессе';
-                            }
+                            // Заполняем данные модального окна (текст вместо полей ввода)
+                            const taskDetailsHeading = document.getElementById('taskDetailsHeading');
+                            const taskDetailsDescription = document.getElementById('taskDetailsDescription');
+                            const taskDetailsFacility = document.getElementById('taskDetailsFacility');
+                            const taskDetailsDepartment = document.getElementById('taskDetailsDepartment');
+                            const taskDetailsEquipment = document.getElementById('taskDetailsEquipment');
+                            const taskDetailsCreationDate = document.getElementById('taskDetailsCreationDate');
+                            const taskDetailsEndDate = document.getElementById('taskDetailsEndDate');
+
+                            if (taskDetailsHeading) taskDetailsHeading.textContent = task.heading || '—';
+                            if (taskDetailsDescription) taskDetailsDescription.textContent = task.description || '—';
+                            if (taskDetailsFacility) taskDetailsFacility.textContent = task.facility_name || '—';
+                            if (taskDetailsDepartment) taskDetailsDepartment.textContent = task.department_name || '—';
+                            if (taskDetailsEquipment) taskDetailsEquipment.textContent = task.equipment_name || '—';
+                            if (taskDetailsCreationDate) taskDetailsCreationDate.textContent = task.creation_date || '—';
+                            if (taskDetailsEndDate) taskDetailsEndDate.textContent = task.end_date || '—';
 
                             // Открываем модальное окно
                             if (taskDetailsModal) {
                                 taskDetailsModal.classList.add('visible');
-                                taskDetailsModal.setAttribute('aria-hidden', 'false');
                                 document.body.classList.add('modal-open');
+                                setTimeout(() => {
+                                    taskDetailsModal.setAttribute('aria-hidden', 'false');
+                                }, 0);
                             }
+                        } else {
+                            console.error('Ошибка загрузки задачи:', result);
                         }
                     } catch (error) {
                         console.error('Ошибка при загрузке задачи:', error);
@@ -14229,24 +14890,694 @@
                 });
             }
 
-            // Закрытие модальных окон при клике вне их
-            [createTaskModal, taskDetailsModal].forEach(modal => {
-                if (modal) {
-                    modal.addEventListener('click', (e) => {
-                        if (e.target === modal) {
-                            modal.classList.remove('visible');
-                            modal.setAttribute('aria-hidden', 'true');
-                            document.body.classList.remove('modal-open');
-                            if (modal === taskDetailsModal) {
-                                currentTaskId = null;
+            // Функция закрытия модального окна создания задачи
+            function closeCreateTaskModal() {
+                if (!createTaskModal) return;
+                
+                // Очищаем dataset при закрытии
+                delete createTaskModal.dataset.equipmentAssignmentId;
+                delete createTaskModal.dataset.equipmentId;
+                delete createTaskModal.dataset.departmentId;
+                delete createTaskModal.dataset.facilityId;
+                
+                // Восстанавливаем селекторы
+                const taskDepartmentDisplay = document.getElementById('taskDepartmentDisplay');
+                const taskDepartmentSelectWrapper = document.getElementById('taskDepartmentSelectWrapper');
+                const taskFacilityDisplay = document.getElementById('taskFacilityDisplay');
+                const taskFacilitySelectWrapper = document.getElementById('taskFacilitySelectWrapper');
+                if (taskDepartmentDisplay) {
+                    taskDepartmentDisplay.style.display = 'none';
+                }
+                
+                if (taskDepartmentSelectWrapper) {
+                    taskDepartmentSelectWrapper.style.display = 'block';
+                }
+                
+                if (taskFacilityDisplay) {
+                    taskFacilityDisplay.style.display = 'none';
+                }
+                
+                if (taskFacilitySelectWrapper) {
+                    taskFacilitySelectWrapper.style.display = 'block';
+                }
+                
+                if (taskEquipmentDisplayReadonly) {
+                    taskEquipmentDisplayReadonly.style.display = 'none';
+                }
+                
+                const taskEquipmentDisplay = document.getElementById('taskEquipmentDisplay');
+                const taskEquipmentSelectWrapper = document.getElementById('taskEquipmentSelectWrapper');
+                
+                if (taskEquipmentDisplay) {
+                    taskEquipmentDisplay.style.display = 'none';
+                }
+                
+                if (taskEquipmentSelectWrapper) {
+                    taskEquipmentSelectWrapper.style.display = 'block';
+                }
+                
+                // Сбрасываем каскадные селекторы
+                const taskFacilitySelect = document.getElementById('taskFacilitySelect');
+                const taskDepartmentSelect = document.getElementById('taskDepartmentSelect');
+                const taskEquipmentSelect = document.getElementById('taskEquipmentSelect');
+                
+                if (taskFacilitySelect) {
+                    taskFacilitySelect.value = '';
+                    const modalTaskFacilityBtn = document.getElementById('modalTaskFacilityBtn');
+                    if (modalTaskFacilityBtn) {
+                        const label = modalTaskFacilityBtn.querySelector('.modal-select-label');
+                        if (label) label.textContent = 'Выберите предприятие';
+                    }
+                }
+                
+                if (taskDepartmentSelect) {
+                    taskDepartmentSelect.value = '';
+                    taskDepartmentSelect.innerHTML = '<option value="">Сначала выберите предприятие</option>';
+                    taskDepartmentSelect.disabled = true;
+                    const modalTaskDepartmentBtn = document.getElementById('modalTaskDepartmentBtn');
+                    if (modalTaskDepartmentBtn) {
+                        modalTaskDepartmentBtn.disabled = true;
+                        const label = modalTaskDepartmentBtn.querySelector('.modal-select-label');
+                        if (label) label.textContent = 'Сначала выберите предприятие';
+                    }
+                }
+                
+                if (taskEquipmentSelect) {
+                    taskEquipmentSelect.value = '';
+                    taskEquipmentSelect.innerHTML = '<option value="">Сначала выберите отдел</option>';
+                    taskEquipmentSelect.disabled = true;
+                    const modalTaskEquipmentBtn = document.getElementById('modalTaskEquipmentBtn');
+                    if (modalTaskEquipmentBtn) {
+                        modalTaskEquipmentBtn.disabled = true;
+                        const label = modalTaskEquipmentBtn.querySelector('.modal-select-label');
+                        if (label) label.textContent = 'Сначала выберите отдел';
+                    }
+                }
+                
+                // Убираем фокус с активного элемента перед установкой aria-hidden
+                const activeElement = document.activeElement;
+                if (activeElement && createTaskModal.contains(activeElement)) {
+                    activeElement.blur();
+                }
+                
+                createTaskModal.classList.remove('visible');
+                document.body.classList.remove('modal-open');
+                
+                // Устанавливаем aria-hidden после небольшой задержки
+                setTimeout(() => {
+                    createTaskModal.setAttribute('aria-hidden', 'true');
+                }, 0);
+            }
+
+            // Обработчики закрытия модального окна создания задачи 
+            // перенесены в общий скрипт в конце страницы для работы на всех секциях
+
+            // Закрытие модального окна деталей задачи при клике вне его
+            if (taskDetailsModal) {
+                taskDetailsModal.addEventListener('click', (e) => {
+                    if (e.target === taskDetailsModal) {
+                        // Убираем фокус с активного элемента перед установкой aria-hidden
+                        const activeElement = document.activeElement;
+                        if (activeElement && taskDetailsModal.contains(activeElement)) {
+                            activeElement.blur();
+                        }
+                        
+                        taskDetailsModal.classList.remove('visible');
+                        document.body.classList.remove('modal-open');
+                        
+                        // Устанавливаем aria-hidden после небольшой задержки
+                        setTimeout(() => {
+                            taskDetailsModal.setAttribute('aria-hidden', 'true');
+                        }, 0);
+                        
+                        currentTaskId = null;
+                    }
+                });
+            }
+
+            // Фильтрация таблицы задач
+            const tasksSearch = document.getElementById('tasksSearch');
+            const tasksStatusFilter = document.getElementById('tasksStatusFilter');
+            const tasksFilterBtn = document.getElementById('tasksFilterBtn');
+            const tasksFilterDropdown = document.getElementById('tasksFilterDropdown');
+            const tasksResetFilters = document.getElementById('tasksResetFilters');
+            const tasksTable = document.getElementById('tasksTable');
+            const taskRows = tasksTable ? Array.from(tasksTable.querySelectorAll('tbody tr.task-row')) : [];
+
+            function applyTasksFilters() {
+                const searchValue = tasksSearch ? tasksSearch.value.toLowerCase().trim() : '';
+                const statusValue = tasksStatusFilter ? tasksStatusFilter.value : '';
+
+                taskRows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    const rowStatus = row.dataset.status || '';
+
+                    const matchesSearch = searchValue === '' || text.includes(searchValue);
+                    const matchesStatus = statusValue === '' || rowStatus === statusValue;
+
+                    row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
+                });
+
+                // Обновляем нумерацию
+                let visibleIndex = 0;
+                taskRows.forEach(row => {
+                    if (row.style.display !== 'none') {
+                        const numberCell = row.querySelector('.number-column');
+                        if (numberCell) {
+                            numberCell.textContent = visibleIndex + 1;
+                        }
+                        visibleIndex++;
+                    }
+                });
+            }
+
+            if (tasksSearch) {
+                tasksSearch.addEventListener('input', applyTasksFilters);
+            }
+
+            if (tasksStatusFilter) {
+                tasksStatusFilter.addEventListener('change', () => {
+                    applyTasksFilters();
+                    // Обновляем URL для сохранения фильтра
+                    const url = new URL(window.location);
+                    if (tasksStatusFilter.value === 'completed') {
+                        url.searchParams.set('include_completed', 'true');
+                    } else {
+                        url.searchParams.delete('include_completed');
+                    }
+                    window.history.pushState({}, '', url);
+                });
+            }
+
+            if (tasksFilterBtn && tasksFilterDropdown) {
+                tasksFilterBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    tasksFilterDropdown.classList.toggle('active');
+                    tasksFilterBtn.classList.toggle('active');
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!tasksFilterDropdown.contains(e.target) && !tasksFilterBtn.contains(e.target)) {
+                        tasksFilterDropdown.classList.remove('active');
+                        tasksFilterBtn.classList.remove('active');
+                    }
+                });
+            }
+
+            if (tasksResetFilters) {
+                tasksResetFilters.addEventListener('click', () => {
+                    if (tasksSearch) tasksSearch.value = '';
+                    if (tasksStatusFilter) tasksStatusFilter.value = '';
+                    applyTasksFilters();
+                    const url = new URL(window.location);
+                    url.searchParams.delete('include_completed');
+                    window.history.pushState({}, '', url);
+                });
+            }
+
+            // Контекстное меню для задач
+            let selectedTaskRow = null;
+            let taskContextMenu = null;
+
+            function createTaskContextMenu() {
+                if (taskContextMenu) return taskContextMenu;
+                
+                taskContextMenu = document.createElement('div');
+                taskContextMenu.className = 'context-menu';
+                taskContextMenu.innerHTML = `
+                    <button type="button" class="context-menu-item" id="taskViewBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        Просмотр
+                    </button>
+                    <button type="button" class="context-menu-item" id="taskReportBtn" style="display: none;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        Создать отчёт
+                    </button>
+                    <button type="button" class="context-menu-item danger" id="taskDeleteBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                        Удалить
+                    </button>
+                `;
+                document.body.appendChild(taskContextMenu);
+                
+                const viewBtn = document.getElementById('taskViewBtn');
+                const reportBtn = document.getElementById('taskReportBtn');
+                const deleteBtn = document.getElementById('taskDeleteBtn');
+                
+                if (viewBtn) {
+                    viewBtn.addEventListener('click', () => {
+                        if (selectedTaskRow) {
+                            selectedTaskRow.dispatchEvent(new Event('dblclick'));
+                        }
+                        hideTaskContextMenu();
+                    });
+                }
+                
+                if (reportBtn) {
+                    reportBtn.addEventListener('click', () => {
+                        if (selectedTaskRow) {
+                            const taskId = selectedTaskRow.dataset.taskId;
+                            if (taskId) {
+                                window.location.href = `/admin/tasks/${taskId}/report`;
                             }
                         }
+                        hideTaskContextMenu();
                     });
+                }
+                
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', async () => {
+                        if (selectedTaskRow) {
+                            const taskId = selectedTaskRow.dataset.taskId;
+                            if (taskId && confirm('Вы уверены, что хотите удалить эту задачу?')) {
+                                try {
+                                    const response = await fetch(`/admin/tasks/${taskId}`, {
+                                        method: 'DELETE'
+                                    });
+                                    const result = await response.json();
+                                    if (result.success) {
+                                        selectedTaskRow.remove();
+                                        applyTasksFilters();
+                                    } else {
+                                        alert(result.message || 'Ошибка при удалении задачи');
+                                    }
+                                } catch (error) {
+                                    console.error('Ошибка:', error);
+                                    alert('Ошибка при удалении задачи');
+                                }
+                            }
+                        }
+                        hideTaskContextMenu();
+                    });
+                }
+                
+                return taskContextMenu;
+            }
+
+            function showTaskContextMenu(event, row) {
+                event.preventDefault();
+                event.stopPropagation();
+                
+                const menu = createTaskContextMenu();
+                selectedTaskRow = row;
+                
+                // Показываем кнопку "Создать отчёт" только для завершённых задач
+                const reportBtn = document.getElementById('taskReportBtn');
+                if (reportBtn) {
+                    reportBtn.style.display = row.dataset.status === 'completed' ? 'block' : 'none';
+                }
+                
+                const tableContainer = document.querySelector('.table-container');
+                if (!tableContainer) return;
+                
+                menu.style.display = 'block';
+                menu.style.visibility = 'hidden';
+                menu.style.left = '0px';
+                menu.style.top = '0px';
+                
+                const containerRect = tableContainer.getBoundingClientRect();
+                const menuRect = menu.getBoundingClientRect();
+                
+                let left = event.clientX;
+                let top = event.clientY;
+                
+                if (left + menuRect.width > containerRect.right) {
+                    left = containerRect.right - menuRect.width - 10;
+                }
+                if (left < containerRect.left) {
+                    left = containerRect.left + 10;
+                }
+                if (top + menuRect.height > containerRect.bottom) {
+                    top = containerRect.bottom - menuRect.height - 10;
+                }
+                if (top < containerRect.top) {
+                    top = containerRect.top + 10;
+                }
+                
+                menu.style.left = left + 'px';
+                menu.style.top = top + 'px';
+                menu.style.visibility = 'visible';
+            }
+
+            function hideTaskContextMenu() {
+                if (taskContextMenu) {
+                    taskContextMenu.style.display = 'none';
+                }
+                selectedTaskRow = null;
+            }
+
+            // Обработчики для контекстного меню задач
+            if (tasksTable) {
+                const tbody = tasksTable.querySelector('tbody');
+                if (tbody) {
+                    tbody.addEventListener('contextmenu', (e) => {
+                        const row = e.target.closest('tr.task-row');
+                        if (row) {
+                            e.preventDefault();
+                            showTaskContextMenu(e, row);
+                        }
+                    });
+                }
+            }
+
+            // Закрытие контекстного меню задач при клике вне его
+            document.addEventListener('click', (e) => {
+                if (taskContextMenu && !taskContextMenu.contains(e.target) && !e.target.closest('tr.task-row')) {
+                    hideTaskContextMenu();
                 }
             });
         })();
     </script>
     {% endif %}
+
+    <!-- Обработчики закрытия модального окна создания задачи (работают на всех страницах) -->
+    <script>
+        (function() {
+            const createTaskModal = document.getElementById('createTaskModal');
+            const createTaskModalClose = document.getElementById('createTaskModalClose');
+            const createTaskModalCancel = document.getElementById('createTaskModalCancel');
+
+            // Функция закрытия модального окна создания задачи
+            function closeCreateTaskModal() {
+                if (!createTaskModal) return;
+                
+                // Очищаем dataset при закрытии
+                delete createTaskModal.dataset.equipmentAssignmentId;
+                delete createTaskModal.dataset.equipmentId;
+                delete createTaskModal.dataset.departmentId;
+                delete createTaskModal.dataset.facilityId;
+                
+                // Восстанавливаем селекторы
+                const taskDepartmentDisplay = document.getElementById('taskDepartmentDisplay');
+                const taskDepartmentSelectWrapper = document.getElementById('taskDepartmentSelectWrapper');
+                const taskFacilityDisplay = document.getElementById('taskFacilityDisplay');
+                const taskFacilitySelectWrapper = document.getElementById('taskFacilitySelectWrapper');
+                if (taskDepartmentDisplay) {
+                    taskDepartmentDisplay.style.display = 'none';
+                }
+                
+                if (taskDepartmentSelectWrapper) {
+                    taskDepartmentSelectWrapper.style.display = 'block';
+                }
+                
+                if (taskFacilityDisplay) {
+                    taskFacilityDisplay.style.display = 'none';
+                }
+                
+                if (taskFacilitySelectWrapper) {
+                    taskFacilitySelectWrapper.style.display = 'block';
+                }
+                
+                if (taskEquipmentDisplayReadonly) {
+                    taskEquipmentDisplayReadonly.style.display = 'none';
+                }
+                
+                const taskEquipmentDisplay = document.getElementById('taskEquipmentDisplay');
+                const taskEquipmentSelectWrapper = document.getElementById('taskEquipmentSelectWrapper');
+                
+                if (taskEquipmentDisplay) {
+                    taskEquipmentDisplay.style.display = 'none';
+                }
+                
+                if (taskEquipmentSelectWrapper) {
+                    taskEquipmentSelectWrapper.style.display = 'block';
+                }
+                
+                // Сбрасываем каскадные селекторы
+                const taskFacilitySelect = document.getElementById('taskFacilitySelect');
+                const taskDepartmentSelect = document.getElementById('taskDepartmentSelect');
+                const taskEquipmentSelect = document.getElementById('taskEquipmentSelect');
+                
+                if (taskFacilitySelect) {
+                    taskFacilitySelect.value = '';
+                    const modalTaskFacilityBtn = document.getElementById('modalTaskFacilityBtn');
+                    if (modalTaskFacilityBtn) {
+                        const label = modalTaskFacilityBtn.querySelector('.modal-select-label');
+                        if (label) label.textContent = 'Выберите предприятие';
+                    }
+                }
+                
+                if (taskDepartmentSelect) {
+                    taskDepartmentSelect.value = '';
+                    taskDepartmentSelect.innerHTML = '<option value="">Сначала выберите предприятие</option>';
+                    taskDepartmentSelect.disabled = true;
+                    const modalTaskDepartmentBtn = document.getElementById('modalTaskDepartmentBtn');
+                    if (modalTaskDepartmentBtn) {
+                        modalTaskDepartmentBtn.disabled = true;
+                        const label = modalTaskDepartmentBtn.querySelector('.modal-select-label');
+                        if (label) label.textContent = 'Сначала выберите предприятие';
+                    }
+                }
+                
+                if (taskEquipmentSelect) {
+                    taskEquipmentSelect.value = '';
+                    taskEquipmentSelect.innerHTML = '<option value="">Сначала выберите отдел</option>';
+                    taskEquipmentSelect.disabled = true;
+                    const modalTaskEquipmentBtn = document.getElementById('modalTaskEquipmentBtn');
+                    if (modalTaskEquipmentBtn) {
+                        modalTaskEquipmentBtn.disabled = true;
+                        const label = modalTaskEquipmentBtn.querySelector('.modal-select-label');
+                        if (label) label.textContent = 'Сначала выберите отдел';
+                    }
+                }
+                
+                // Убираем фокус с активного элемента перед установкой aria-hidden
+                const activeElement = document.activeElement;
+                if (activeElement && createTaskModal.contains(activeElement)) {
+                    activeElement.blur();
+                }
+                
+                createTaskModal.classList.remove('visible');
+                document.body.classList.remove('modal-open');
+                
+                // Устанавливаем aria-hidden после небольшой задержки
+                setTimeout(() => {
+                    createTaskModal.setAttribute('aria-hidden', 'true');
+                }, 0);
+            }
+
+            // Закрытие модального окна создания задачи по крестику и кнопке "Отмена"
+            [createTaskModalClose, createTaskModalCancel].forEach(btn => {
+                if (btn) {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        closeCreateTaskModal();
+                    });
+                }
+            });
+
+            // Закрытие модального окна создания задачи при клике вне его
+            if (createTaskModal) {
+                createTaskModal.addEventListener('click', (e) => {
+                    if (e.target === createTaskModal) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        closeCreateTaskModal();
+                    }
+                });
+            }
+
+            // Обработка отправки формы создания задачи (работает на всех страницах)
+            const createTaskForm = document.getElementById('createTaskForm');
+            const createTaskFormError = document.getElementById('createTaskFormError');
+            const taskFacilitySelect = document.getElementById('taskFacilitySelect');
+            const taskDepartmentSelect = document.getElementById('taskDepartmentSelect');
+            const taskEquipmentSelect = document.getElementById('taskEquipmentSelect');
+            
+            console.log('Инициализация обработчика submit формы создания задачи:', {
+                createTaskForm: !!createTaskForm,
+                createTaskFormError: !!createTaskFormError,
+                createTaskModal: !!createTaskModal
+            });
+            
+            if (createTaskForm) {
+                console.log('Добавление обработчика submit для createTaskForm');
+                createTaskForm.addEventListener('submit', async (e) => {
+                    console.log('Обработчик submit вызван!');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    if (createTaskFormError) {
+                        createTaskFormError.textContent = '';
+                    }
+
+                    // Проверяем, есть ли equipment_assignment_id в dataset модального окна (создание из контекстного меню)
+                    const equipmentAssignmentIdFromContext = createTaskModal?.dataset.equipmentAssignmentId;
+                    const departmentIdFromContext = createTaskModal?.dataset.departmentId;
+                    
+                    console.log('Проверка данных из контекстного меню:', {
+                        equipmentAssignmentIdFromContext,
+                        departmentIdFromContext,
+                        createTaskModal: !!createTaskModal
+                    });
+                    
+                    // Валидация полей перед отправкой
+                    // Если задача создается из контекстного меню, используем данные из dataset
+                    if (equipmentAssignmentIdFromContext && equipmentAssignmentIdFromContext.trim() !== '') {
+                        // Создание из контекстного меню - данные уже есть в dataset
+                        console.log('Создание задачи из контекстного меню, используем equipmentAssignmentIdFromContext:', equipmentAssignmentIdFromContext);
+                    } else {
+                        // Создание со страницы задач - проверяем все поля
+                        const facilityId = taskFacilitySelect?.value;
+                        const departmentId = taskDepartmentSelect?.value;
+                        const equipmentAssignmentId = taskEquipmentSelect?.value;
+                        
+                        if (!facilityId) {
+                            if (createTaskFormError) {
+                                createTaskFormError.textContent = 'Выберите предприятие';
+                            }
+                            return;
+                        }
+                        
+                        if (!departmentId) {
+                            if (createTaskFormError) {
+                                createTaskFormError.textContent = 'Выберите отдел';
+                            }
+                            return;
+                        }
+                        
+                        if (!equipmentAssignmentId) {
+                            if (createTaskFormError) {
+                                createTaskFormError.textContent = 'Выберите оборудование';
+                            }
+                            return;
+                        }
+                    }
+                    
+                    // Определяем финальный equipment_assignment_id
+                    let finalEquipmentAssignmentId;
+                    if (equipmentAssignmentIdFromContext && equipmentAssignmentIdFromContext.trim() !== '') {
+                        // Используем данные из контекстного меню
+                        finalEquipmentAssignmentId = equipmentAssignmentIdFromContext;
+                        console.log('Используем equipment_assignment_id из контекстного меню:', finalEquipmentAssignmentId);
+                    } else {
+                        // Используем данные из формы (создание со страницы задач)
+                        finalEquipmentAssignmentId = taskEquipmentSelect?.value;
+                        console.log('Используем equipment_assignment_id из формы:', finalEquipmentAssignmentId);
+                    }
+                    
+                    console.log('Данные перед отправкой:', {
+                        equipmentAssignmentIdFromContext,
+                        taskEquipmentSelectValue: taskEquipmentSelect?.value,
+                        finalEquipmentAssignmentId,
+                        departmentIdFromContext,
+                        hasEquipmentAssignmentIdFromContext: !!(equipmentAssignmentIdFromContext && equipmentAssignmentIdFromContext.trim() !== '')
+                    });
+                    
+                    if (!finalEquipmentAssignmentId || finalEquipmentAssignmentId === '' || finalEquipmentAssignmentId === 'undefined') {
+                        console.error('Ошибка: не указано оборудование, finalEquipmentAssignmentId:', finalEquipmentAssignmentId);
+                        if (createTaskFormError) {
+                            createTaskFormError.textContent = 'Ошибка: не указано оборудование';
+                        }
+                        return;
+                    }
+                    
+                    const formData = new FormData(createTaskForm);
+                    
+                    const heading = formData.get('heading')?.trim();
+                    const description = formData.get('repair_task_description')?.trim();
+                    
+                    console.log('Данные формы:', { heading, description });
+                    
+                    // Проверяем обязательные поля
+                    if (!heading) {
+                        console.error('Ошибка: не указана тема');
+                        if (createTaskFormError) {
+                            createTaskFormError.textContent = 'Введите тему задачи';
+                        }
+                        return;
+                    }
+                    
+                    if (!description) {
+                        console.error('Ошибка: не указано описание');
+                        if (createTaskFormError) {
+                            createTaskFormError.textContent = 'Введите описание проблемы';
+                        }
+                        return;
+                    }
+                    
+                    // Преобразуем equipment_assignment_id в число
+                    const equipmentAssignmentIdNum = parseInt(finalEquipmentAssignmentId, 10);
+                    if (isNaN(equipmentAssignmentIdNum)) {
+                        console.error('Ошибка: equipment_assignment_id не является числом:', finalEquipmentAssignmentId);
+                        if (createTaskFormError) {
+                            createTaskFormError.textContent = 'Ошибка: некорректный ID оборудования';
+                        }
+                        return;
+                    }
+                    
+                    const data = {
+                        equipment_assignment_id: equipmentAssignmentIdNum,
+                        heading: heading,
+                        repair_task_description: description
+                    };
+                    
+                    console.log('Отправка данных для создания задачи:', data);
+
+                    try {
+                        console.log('Отправка запроса на создание задачи...');
+                        const url = '{{ url_for("admin_tasks.create_task") }}';
+                        console.log('URL:', url);
+                        console.log('Данные для отправки (JSON):', JSON.stringify(data));
+                        
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(data)
+                        });
+
+                        console.log('Ответ сервера получен:', {
+                            status: response.status,
+                            statusText: response.statusText,
+                            ok: response.ok
+                        });
+                        
+                        const result = await response.json();
+                        console.log('Результат от сервера:', result);
+
+                        if (result.success) {
+                            console.log('Задача успешно создана:', result.task);
+                            // Если задача создана из контекстного меню оборудования, переходим на страницу задач
+                            const equipmentAssignmentIdFromContext = createTaskModal?.dataset.equipmentAssignmentId;
+                            if (equipmentAssignmentIdFromContext) {
+                                console.log('Переход на страницу задач...');
+                                window.location.href = '{{ url_for("admin_tasks.list_tasks") }}';
+                            } else {
+                                // Если создана со страницы задач, просто перезагружаем страницу
+                                console.log('Перезагрузка страницы...');
+                                location.reload();
+                            }
+                        } else {
+                            console.error('Ошибка создания задачи:', result.message);
+                            if (createTaskFormError) {
+                                createTaskFormError.textContent = result.message || 'Ошибка при создании задачи';
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Ошибка при создании задачи:', error);
+                        if (createTaskFormError) {
+                            createTaskFormError.textContent = 'Ошибка при создании задачи: ' + (error.message || 'Неизвестная ошибка');
+                        }
+                    }
+                });
+            }
+        })();
+    </script>
 </body>
 </html>
 

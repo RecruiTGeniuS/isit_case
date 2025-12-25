@@ -79,8 +79,88 @@ html.dark-theme .status-toggle-label {
     color: #dd9e00;
 }
 
+/* Бейджи статусов задач (стилистика как у оборудования) */
+#tasksTable td:last-child {
+    width: 180px !important;
+    min-width: 180px !important;
+    max-width: 180px !important;
+    text-align: center;
+    padding: 0 !important;
+}
 
+#tasksTable td:last-child {
+    display: table-cell !important;
+    vertical-align: middle !important;
+    border-right: none !important;
+}
 
+#tasksTable td:last-child .status-badge {
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 8px 12px !important;
+    border-radius: 12px !important;
+    text-align: center !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: #fff !important;
+    background: #6b7280 !important; /* Серый по умолчанию */
+}
+
+/* Статус "Ожидают назначения" - оранжевый */
+#tasksTable td:last-child .status-badge.status-pending {
+    background: rgba(249, 115, 22, 0.8) !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+
+/* Статус "В процессе" - синий */
+#tasksTable td:last-child .status-badge.status-in-progress {
+    background: rgba(59, 130, 246, 0.8) !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+
+/* Статус "Завершено" - зелёный */
+#tasksTable td:last-child .status-badge.status-completed {
+    background: rgba(34, 197, 94, 0.8) !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+
+/* Стили для тёмной темы */
+html.dark-theme #tasksTable td:last-child .status-badge {
+    background: rgba(75, 85, 99, 0.6) !important;
+}
+
+html.dark-theme #tasksTable td:last-child .status-badge.status-pending {
+    background: rgba(249, 115, 22, 0.8) !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+
+html.dark-theme #tasksTable td:last-child .status-badge.status-in-progress {
+    background: rgba(59, 130, 246, 0.8) !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+
+html.dark-theme #tasksTable td:last-child .status-badge.status-completed {
+    background: rgba(34, 197, 94, 0.8) !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+
+/* Выделение строки задачи при клике */
+.data-table tbody tr.task-row.selected {
+    background-color: #fff8ec;
+    position: relative;
+}
+
+html.dark-theme .data-table tbody tr.task-row.selected {
+    background-color: #3a2f1a;
+}
 
 
 

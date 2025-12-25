@@ -229,6 +229,130 @@
     padding-left: 20px;
 }
 
+/* Стили для модального окна создания задачи */
+#createTaskModal .modal-header {
+    padding-bottom: 16px;
+    border-bottom: 2px solid rgba(221, 158, 0, 0.4);
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom: 0;
+}
+
+#createTaskModal .modal-window {
+    border: 1px solid rgba(221, 158, 0, 0.4);
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-right: 20px;
+    padding-left: 20px;
+}
+
+/* Стили для модального окна назначения сотрудников */
+#assignEmployeesModal .modal-header {
+    padding-bottom: 16px;
+    border-bottom: 2px solid rgba(221, 158, 0, 0.4);
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom: 0;
+}
+
+#assignEmployeesModal .modal-window {
+    border: 1px solid rgba(221, 158, 0, 0.4);
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-right: 20px;
+    padding-left: 20px;
+}
+
+/* Стили для модального окна деталей задачи */
+#taskDetailsModal .modal-header {
+    padding-bottom: 16px;
+    border-bottom: 2px solid rgba(221, 158, 0, 0.4);
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom: 0;
+}
+
+#taskDetailsModal .modal-window {
+    border: 1px solid rgba(221, 158, 0, 0.4);
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-right: 20px;
+    padding-left: 20px;
+}
+
+/* Стили для списка деталей задачи (как в паспорте оборудования) */
+#taskDetailsModal .task-details-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+}
+
+#taskDetailsModal .detail-item {
+    display: flex;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-md) 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+#taskDetailsModal .detail-item:last-child {
+    border-bottom: none;
+}
+
+#taskDetailsModal .detail-item-full {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+#taskDetailsModal .detail-label {
+    font-weight: 600;
+    color: var(--text-dark);
+    min-width: 220px;
+    flex-shrink: 0;
+    font-size: 15px;
+}
+
+#taskDetailsModal .detail-value {
+    color: var(--text-medium);
+    font-size: 15px;
+    flex: 1;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+
+/* Увеличение размера полей в модальном окне создания задачи */
+/* Поля "Тема" и "Описание проблемы" должны занимать всю ширину */
+#createTaskModal .modal-row:has(#taskHeading) .modal-field,
+#createTaskModal .modal-row:has(#taskDescription) .modal-field {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 100% !important;
+    min-width: 100% !important;
+}
+
+#createTaskModal .modal-field #taskHeading,
+#createTaskModal #taskHeading {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+#createTaskModal .modal-field #taskDescription,
+#createTaskModal #taskDescription {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    resize: vertical !important;
+}
+
 /* Убеждаемся, что поля локаций имеют стандартный цвет и правильную ширину */
 /* Поля локаций должны иметь такую же ширину, как modal-select-wrapper выше */
 /* Убеждаемся, что modal-field в обоих контейнерах ведет себя одинаково */
@@ -985,6 +1109,128 @@ html.dark-theme #deleteMovementModal .modal-window {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
+/* Компактное модальное окно для подтверждения удаления задачи */
+#deleteTaskModal .modal-window {
+    width: min(680px, 90%);
+    padding: 24px;
+    gap: 16px;
+    border: 1px solid rgba(245, 90, 100, 0.4);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Тускло-красная разделительная линия под заголовком в окне подтверждения удаления задачи */
+#deleteTaskModal .modal-header {
+    padding-bottom: 16px;
+    border-bottom: 2px solid rgba(245, 90, 100, 0.4);
+    margin-left: -24px;
+    margin-right: -24px;
+    padding-left: 24px;
+    padding-right: 24px;
+    margin-bottom: 0;
+}
+
+/* Увеличенный отступ между строками в сообщении об удалении задачи */
+#deleteTaskModal #deleteTaskMessage {
+    line-height: 1.8;
+}
+
+#deleteTaskModal #deleteTaskMessage br {
+    line-height: 1.8;
+    display: block;
+    margin-top: 6px;
+}
+
+html.dark-theme #deleteTaskModal .modal-window {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Стили для модального окна завершения задачи */
+#completeTaskModal .modal-header {
+    padding-bottom: 16px;
+    border-bottom: 2px solid rgba(221, 158, 0, 0.4);
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom: 0;
+}
+
+#completeTaskModal .modal-window {
+    border: 1px solid rgba(221, 158, 0, 0.4);
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-right: 20px;
+    padding-left: 20px;
+    width: min(1200px, 95%) !important;
+}
+
+/* Увеличение размера поля описания работ */
+#completeTaskModal #taskResolution {
+    width: 100% !important;
+    min-height: 200px !important;
+    resize: vertical !important;
+    box-sizing: border-box !important;
+    max-width: 100% !important;
+}
+
+/* Убеждаемся, что поле занимает всю ширину */
+#completeTaskModal .modal-field {
+    width: 100% !important;
+}
+
+#completeTaskModal .modal-row {
+    width: 100% !important;
+}
+
+/* Увеличение размера списка запчастей */
+#completeTaskModal #completeTaskSparePartsList {
+    min-height: 450px !important;
+    max-height: 450px !important;
+}
+
+/* Стили для элементов запчастей */
+#completeTaskModal .spare-part-item {
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+#completeTaskModal .spare-part-item:hover {
+    background: var(--bg-secondary) !important;
+    border-color: var(--border-medium) !important;
+}
+
+#completeTaskModal .spare-part-quantity-input {
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#completeTaskModal .spare-part-quantity-input:focus {
+    outline: none;
+    border-color: rgba(221, 158, 0, 0.6) !important;
+    box-shadow: 0 0 0 3px rgba(221, 158, 0, 0.1) !important;
+}
+
+/* Стили для фильтра */
+#completeTaskModal .modal-field-select {
+    padding: 10px 12px;
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+#completeTaskModal .modal-field-select:focus {
+    outline: none;
+    border-color: rgba(221, 158, 0, 0.6);
+    box-shadow: 0 0 0 3px rgba(221, 158, 0, 0.1);
+}
+
+html.dark-theme #completeTaskModal .modal-field-select {
+    background: #1f1f1f;
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #f5f5f5;
+}
+
 html.dark-theme .modal-header h3 {
     color: #f5f5f5;
 }
@@ -1046,6 +1292,280 @@ html.dark-theme .modal-field select {
 html.dark-theme .modal-field input[readonly] {
     background: #2a2a2a;
     color: #9a9a9a;
+}
+
+/* Стили для модального окна назначения сотрудников */
+.assign-employees-modal .modal-window {
+    width: min(720px, 90%);
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.assign-employees-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    gap: 20px;
+}
+
+.loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(221, 158, 0, 0.1);
+    border-top-color: #dd9e00;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.assign-employees-loading p {
+    color: var(--text-medium);
+    font-size: 15px;
+    margin: 0;
+}
+
+.assign-employees-search-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: nowrap;
+}
+
+.assign-employees-search {
+    flex: 1;
+    min-width: 0;
+}
+
+.assign-employees-counter {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    background: rgba(221, 158, 0, 0.1);
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #dd9e00;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.assign-employees-counter span {
+    font-size: 16px;
+    font-weight: 700;
+    margin-right: 4px;
+}
+
+.assign-employees-list {
+    max-height: 420px;
+    overflow-y: auto;
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    background: var(--bg-white);
+    padding: 8px;
+}
+
+html.dark-theme .assign-employees-list {
+    background: #1f1f1f;
+    border-color: #3a3a3a;
+}
+
+.employee-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 4px;
+    border: 2px solid transparent;
+    background: var(--bg-white);
+}
+
+html.dark-theme .employee-checkbox-item {
+    background: #2a2a2a;
+}
+
+.employee-checkbox-item:hover {
+    background: rgba(221, 158, 0, 0.05);
+    border-color: rgba(221, 158, 0, 0.2);
+    transform: translateX(2px);
+}
+
+html.dark-theme .employee-checkbox-item:hover {
+    background: rgba(221, 158, 0, 0.1);
+}
+
+.employee-checkbox-item.checked {
+    background: rgba(221, 158, 0, 0.08);
+    border-color: rgba(221, 158, 0, 0.4);
+}
+
+html.dark-theme .employee-checkbox-item.checked {
+    background: rgba(221, 158, 0, 0.15);
+}
+
+.employee-checkbox-wrapper {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.employee-checkbox-input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.employee-checkbox-custom {
+    display: block;
+    width: 22px;
+    height: 22px;
+    border: 2px solid #d0d0d0;
+    border-radius: 6px;
+    background: white;
+    position: relative;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+html.dark-theme .employee-checkbox-custom {
+    background: #1f1f1f;
+    border-color: #4a4a4a;
+}
+
+.employee-checkbox-item:hover .employee-checkbox-custom {
+    border-color: #dd9e00;
+}
+
+.employee-checkbox-input:checked + .employee-checkbox-custom {
+    background: #dd9e00;
+    border-color: #dd9e00;
+}
+
+.employee-checkbox-input:checked + .employee-checkbox-custom::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+}
+
+
+.employee-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.employee-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+}
+
+.employee-role-icon {
+    font-size: 16px;
+    line-height: 1;
+}
+
+.employee-details {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-medium);
+    flex-wrap: wrap;
+}
+
+.employee-post {
+    font-weight: 500;
+}
+
+.employee-separator {
+    opacity: 0.5;
+}
+
+.employee-department {
+    color: var(--text-medium);
+}
+
+.assign-employees-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+    color: var(--text-medium);
+}
+
+.assign-employees-empty svg {
+    opacity: 0.4;
+    margin-bottom: 16px;
+}
+
+.assign-employees-empty p {
+    font-size: 15px;
+    margin: 0;
+}
+
+.assign-employees-error {
+    color: #f55a64;
+    padding: 16px;
+    text-align: center;
+    background: rgba(245, 90, 100, 0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(245, 90, 100, 0.2);
+    font-size: 14px;
+}
+
+.assign-employees-modal .primary-btn {
+    position: relative;
+}
+
+.assign-employees-modal .save-count {
+    display: none;
+    margin-left: 8px;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+/* Кастомный скроллбар для списка сотрудников */
+.assign-employees-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.assign-employees-list::-webkit-scrollbar-track {
+    background: var(--bg-light);
+    border-radius: 4px;
+}
+
+html.dark-theme .assign-employees-list::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+.assign-employees-list::-webkit-scrollbar-thumb {
+    background: rgba(221, 158, 0, 0.3);
+    border-radius: 4px;
+}
+
+.assign-employees-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(221, 158, 0, 0.5);
 }
 
 /* Стили для кастомных полей ввода (тип и периодичность ТО) */

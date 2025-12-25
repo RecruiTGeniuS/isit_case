@@ -11,9 +11,9 @@ class AdminEmployeeService:
                 SELECT e.employee_id, e.last_name, e.first_name, e.patronymic,
                        e.employee_post, e.phone_number, e.email, e.login, e.password, e.user_role,
                        e.department_id, d.department_name, f.facility_name
-                FROM employee e
-                LEFT JOIN department d ON e.department_id = d.department_id
-                LEFT JOIN facility f ON d.facility_id = f.facility_id
+                FROM public.employee e
+                LEFT JOIN public.department d ON e.department_id = d.department_id
+                LEFT JOIN public.facility f ON d.facility_id = f.facility_id
                 WHERE 1=1
             """
             params = []
@@ -36,9 +36,9 @@ class AdminEmployeeService:
                 SELECT e.employee_id, e.last_name, e.first_name, e.patronymic,
                        e.employee_post, e.phone_number, e.email, e.login, e.password,
                        e.user_role, e.department_id, d.department_name, f.facility_name
-                FROM employee e
-                LEFT JOIN department d ON e.department_id = d.department_id
-                LEFT JOIN facility f ON d.facility_id = f.facility_id
+                FROM public.employee e
+                LEFT JOIN public.department d ON e.department_id = d.department_id
+                LEFT JOIN public.facility f ON d.facility_id = f.facility_id
                 WHERE e.employee_id = %s
             """, (employee_id,))
             row = cur.fetchone()
@@ -48,7 +48,7 @@ class AdminEmployeeService:
         """Создать нового сотрудника"""
         with get_db_cursor(commit=True) as cur:
             cur.execute("""
-                INSERT INTO employee (
+                INSERT INTO public.employee (
                     department_id, employee_post, last_name, first_name, patronymic,
                     phone_number, email, user_role, login, password
                 )
@@ -94,7 +94,7 @@ class AdminEmployeeService:
             if not facility_name:
                 # Если предприятие пустое, устанавливаем department_id в NULL
                 with get_db_cursor(commit=True) as cur:
-                    cur.execute("UPDATE employee SET department_id = NULL WHERE employee_id = %s", 
+                    cur.execute("UPDATE public.employee SET department_id = NULL WHERE employee_id = %s", 
                                (employee_id,))
                     if cur.rowcount == 0:
                         raise ValueError('Сотрудник не найден')
@@ -102,7 +102,7 @@ class AdminEmployeeService:
             
             # При смене предприятия всегда сбрасываем отдел
             with get_db_cursor(commit=True) as cur:
-                cur.execute("UPDATE employee SET department_id = NULL WHERE employee_id = %s", 
+                cur.execute("UPDATE public.employee SET department_id = NULL WHERE employee_id = %s", 
                            (employee_id,))
                 if cur.rowcount == 0:
                     raise ValueError('Сотрудник не найден')
@@ -124,7 +124,7 @@ class AdminEmployeeService:
             db_value = db_value if db_value != '' else None
         
         with get_db_cursor(commit=True) as cur:
-            cur.execute(f"UPDATE employee SET {column} = %s WHERE employee_id = %s", 
+            cur.execute(f"UPDATE public.employee SET {column} = %s WHERE employee_id = %s", 
                        (db_value, employee_id))
             if cur.rowcount == 0:
                 raise ValueError('Сотрудник не найден')
@@ -134,8 +134,8 @@ class AdminEmployeeService:
         with get_db_cursor() as cur:
             cur.execute("""
                 SELECT d.department_id, d.department_name, f.facility_id, f.facility_name
-                FROM department d
-                LEFT JOIN facility f ON d.facility_id = f.facility_id
+                FROM public.department d
+                LEFT JOIN public.facility f ON d.facility_id = f.facility_id
                 ORDER BY f.facility_name NULLS LAST, d.department_name
             """)
             return [
@@ -151,14 +151,14 @@ class AdminEmployeeService:
     def delete(self, employee_id):
         """Удалить сотрудника"""
         with get_db_cursor(commit=True) as cur:
-            cur.execute("DELETE FROM employee WHERE employee_id = %s", (employee_id,))
+            cur.execute("DELETE FROM public.employee WHERE employee_id = %s", (employee_id,))
             if cur.rowcount == 0:
                 raise ValueError('Сотрудник не найден')
     
     def get_user_department_id(self, user_id):
         """Получить department_id пользователя"""
         with get_db_cursor() as cur:
-            cur.execute("SELECT department_id FROM employee WHERE employee_id = %s", 
+            cur.execute("SELECT department_id FROM public.employee WHERE employee_id = %s", 
                        (user_id,))
             result = cur.fetchone()
             return result[0] if result else None

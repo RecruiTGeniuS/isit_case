@@ -5,13 +5,15 @@ from config import Config
 
 def get_db_connection():
     """Создает подключение к базе данных"""
-    return psycopg2.connect(
+    conn = psycopg2.connect(
         host=Config.DB_HOST,
         port=Config.DB_PORT,
         user=Config.DB_USER,
         password=Config.DB_PASSWORD,
-        dbname=Config.DB_NAME
+        dbname=Config.DB_NAME,
+        options="-c search_path=public"
     )
+    return conn
 
 @contextmanager
 def get_db_cursor(commit=False):
@@ -19,6 +21,8 @@ def get_db_cursor(commit=False):
     conn = get_db_connection()
     cur = conn.cursor()
     try:
+        # Явно устанавливаем search_path для текущей сессии
+        cur.execute("SET search_path TO public")
         yield cur
         if commit:
             conn.commit()

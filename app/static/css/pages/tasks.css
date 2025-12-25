@@ -108,9 +108,13 @@ html.dark-theme .status-toggle-label {
     background: #6b7280 !important; /* Серый по умолчанию */
 }
 
-/* Статус "Ожидают назначения" - оранжевый */
+/* Статус "Ожидают назначения" - оранжевый (для светлой темы) */
+#tasksTable tbody tr.task-row td:last-child .status-badge.status-pending,
+#tasksTable tbody tr td:last-child .status-badge.status-pending,
 #tasksTable td:last-child .status-badge.status-pending {
-    background: rgba(249, 115, 22, 0.8) !important;
+    background: #f97316 !important;
+    background-color: #f97316 !important;
+    border: none !important;
     color: #fff !important;
     font-weight: 600 !important;
 }
@@ -129,13 +133,26 @@ html.dark-theme .status-toggle-label {
     font-weight: 600 !important;
 }
 
+/* Статус "Завершена" - серый */
+#tasksTable td:last-child .status-badge.status-finished {
+    background: #6b7280 !important;
+    background-color: #6b7280 !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+
 /* Стили для тёмной темы */
 html.dark-theme #tasksTable td:last-child .status-badge {
     background: rgba(75, 85, 99, 0.6) !important;
 }
 
+/* Статус "Ожидают назначения" - оранжевый (для темной темы) - должно быть после общего правила */
+html.dark-theme #tasksTable tbody tr.task-row td:last-child .status-badge.status-pending,
+html.dark-theme #tasksTable tbody tr td:last-child .status-badge.status-pending,
 html.dark-theme #tasksTable td:last-child .status-badge.status-pending {
-    background: rgba(249, 115, 22, 0.8) !important;
+    background: #f97316 !important;
+    background-color: #f97316 !important;
+    border: none !important;
     color: #fff !important;
     font-weight: 600 !important;
 }
@@ -152,6 +169,13 @@ html.dark-theme #tasksTable td:last-child .status-badge.status-completed {
     font-weight: 600 !important;
 }
 
+html.dark-theme #tasksTable td:last-child .status-badge.status-finished {
+    background: #6b7280 !important;
+    background-color: #6b7280 !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+
 /* Выделение строки задачи при клике */
 .data-table tbody tr.task-row.selected {
     background-color: #fff8ec;
@@ -160,6 +184,23 @@ html.dark-theme #tasksTable td:last-child .status-badge.status-completed {
 
 html.dark-theme .data-table tbody tr.task-row.selected {
     background-color: #3a2f1a;
+}
+
+/* Дополнительное правило для статуса "Ожидают назначения" с максимальной специфичностью */
+#tasksTable tbody tr.task-row td:last-child span.status-badge.status-pending {
+    background: #f97316 !important;
+    background-color: #f97316 !important;
+    border: none !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+
+html.dark-theme #tasksTable tbody tr.task-row td:last-child span.status-badge.status-pending {
+    background: #f97316 !important;
+    background-color: #f97316 !important;
+    border: none !important;
+    color: #fff !important;
+    font-weight: 600 !important;
 }
 
 

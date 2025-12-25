@@ -42,6 +42,7 @@
     </script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body class="admin-page">
     <div class="admin-container">
@@ -1513,7 +1514,7 @@
                             </thead>
                             <tbody>
                                 {% for task in tasks %}
-                                <tr class="task-row" data-task-id="{{ task.id }}" data-status="{{ 'completed' if task.status == 'Завершено' else 'active' }}" style="cursor: pointer;">
+                                <tr class="task-row" data-task-id="{{ task.id }}" data-status="{{ 'completed' if task.status in ['Завершено', 'Завершена'] else 'active' }}" data-facility-id="{{ task.facility_id or '' }}" style="cursor: pointer;">
                                     <td class="number-column">{{ loop.index }}</td>
                                     <td>{{ task.heading or '—' }}</td>
                                     <td>{{ task.equipment_name or '—' }}</td>
@@ -1526,6 +1527,8 @@
                                         <span class="status-badge status-pending">{{ task.status }}</span>
                                         {% elif task.status == 'В процессе' %}
                                         <span class="status-badge status-in-progress">{{ task.status }}</span>
+                                        {% elif task.status == 'Завершена' %}
+                                        <span class="status-badge status-finished">{{ task.status }}</span>
                                         {% else %}
                                         <span class="status-badge status-in-progress">{{ task.status or 'В процессе' }}</span>
                                         {% endif %}
@@ -1552,16 +1555,184 @@
                     <div class="content-header">
                         <h2>Статистика</h2>
                     </div>
-                    <div class="content-placeholder">
-                        <div class="placeholder-icon">
-                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="18" y1="20" x2="18" y2="10"></line>
-                                <line x1="12" y1="20" x2="12" y2="4"></line>
-                                <line x1="6" y1="20" x2="6" y2="14"></line>
-                            </svg>
+                    <div class="statistics-dashboard">
+                        <!-- Индикатор загрузки -->
+                        <div id="statisticsLoading" class="statistics-loading">
+                            <div class="loading-spinner"></div>
+                            <p>Загрузка статистики...</p>
                         </div>
-                        <h3>Раздел в разработке</h3>
-                        <p>Функционал статистики и аналитики находится в разработке и будет доступен в ближайшее время.</p>
+
+                        <!-- Карточки с метриками -->
+                        <div class="stats-cards-grid" id="statsCards" style="display: none;">
+                            <div class="stat-card">
+                                <div class="stat-card-icon pto">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                                        <line x1="3" y1="9" x2="21" y2="9"></line>
+                                    </svg>
+                                </div>
+                                <div class="stat-card-content">
+                                    <div class="stat-card-label">Всего ПТО</div>
+                                    <div class="stat-card-value" id="ptoTotal">0</div>
+                                    <div class="stat-card-detail" id="ptoDetail"></div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card-icon tasks">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    </svg>
+                                </div>
+                                <div class="stat-card-content">
+                                    <div class="stat-card-label">Всего задач</div>
+                                    <div class="stat-card-value" id="tasksTotal">0</div>
+                                    <div class="stat-card-detail" id="tasksDetail"></div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card-icon employees">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                </div>
+                                <div class="stat-card-content">
+                                    <div class="stat-card-label">Сотрудников</div>
+                                    <div class="stat-card-value" id="employeesTotal">0</div>
+                                    <div class="stat-card-detail" id="employeesDetail"></div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card-icon parts">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="8" width="18" height="4" rx="1"></rect>
+                                        <path d="M12 8v13"></path>
+                                        <path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"></path>
+                                        <path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"></path>
+                                    </svg>
+                                </div>
+                                <div class="stat-card-content">
+                                    <div class="stat-card-label">Запчастей</div>
+                                    <div class="stat-card-value" id="partsTotal">0</div>
+                                    <div class="stat-card-detail" id="partsDetail"></div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card-icon equipment">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                                        <line x1="8" y1="21" x2="16" y2="21"></line>
+                                        <line x1="12" y1="17" x2="12" y2="21"></line>
+                                    </svg>
+                                </div>
+                                <div class="stat-card-content">
+                                    <div class="stat-card-label">Оборудования</div>
+                                    <div class="stat-card-value" id="equipmentTotal">0</div>
+                                    <div class="stat-card-detail" id="equipmentDetail"></div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card-icon completed">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="stat-card-content">
+                                    <div class="stat-card-label">Завершено задач</div>
+                                    <div class="stat-card-value" id="completedTasks">0</div>
+                                    <div class="stat-card-detail" id="completedTasksDetail"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Диаграммы -->
+                        <div class="charts-grid">
+                            <!-- Топ сотрудников (столбчатая) - растянут до левого края -->
+                            <div class="chart-container chart-employees">
+                                <div class="chart-header">
+                                    <h3>Топ сотрудников по количеству задач</h3>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <canvas id="topEmployeesChart"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- ПТО по статусам (круговая) -->
+                            <div class="chart-container">
+                                <div class="chart-header">
+                                    <h3>ПТО по статусам</h3>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <canvas id="ptoStatusChart"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- Задачи по статусам (круговая) -->
+                            <div class="chart-container">
+                                <div class="chart-header">
+                                    <h3>Задачи по статусам</h3>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <canvas id="tasksStatusChart"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- Оборудование по статусам (круговая) -->
+                            <div class="chart-container">
+                                <div class="chart-header">
+                                    <h3>Оборудование по статусам</h3>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <canvas id="equipmentStatusChart"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- ПТО по месяцам (столбчатая) - отдельная строка -->
+                            <div class="chart-container chart-wide">
+                                <div class="chart-header">
+                                    <h3>ПТО по месяцам (последние 12 месяцев)</h3>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <canvas id="ptoMonthlyChart"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- Задачи по месяцам (столбчатая) -->
+                            <div class="chart-container chart-wide">
+                                <div class="chart-header">
+                                    <h3>Задачи по месяцам (последние 12 месяцев)</h3>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <canvas id="tasksMonthlyChart"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- Запчасти по типам (круговая) -->
+                            <div class="chart-container">
+                                <div class="chart-header">
+                                    <h3>Запчасти по типам</h3>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <canvas id="partsTypeChart"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- Топ используемых запчастей (столбчатая) -->
+                            <div class="chart-container chart-parts-top">
+                                <div class="chart-header">
+                                    <h3>Топ используемых запчастей</h3>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <canvas id="topPartsChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 {% endif %}
             </main>
@@ -2507,11 +2678,146 @@
                     </div>
                 </div>
             </div>
+            <div class="modal-section">
+                <div class="detail-label" style="margin-bottom: var(--spacing-md);">Назначенные сотрудники</div>
+                <div id="taskAssignedEmployees" style="margin-bottom: var(--spacing-md);">
+                    <div style="color: var(--text-medium); font-size: 14px;">Загрузка...</div>
+                </div>
+                <div>
+                    <button type="button" class="btn-primary" id="assignEmployeesBtn" style="width: 100%;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Назначить сотрудников
+                    </button>
+                </div>
+            </div>
         </div>
         <div class="modal-footer">
             <div class="modal-error" id="taskDetailsFormError"></div>
             <div class="modal-actions">
                 <button type="button" class="secondary-btn" id="taskDetailsModalCancel">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для назначения сотрудников на задачу -->
+<div class="modal-overlay" id="assignEmployeesModal" aria-hidden="true">
+    <div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="assignEmployeesModalTitle">
+        <div class="modal-header">
+            <h3 id="assignEmployeesModalTitle">Назначить сотрудников</h3>
+            <button type="button" class="modal-close-btn" id="assignEmployeesModalClose" aria-label="Закрыть">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-section">
+                <div id="assignEmployeesList" style="max-height: 400px; overflow-y: auto;">
+                    <div style="color: var(--text-medium); font-size: 14px; text-align: center; padding: 20px;">Загрузка сотрудников...</div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="modal-error" id="assignEmployeesFormError"></div>
+            <div class="modal-actions">
+                <button type="button" class="secondary-btn" id="assignEmployeesModalCancel">Отмена</button>
+                <button type="button" class="btn-primary" id="assignEmployeesSaveBtn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно подтверждения удаления задачи -->
+<div class="modal-overlay" id="deleteTaskModal" aria-hidden="true">
+    <div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="deleteTaskModalTitle">
+        <div class="modal-header">
+            <h3 id="deleteTaskModalTitle">Подтверждение удаления</h3>
+            <button type="button" class="modal-close-btn" id="deleteTaskModalClose" aria-label="Закрыть">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p id="deleteTaskMessage">Вы уверены, что хотите удалить эту задачу?<br><em>Это действие нельзя будет отменить.</em></p>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="secondary-btn" id="deleteTaskCancel">Отмена</button>
+            <button type="button" class="primary-btn danger-btn" id="deleteTaskConfirm">Удалить</button>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для назначения сотрудников на задачу из контекстного меню -->
+<div class="modal-overlay assign-employees-modal" id="assignEmployeesTaskModal" aria-hidden="true">
+    <div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="assignEmployeesTaskModalTitle">
+        <div class="modal-header">
+            <h3 id="assignEmployeesTaskModalTitle">Назначить сотрудников</h3>
+            <button type="button" class="modal-close-btn" id="assignEmployeesTaskModalClose" aria-label="Закрыть">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-section">
+                <div class="assign-employees-list" id="assignEmployeesTaskList">
+                    <div class="assign-employees-loading">
+                        <div class="loading-spinner"></div>
+                        <div style="color: var(--text-medium); font-size: 14px;">Загрузка сотрудников...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="modal-error" id="assignEmployeesTaskFormError"></div>
+            <div class="modal-actions">
+                <button type="button" class="secondary-btn" id="assignEmployeesTaskModalCancel">Отмена</button>
+                <button type="button" class="btn-primary" id="assignEmployeesTaskSaveBtn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для завершения задачи -->
+<div class="modal-overlay" id="completeTaskModal" aria-hidden="true">
+    <div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="completeTaskModalTitle">
+        <div class="modal-header">
+            <h3 id="completeTaskModalTitle">Завершить задачу</h3>
+            <button type="button" class="modal-close-btn" id="completeTaskModalClose" aria-label="Закрыть">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-section">
+                <label for="completeTaskResolution" class="form-label">Описание выполненных работ *</label>
+                <textarea id="completeTaskResolution" class="form-input" rows="5" placeholder="Опишите ход выполнения работы..." required></textarea>
+            </div>
+            <div class="modal-section">
+                <label class="form-label">Использованные детали</label>
+                <div class="complete-task-spare-parts-list" id="completeTaskSparePartsList">
+                    <div class="complete-task-spare-parts-loading">
+                        <div class="loading-spinner"></div>
+                        <div style="color: var(--text-medium); font-size: 14px;">Загрузка деталей...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="modal-error" id="completeTaskFormError"></div>
+            <div class="modal-actions">
+                <button type="button" class="secondary-btn" id="completeTaskModalCancel">Отмена</button>
+                <button type="button" class="btn-primary" id="completeTaskSaveBtn">Завершить</button>
             </div>
         </div>
     </div>
@@ -14995,6 +15301,9 @@
                             if (taskDetailsCreationDate) taskDetailsCreationDate.textContent = task.creation_date || '—';
                             if (taskDetailsEndDate) taskDetailsEndDate.textContent = task.end_date || '—';
 
+                            // Загружаем назначенных сотрудников
+                            await loadTaskEmployees(task.id, task.facility_id);
+
                             // Открываем модальное окно
                             if (taskDetailsModal) {
                                 taskDetailsModal.classList.add('visible');
@@ -15235,6 +15544,9 @@
                 });
             }
 
+            // Делаем функцию глобальной для использования в других местах
+            window.applyTasksFilters = applyTasksFilters;
+
             if (tasksSearch) {
                 tasksSearch.addEventListener('input', applyTasksFilters);
             }
@@ -15296,6 +15608,21 @@
                         </svg>
                         Просмотр
                     </button>
+                    <button type="button" class="context-menu-item" id="taskAssignEmployeesBtn" style="display: none;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        Назначить сотрудников
+                    </button>
+                    <button type="button" class="context-menu-item" id="taskCompleteBtn" style="display: none;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Завершить задачу
+                    </button>
                     <button type="button" class="context-menu-item" id="taskReportBtn" style="display: none;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -15317,6 +15644,8 @@
                 document.body.appendChild(taskContextMenu);
                 
                 const viewBtn = document.getElementById('taskViewBtn');
+                const assignEmployeesBtn = document.getElementById('taskAssignEmployeesBtn');
+                const completeBtn = document.getElementById('taskCompleteBtn');
                 const reportBtn = document.getElementById('taskReportBtn');
                 const deleteBtn = document.getElementById('taskDeleteBtn');
                 
@@ -15324,6 +15653,45 @@
                     viewBtn.addEventListener('click', () => {
                         if (selectedTaskRow) {
                             selectedTaskRow.dispatchEvent(new Event('dblclick'));
+                        }
+                        hideTaskContextMenu();
+                    });
+                }
+                
+                if (assignEmployeesBtn) {
+                    assignEmployeesBtn.addEventListener('click', async () => {
+                        if (selectedTaskRow) {
+                            const taskId = selectedTaskRow.dataset.taskId;
+                            const facilityId = selectedTaskRow.dataset.facilityId;
+                            if (taskId && facilityId) {
+                                if (window.openAssignEmployeesModal) {
+                                    await window.openAssignEmployeesModal(taskId, facilityId);
+                                } else {
+                                    console.error('openAssignEmployeesModal не определена');
+                                    alert('Ошибка: функция назначения сотрудников недоступна');
+                                }
+                            } else {
+                                alert('Не удалось определить задачу или предприятие');
+                            }
+                        }
+                        hideTaskContextMenu();
+                    });
+                }
+                
+                if (completeBtn) {
+                    completeBtn.addEventListener('click', async () => {
+                        if (selectedTaskRow) {
+                            const taskId = selectedTaskRow.dataset.taskId;
+                            if (taskId) {
+                                if (window.openCompleteTaskModal) {
+                                    await window.openCompleteTaskModal(taskId);
+                                } else {
+                                    console.error('openCompleteTaskModal не определена');
+                                    alert('Ошибка: функция завершения задачи недоступна');
+                                }
+                            } else {
+                                alert('Не удалось определить задачу');
+                            }
                         }
                         hideTaskContextMenu();
                     });
@@ -15342,25 +15710,11 @@
                 }
                 
                 if (deleteBtn) {
-                    deleteBtn.addEventListener('click', async () => {
+                    deleteBtn.addEventListener('click', () => {
                         if (selectedTaskRow) {
                             const taskId = selectedTaskRow.dataset.taskId;
-                            if (taskId && confirm('Вы уверены, что хотите удалить эту задачу?')) {
-                                try {
-                                    const response = await fetch(`/admin/tasks/${taskId}`, {
-                                        method: 'DELETE'
-                                    });
-                                    const result = await response.json();
-                                    if (result.success) {
-                                        selectedTaskRow.remove();
-                                        applyTasksFilters();
-                                    } else {
-                                        alert(result.message || 'Ошибка при удалении задачи');
-                                    }
-                                } catch (error) {
-                                    console.error('Ошибка:', error);
-                                    alert('Ошибка при удалении задачи');
-                                }
+                            if (taskId) {
+                                openDeleteTaskModal(taskId, selectedTaskRow);
                             }
                         }
                         hideTaskContextMenu();
@@ -15380,7 +15734,25 @@
                 // Показываем кнопку "Создать отчёт" только для завершённых задач
                 const reportBtn = document.getElementById('taskReportBtn');
                 if (reportBtn) {
-                    reportBtn.style.display = row.dataset.status === 'completed' ? 'block' : 'none';
+                    const statusText = row.querySelector('.status-badge')?.textContent || '';
+                    const isCompleted = row.dataset.status === 'completed' || 
+                                       statusText.includes('Завершено') || 
+                                       statusText.includes('Завершена');
+                    reportBtn.style.display = isCompleted ? 'block' : 'none';
+                }
+                
+                // Показываем кнопку "Назначить сотрудников" только для задач со статусом "Ожидают назначения"
+                const assignEmployeesBtn = document.getElementById('taskAssignEmployeesBtn');
+                if (assignEmployeesBtn) {
+                    const statusText = row.querySelector('.status-badge')?.textContent || '';
+                    assignEmployeesBtn.style.display = statusText.includes('Ожидают назначения') ? 'block' : 'none';
+                }
+                
+                // Показываем кнопку "Завершить задачу" только для задач со статусом "В процессе"
+                const completeBtn = document.getElementById('taskCompleteBtn');
+                if (completeBtn) {
+                    const statusText = row.querySelector('.status-badge')?.textContent || '';
+                    completeBtn.style.display = statusText.includes('В процессе') ? 'block' : 'none';
                 }
                 
                 const tableContainer = document.querySelector('.table-container');
@@ -15760,7 +16132,1081 @@
                     }
                 });
             }
+
+            // Функции для работы с назначением сотрудников
+            const assignEmployeesBtn = document.getElementById('assignEmployeesBtn');
+            const assignEmployeesModal = document.getElementById('assignEmployeesModal');
+            const assignEmployeesModalClose = document.getElementById('assignEmployeesModalClose');
+            const assignEmployeesModalCancel = document.getElementById('assignEmployeesModalCancel');
+            const assignEmployeesSaveBtn = document.getElementById('assignEmployeesSaveBtn');
+            const assignEmployeesList = document.getElementById('assignEmployeesList');
+            const assignEmployeesFormError = document.getElementById('assignEmployeesFormError');
+            let selectedEmployeeIds = new Set();
+            let currentFacilityId = null;
+
+            // Загрузка назначенных сотрудников
+            async function loadTaskEmployees(taskId, facilityId) {
+                const taskAssignedEmployees = document.getElementById('taskAssignedEmployees');
+                if (!taskAssignedEmployees) return;
+
+                try {
+                    const response = await fetch(`{{ url_for("admin_tasks.get_task_employees", task_id=0) }}`.replace('0', taskId));
+                    const result = await response.json();
+
+                    if (result.success) {
+                        const employees = result.employees || [];
+                        if (employees.length === 0) {
+                            taskAssignedEmployees.innerHTML = '<div style="color: var(--text-medium); font-size: 14px;">Сотрудники не назначены</div>';
+                        } else {
+                            taskAssignedEmployees.innerHTML = employees.map(emp => `
+                                <div style="padding: var(--spacing-sm); background: var(--bg-light); border-radius: var(--radius-sm); margin-bottom: var(--spacing-xs);">
+                                    <div style="font-weight: 500;">${escapeHtml(emp.full_name || `${emp.last_name || ''} ${emp.first_name || ''} ${emp.patronymic || ''}`.trim())}</div>
+                                    ${emp.post ? `<div style="font-size: 13px; color: var(--text-medium);">${escapeHtml(emp.post)}</div>` : ''}
+                                </div>
+                            `).join('');
+                        }
+                    }
+                    currentFacilityId = facilityId;
+                } catch (error) {
+                    console.error('Ошибка при загрузке сотрудников:', error);
+                    taskAssignedEmployees.innerHTML = '<div style="color: var(--text-medium); font-size: 14px;">Ошибка загрузки</div>';
+                }
+            }
+
+            // Открытие модального окна для назначения сотрудников
+            if (assignEmployeesBtn) {
+                assignEmployeesBtn.addEventListener('click', async () => {
+                    if (!currentTaskId || !currentFacilityId) {
+                        if (assignEmployeesFormError) {
+                            assignEmployeesFormError.textContent = 'Не выбрана задача или не указано предприятие';
+                        }
+                        return;
+                    }
+
+                    // Загружаем доступных сотрудников
+                    try {
+                        const response = await fetch(`{{ url_for("admin_tasks.get_employees_by_facility", facility_id=0) }}`.replace('0', currentFacilityId));
+                        const result = await response.json();
+
+                        if (result.success) {
+                            const employees = result.employees || [];
+                            
+                            // Загружаем уже назначенных сотрудников
+                            const assignedResponse = await fetch(`{{ url_for("admin_tasks.get_task_employees", task_id=0) }}`.replace('0', currentTaskId));
+                            const assignedResult = await assignedResponse.json();
+                            const assignedIds = new Set((assignedResult.employees || []).map(e => e.id));
+                            selectedEmployeeIds = new Set(assignedIds);
+
+                            // Отображаем список сотрудников
+                            if (assignEmployeesList) {
+                                if (employees.length === 0) {
+                                    assignEmployeesList.innerHTML = '<div style="color: var(--text-medium); font-size: 14px; text-align: center; padding: 20px;">Нет доступных сотрудников</div>';
+                                } else {
+                                    assignEmployeesList.innerHTML = employees.map(emp => {
+                                        const isSelected = selectedEmployeeIds.has(emp.id);
+                                        return `
+                                            <label style="display: flex; align-items: center; padding: var(--spacing-sm); border-radius: var(--radius-sm); cursor: pointer; transition: background-color 0.2s; ${isSelected ? 'background: var(--color-primary-light);' : ''}" onmouseover="this.style.background='var(--color-primary-light)'" onmouseout="this.style.background=${isSelected ? "'var(--color-primary-light)'" : "'transparent'"}">
+                                                <input type="checkbox" value="${emp.id}" ${isSelected ? 'checked' : ''} style="margin-right: var(--spacing-sm);" onchange="toggleEmployeeSelection(${emp.id}, this.checked)">
+                                                <div style="flex: 1;">
+                                                    <div style="font-weight: 500;">${escapeHtml(emp.full_name || `${emp.last_name || ''} ${emp.first_name || ''} ${emp.patronymic || ''}`.trim())}</div>
+                                                    ${emp.post ? `<div style="font-size: 13px; color: var(--text-medium);">${escapeHtml(emp.post)}</div>` : ''}
+                                                </div>
+                                            </label>
+                                        `;
+                                    }).join('');
+                                }
+                            }
+
+                            // Открываем модальное окно
+                            if (assignEmployeesModal) {
+                                assignEmployeesModal.classList.add('visible');
+                                document.body.classList.add('modal-open');
+                                setTimeout(() => {
+                                    assignEmployeesModal.setAttribute('aria-hidden', 'false');
+                                }, 0);
+                            }
+                        } else {
+                            if (assignEmployeesFormError) {
+                                assignEmployeesFormError.textContent = 'Ошибка загрузки сотрудников';
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Ошибка при загрузке сотрудников:', error);
+                        if (assignEmployeesFormError) {
+                            assignEmployeesFormError.textContent = 'Ошибка загрузки сотрудников';
+                        }
+                    }
+                });
+            }
+
+            // Функция для переключения выбора сотрудника
+            window.toggleEmployeeSelection = function(employeeId, isChecked) {
+                if (isChecked) {
+                    selectedEmployeeIds.add(employeeId);
+                } else {
+                    selectedEmployeeIds.delete(employeeId);
+                }
+            };
+
+            // Сохранение назначенных сотрудников
+            if (assignEmployeesSaveBtn) {
+                assignEmployeesSaveBtn.addEventListener('click', async () => {
+                    if (!currentTaskId) return;
+
+                    if (assignEmployeesFormError) {
+                        assignEmployeesFormError.textContent = '';
+                    }
+
+                    try {
+                        const employeeIds = Array.from(selectedEmployeeIds);
+                        const response = await fetch(`{{ url_for("admin_tasks.assign_employees_to_task", task_id=0) }}`.replace('0', currentTaskId), {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ employee_ids: employeeIds })
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            // Обновляем список назначенных сотрудников
+                            const task = await fetch(`{{ url_for("admin_tasks.get_task", task_id=0) }}`.replace('0', currentTaskId));
+                            const taskResult = await task.json();
+                            if (taskResult.success && taskResult.task) {
+                                await loadTaskEmployees(currentTaskId, taskResult.task.facility_id);
+                            }
+
+                            // Закрываем модальное окно
+                            if (assignEmployeesModal) {
+                                assignEmployeesModal.classList.remove('visible');
+                                document.body.classList.remove('modal-open');
+                                setTimeout(() => {
+                                    assignEmployeesModal.setAttribute('aria-hidden', 'true');
+                                }, 0);
+                            }
+
+                            // Перезагружаем страницу для обновления таблицы
+                            window.location.reload();
+                        } else {
+                            if (assignEmployeesFormError) {
+                                assignEmployeesFormError.textContent = result.message || 'Ошибка при назначении сотрудников';
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Ошибка при назначении сотрудников:', error);
+                        if (assignEmployeesFormError) {
+                            assignEmployeesFormError.textContent = 'Ошибка при назначении сотрудников';
+                        }
+                    }
+                });
+            }
+
+            // Закрытие модального окна назначения сотрудников
+            [assignEmployeesModalClose, assignEmployeesModalCancel].forEach(btn => {
+                if (btn) {
+                    btn.addEventListener('click', () => {
+                        if (assignEmployeesModal) {
+                            assignEmployeesModal.classList.remove('visible');
+                            document.body.classList.remove('modal-open');
+                            setTimeout(() => {
+                                assignEmployeesModal.setAttribute('aria-hidden', 'true');
+                            }, 0);
+                        }
+                        if (assignEmployeesFormError) {
+                            assignEmployeesFormError.textContent = '';
+                        }
+                    });
+                }
+            });
+
+            // Закрытие модального окна при клике вне его
+            if (assignEmployeesModal) {
+                assignEmployeesModal.addEventListener('click', (e) => {
+                    if (e.target === assignEmployeesModal) {
+                        assignEmployeesModal.classList.remove('visible');
+                        document.body.classList.remove('modal-open');
+                        setTimeout(() => {
+                            assignEmployeesModal.setAttribute('aria-hidden', 'true');
+                        }, 0);
+                    }
+                });
+            }
+
+            // Функция экранирования HTML
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            // Модальное окно для назначения сотрудников из контекстного меню задач
+            const assignEmployeesTaskModal = document.getElementById('assignEmployeesTaskModal');
+            const assignEmployeesTaskModalClose = document.getElementById('assignEmployeesTaskModalClose');
+            const assignEmployeesTaskModalCancel = document.getElementById('assignEmployeesTaskModalCancel');
+            const assignEmployeesTaskSaveBtn = document.getElementById('assignEmployeesTaskSaveBtn');
+            const assignEmployeesTaskList = document.getElementById('assignEmployeesTaskList');
+            const assignEmployeesTaskFormError = document.getElementById('assignEmployeesTaskFormError');
+            
+            // Переменные для модального окна назначения сотрудников (определяем здесь для доступа в функции)
+            if (typeof window.selectedTaskEmployeeIds === 'undefined') {
+                window.selectedTaskEmployeeIds = new Set();
+            }
+            if (typeof window.currentTaskIdForAssign === 'undefined') {
+                window.currentTaskIdForAssign = null;
+            }
+
+            // Функция открытия модального окна для назначения сотрудников (глобальная)
+            window.openAssignEmployeesModal = async function(taskId, facilityId) {
+                window.currentTaskIdForAssign = taskId;
+                window.selectedTaskEmployeeIds.clear();
+
+                if (assignEmployeesTaskFormError) {
+                    assignEmployeesTaskFormError.textContent = '';
+                }
+
+                // Загружаем доступных сотрудников
+                try {
+                    const response = await fetch(`{{ url_for("admin_tasks.get_employees_by_facility", facility_id=0) }}`.replace('0', facilityId));
+                    const result = await response.json();
+
+                    if (result.success) {
+                        const employees = result.employees || [];
+                        
+                        // Загружаем уже назначенных сотрудников
+                        const assignedResponse = await fetch(`{{ url_for("admin_tasks.get_task_employees", task_id=0) }}`.replace('0', taskId));
+                        const assignedResult = await assignedResponse.json();
+                        const assignedIds = new Set((assignedResult.employees || []).map(e => e.id));
+                        window.selectedTaskEmployeeIds = new Set(assignedIds);
+
+                        // Отображаем список сотрудников
+                        if (assignEmployeesTaskList) {
+                            if (employees.length === 0) {
+                                assignEmployeesTaskList.innerHTML = '<div class="assign-employees-empty">Нет доступных сотрудников</div>';
+                            } else {
+                                assignEmployeesTaskList.innerHTML = employees.map(emp => {
+                                    const isSelected = window.selectedTaskEmployeeIds.has(emp.id);
+                                    return `
+                                        <label class="assign-employee-item ${isSelected ? 'selected' : ''}">
+                                            <input type="checkbox" value="${emp.id}" ${isSelected ? 'checked' : ''} onchange="toggleTaskEmployeeSelection(${emp.id}, this.checked)">
+                                            <div class="assign-employee-info">
+                                                <div class="assign-employee-name">${escapeHtml(emp.full_name || `${emp.last_name || ''} ${emp.first_name || ''} ${emp.patronymic || ''}`.trim())}</div>
+                                                ${emp.post ? `<div class="assign-employee-post">${escapeHtml(emp.post)}</div>` : ''}
+                                            </div>
+                                        </label>
+                                    `;
+                                }).join('');
+                            }
+                        }
+
+                        // Открываем модальное окно
+                        if (assignEmployeesTaskModal) {
+                            assignEmployeesTaskModal.classList.add('visible');
+                            document.body.classList.add('modal-open');
+                            setTimeout(() => {
+                                assignEmployeesTaskModal.setAttribute('aria-hidden', 'false');
+                            }, 0);
+                        }
+                    } else {
+                        if (assignEmployeesTaskFormError) {
+                            assignEmployeesTaskFormError.textContent = 'Ошибка загрузки сотрудников';
+                        }
+                    }
+                } catch (error) {
+                    console.error('Ошибка при загрузке сотрудников:', error);
+                    if (assignEmployeesTaskFormError) {
+                        assignEmployeesTaskFormError.textContent = 'Ошибка загрузки сотрудников';
+                    }
+                }
+            };
+
+            // Функция для переключения выбора сотрудника
+            window.toggleTaskEmployeeSelection = function(employeeId, isChecked) {
+                if (isChecked) {
+                    window.selectedTaskEmployeeIds.add(employeeId);
+                } else {
+                    window.selectedTaskEmployeeIds.delete(employeeId);
+                }
+            };
+
+            // Сохранение назначенных сотрудников
+            if (assignEmployeesTaskSaveBtn) {
+                assignEmployeesTaskSaveBtn.addEventListener('click', async () => {
+                    if (!window.currentTaskIdForAssign) return;
+
+                    if (assignEmployeesTaskFormError) {
+                        assignEmployeesTaskFormError.textContent = '';
+                    }
+
+                    try {
+                        const employeeIds = Array.from(window.selectedTaskEmployeeIds);
+                        const response = await fetch(`{{ url_for("admin_tasks.assign_employees_to_task", task_id=0) }}`.replace('0', window.currentTaskIdForAssign), {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ employee_ids: employeeIds })
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            // Закрываем модальное окно
+                            if (assignEmployeesTaskModal) {
+                                assignEmployeesTaskModal.classList.remove('visible');
+                                document.body.classList.remove('modal-open');
+                                setTimeout(() => {
+                                    assignEmployeesTaskModal.setAttribute('aria-hidden', 'true');
+                                }, 0);
+                            }
+
+                            // Перезагружаем страницу для обновления таблицы
+                            window.location.reload();
+                        } else {
+                            if (assignEmployeesTaskFormError) {
+                                assignEmployeesTaskFormError.textContent = result.message || 'Ошибка при назначении сотрудников';
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Ошибка при назначении сотрудников:', error);
+                        if (assignEmployeesTaskFormError) {
+                            assignEmployeesTaskFormError.textContent = 'Ошибка при назначении сотрудников';
+                        }
+                    }
+                });
+            }
+
+            // Закрытие модального окна назначения сотрудников
+            [assignEmployeesTaskModalClose, assignEmployeesTaskModalCancel].forEach(btn => {
+                if (btn) {
+                    btn.addEventListener('click', () => {
+                        if (assignEmployeesTaskModal) {
+                            assignEmployeesTaskModal.classList.remove('visible');
+                            document.body.classList.remove('modal-open');
+                            setTimeout(() => {
+                                assignEmployeesTaskModal.setAttribute('aria-hidden', 'true');
+                            }, 0);
+                        }
+                        if (assignEmployeesTaskFormError) {
+                            assignEmployeesTaskFormError.textContent = '';
+                        }
+                        window.currentTaskIdForAssign = null;
+                        window.selectedTaskEmployeeIds.clear();
+                    });
+                }
+            });
+
+            // Закрытие модального окна при клике вне его
+            if (assignEmployeesTaskModal) {
+                assignEmployeesTaskModal.addEventListener('click', (e) => {
+                    if (e.target === assignEmployeesTaskModal) {
+                        assignEmployeesTaskModal.classList.remove('visible');
+                        document.body.classList.remove('modal-open');
+                        setTimeout(() => {
+                            assignEmployeesTaskModal.setAttribute('aria-hidden', 'true');
+                        }, 0);
+                        window.currentTaskIdForAssign = null;
+                        window.selectedTaskEmployeeIds.clear();
+                    }
+                });
+            }
+
+            // Модальное окно подтверждения удаления задачи
+            const deleteTaskModal = document.getElementById('deleteTaskModal');
+            const deleteTaskModalClose = document.getElementById('deleteTaskModalClose');
+            const deleteTaskCancel = document.getElementById('deleteTaskCancel');
+            const deleteTaskConfirm = document.getElementById('deleteTaskConfirm');
+            const deleteTaskMessage = document.getElementById('deleteTaskMessage');
+            let taskToDelete = null;
+            let taskToDeleteRow = null;
+
+            // Функция открытия модального окна удаления задачи
+            window.openDeleteTaskModal = function(taskId, taskRow) {
+                if (!deleteTaskModal) return;
+                
+                taskToDelete = taskId;
+                taskToDeleteRow = taskRow;
+                
+                // Получаем данные задачи для отображения в сообщении
+                const taskHeading = taskRow.querySelector('td:nth-child(2)')?.textContent?.trim() || 'задачу';
+                
+                if (deleteTaskMessage) {
+                    deleteTaskMessage.innerHTML = `Вы уверены, что хотите удалить задачу "${taskHeading}"?<br><em>Это действие нельзя будет отменить.</em>`;
+                }
+                
+                deleteTaskModal.setAttribute('aria-hidden', 'false');
+                deleteTaskModal.classList.add('visible');
+                document.body.classList.add('modal-open');
+            };
+
+            // Подтверждение удаления задачи
+            if (deleteTaskConfirm) {
+                deleteTaskConfirm.addEventListener('click', async () => {
+                    if (!taskToDelete || !taskToDeleteRow) return;
+                    
+                    try {
+                        const response = await fetch(`/admin/tasks/${taskToDelete}`, {
+                            method: 'DELETE'
+                        });
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            // Закрываем модальное окно
+                            if (deleteTaskModal) {
+                                deleteTaskModal.classList.remove('visible');
+                                document.body.classList.remove('modal-open');
+                                setTimeout(() => {
+                                    deleteTaskModal.setAttribute('aria-hidden', 'true');
+                                }, 0);
+                            }
+                            
+                            // Удаляем строку из таблицы
+                            if (taskToDeleteRow) {
+                                taskToDeleteRow.remove();
+                                // Обновляем нумерацию после удаления
+                                if (typeof applyTasksFilters === 'function') {
+                                    applyTasksFilters();
+                                } else if (typeof window.applyTasksFilters === 'function') {
+                                    window.applyTasksFilters();
+                                }
+                            }
+                            
+                            taskToDelete = null;
+                            taskToDeleteRow = null;
+                        } else {
+                            alert(result.message || 'Ошибка при удалении задачи');
+                        }
+                    } catch (error) {
+                        console.error('Ошибка при удалении задачи:', error);
+                        alert('Ошибка при удалении задачи');
+                    }
+                });
+            }
+
+            // Закрытие модального окна удаления задачи
+            [deleteTaskModalClose, deleteTaskCancel].forEach(btn => {
+                if (btn) {
+                    btn.addEventListener('click', () => {
+                        if (deleteTaskModal) {
+                            deleteTaskModal.classList.remove('visible');
+                            document.body.classList.remove('modal-open');
+                            setTimeout(() => {
+                                deleteTaskModal.setAttribute('aria-hidden', 'true');
+                            }, 0);
+                        }
+                        taskToDelete = null;
+                        taskToDeleteRow = null;
+                    });
+                }
+            });
+
+            // Закрытие модального окна при клике вне его
+            if (deleteTaskModal) {
+                deleteTaskModal.addEventListener('click', (e) => {
+                    if (e.target === deleteTaskModal) {
+                        deleteTaskModal.classList.remove('visible');
+                        document.body.classList.remove('modal-open');
+                        setTimeout(() => {
+                            deleteTaskModal.setAttribute('aria-hidden', 'true');
+                        }, 0);
+                        taskToDelete = null;
+                        taskToDeleteRow = null;
+                    }
+                });
+            }
+
+            // Модальное окно для завершения задачи
+            const completeTaskModal = document.getElementById('completeTaskModal');
+            const completeTaskModalClose = document.getElementById('completeTaskModalClose');
+            const completeTaskModalCancel = document.getElementById('completeTaskModalCancel');
+            const completeTaskSaveBtn = document.getElementById('completeTaskSaveBtn');
+            const completeTaskResolution = document.getElementById('completeTaskResolution');
+            const completeTaskSparePartsList = document.getElementById('completeTaskSparePartsList');
+            const completeTaskFormError = document.getElementById('completeTaskFormError');
+            let currentTaskIdForComplete = null;
+            let sparePartsData = [];
+
+            // Функция экранирования HTML (локальная)
+            function escapeHtmlLocal(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            // Функция открытия модального окна для завершения задачи (глобальная)
+            window.openCompleteTaskModal = async function(taskId) {
+                currentTaskIdForComplete = taskId;
+                
+                if (completeTaskFormError) {
+                    completeTaskFormError.textContent = '';
+                }
+                
+                if (completeTaskResolution) {
+                    completeTaskResolution.value = '';
+                }
+
+                // Загружаем список деталей
+                try {
+                    if (completeTaskSparePartsList) {
+                        completeTaskSparePartsList.innerHTML = '<div class="complete-task-spare-parts-loading"><div class="loading-spinner"></div><div style="color: var(--text-medium); font-size: 14px;">Загрузка деталей...</div></div>';
+                    }
+                    
+                    const response = await fetch(`/admin/tasks/${taskId}/spare-parts`);
+                    const result = await response.json();
+
+                    if (result.success) {
+                        sparePartsData = result.spare_parts || [];
+                        
+                        // Отображаем список деталей
+                        if (completeTaskSparePartsList) {
+                            if (sparePartsData.length === 0) {
+                                completeTaskSparePartsList.innerHTML = '<div class="assign-employees-empty">Нет доступных деталей</div>';
+                            } else {
+                                completeTaskSparePartsList.innerHTML = sparePartsData.map(part => {
+                                    return `
+                                        <div class="complete-task-spare-part-item">
+                                            <div class="complete-task-spare-part-info">
+                                                <div class="complete-task-spare-part-name">${escapeHtmlLocal(part.name)}</div>
+                                                <div class="complete-task-spare-part-details">
+                                                    <span>Тип: ${escapeHtmlLocal(part.type)}</span>
+                                                    <span>Доступно: ${part.quantity}</span>
+                                                </div>
+                                            </div>
+                                            <div class="complete-task-spare-part-quantity">
+                                                <input type="number" 
+                                                       class="form-input" 
+                                                       min="0" 
+                                                       max="${part.quantity}" 
+                                                       value="0" 
+                                                       data-part-id="${part.id}"
+                                                       style="width: 80px; text-align: center;">
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('');
+                            }
+                        }
+                    } else {
+                        if (completeTaskSparePartsList) {
+                            completeTaskSparePartsList.innerHTML = '<div class="assign-employees-empty">Ошибка загрузки деталей</div>';
+                        }
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки деталей:', error);
+                    if (completeTaskSparePartsList) {
+                        completeTaskSparePartsList.innerHTML = '<div class="assign-employees-empty">Ошибка загрузки деталей</div>';
+                    }
+                }
+
+                // Открываем модальное окно
+                if (completeTaskModal) {
+                    completeTaskModal.classList.add('visible');
+                    document.body.classList.add('modal-open');
+                    setTimeout(() => {
+                        completeTaskModal.setAttribute('aria-hidden', 'false');
+                    }, 0);
+                }
+            };
+
+            // Сохранение завершенной задачи
+            if (completeTaskSaveBtn) {
+                completeTaskSaveBtn.addEventListener('click', async () => {
+                    if (!currentTaskIdForComplete) return;
+
+                    if (completeTaskFormError) {
+                        completeTaskFormError.textContent = '';
+                    }
+
+                    const resolution = completeTaskResolution?.value.trim() || '';
+                    if (!resolution) {
+                        if (completeTaskFormError) {
+                            completeTaskFormError.textContent = 'Необходимо указать описание выполненных работ';
+                        }
+                        return;
+                    }
+
+                    // Собираем выбранные детали
+                    const sparePartQuantities = {};
+                    if (completeTaskSparePartsList) {
+                        const quantityInputs = completeTaskSparePartsList.querySelectorAll('input[type="number"][data-part-id]');
+                        quantityInputs.forEach(input => {
+                            const partId = input.dataset.partId;
+                            const quantity = parseInt(input.value) || 0;
+                            if (quantity > 0) {
+                                sparePartQuantities[partId] = quantity;
+                            }
+                        });
+                    }
+
+                    try {
+                        completeTaskSaveBtn.disabled = true;
+                        completeTaskSaveBtn.textContent = 'Сохранение...';
+
+                        const response = await fetch(`/admin/tasks/${currentTaskIdForComplete}/complete`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                resolution: resolution,
+                                spare_part_quantities: sparePartQuantities
+                            })
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            // Обновляем строку задачи в таблице сразу
+                            const taskRow = document.querySelector(`tr.task-row[data-task-id="${currentTaskIdForComplete}"]`);
+                            if (taskRow) {
+                                // Обновляем статус в строке
+                                const statusCell = taskRow.querySelector('td:last-child');
+                                if (statusCell) {
+                                    statusCell.innerHTML = '<span class="status-badge status-finished">Завершена</span>';
+                                }
+                                
+                                // Обновляем data-status для фильтрации
+                                taskRow.dataset.status = 'completed';
+                            }
+                            
+                            // Закрываем модальное окно
+                            if (completeTaskModal) {
+                                completeTaskModal.classList.remove('visible');
+                                document.body.classList.remove('modal-open');
+                                setTimeout(() => {
+                                    completeTaskModal.setAttribute('aria-hidden', 'true');
+                                }, 0);
+                            }
+                            
+                            // Применяем фильтры для обновления нумерации (если нужно)
+                            if (window.applyTasksFilters) {
+                                window.applyTasksFilters();
+                            }
+                            
+                            // Очищаем переменные
+                            currentTaskIdForComplete = null;
+                            sparePartsData = [];
+                        } else {
+                            if (completeTaskFormError) {
+                                completeTaskFormError.textContent = result.message || 'Не удалось завершить задачу';
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Ошибка завершения задачи:', error);
+                        if (completeTaskFormError) {
+                            completeTaskFormError.textContent = 'Ошибка при завершении задачи';
+                        }
+                    } finally {
+                        completeTaskSaveBtn.disabled = false;
+                        completeTaskSaveBtn.textContent = 'Завершить';
+                    }
+                });
+            }
+
+            // Закрытие модального окна
+            [completeTaskModalClose, completeTaskModalCancel].forEach(btn => {
+                if (btn) {
+                    btn.addEventListener('click', () => {
+                        if (completeTaskModal) {
+                            completeTaskModal.classList.remove('visible');
+                            document.body.classList.remove('modal-open');
+                            setTimeout(() => {
+                                completeTaskModal.setAttribute('aria-hidden', 'true');
+                            }, 0);
+                        }
+                        currentTaskIdForComplete = null;
+                        sparePartsData = [];
+                    });
+                }
+            });
+
+            // Закрытие модального окна при клике вне его
+            if (completeTaskModal) {
+                completeTaskModal.addEventListener('click', (e) => {
+                    if (e.target === completeTaskModal) {
+                        completeTaskModal.classList.remove('visible');
+                        document.body.classList.remove('modal-open');
+                        setTimeout(() => {
+                            completeTaskModal.setAttribute('aria-hidden', 'true');
+                        }, 0);
+                        currentTaskIdForComplete = null;
+                        sparePartsData = [];
+                    }
+                });
+            }
         })();
+
+        // Статистика
+        {% if section == 'statistics' %}
+        (function() {
+            'use strict';
+            
+            let charts = {};
+            
+            // Цвета для диаграмм
+            const colors = {
+                primary: '#dd9e00',
+                success: '#22c55e',
+                danger: '#ef4444',
+                warning: '#eab308',
+                info: '#3b82f6',
+                purple: '#a855f7',
+                pink: '#ec4899',
+                teal: '#14b8a6',
+                orange: '#f97316',
+                gray: '#6b7280'
+            };
+            
+            const chartColors = [
+                colors.primary,
+                colors.success,
+                colors.info,
+                colors.warning,
+                colors.danger,
+                colors.purple,
+                colors.pink,
+                colors.teal,
+                colors.orange,
+                colors.gray
+            ];
+            
+            // Загрузка данных
+            async function loadStatistics() {
+                const loadingEl = document.getElementById('statisticsLoading');
+                const cardsEl = document.getElementById('statsCards');
+                const chartsEl = document.getElementById('chartsGrid');
+                
+                try {
+                    if (loadingEl) loadingEl.style.display = 'flex';
+                    if (cardsEl) cardsEl.style.display = 'none';
+                    if (chartsEl) chartsEl.style.display = 'none';
+                    
+                    const response = await fetch('/admin/statistics/api/data');
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        const data = result.data;
+                        updateMetrics(data);
+                        createCharts(data);
+                        
+                        if (loadingEl) loadingEl.style.display = 'none';
+                        if (cardsEl) cardsEl.style.display = 'grid';
+                        if (chartsEl) chartsEl.style.display = 'grid';
+                    } else {
+                        console.error('Ошибка загрузки статистики:', result.message);
+                        if (loadingEl) {
+                            loadingEl.innerHTML = '<p style="color: var(--text-danger);">Ошибка загрузки данных: ' + (result.message || 'Неизвестная ошибка') + '</p>';
+                        }
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки статистики:', error);
+                    if (loadingEl) {
+                        loadingEl.innerHTML = '<p style="color: var(--text-danger);">Ошибка загрузки данных: ' + error.message + '</p>';
+                    }
+                }
+            }
+            
+            // Обновление метрик
+            function updateMetrics(data) {
+                // ПТО
+                const ptoTotal = data.pto?.total || 0;
+                document.getElementById('ptoTotal').textContent = ptoTotal;
+                const ptoStatus = data.pto?.by_status || {};
+                const ptoDetail = Object.entries(ptoStatus).slice(0, 2).map(([k, v]) => `${k}: ${v}`).join(', ');
+                document.getElementById('ptoDetail').textContent = ptoDetail || 'Нет данных';
+                
+                // Задачи
+                const tasksTotal = data.tasks?.total || 0;
+                document.getElementById('tasksTotal').textContent = tasksTotal;
+                const tasksStatus = data.tasks?.by_status || {};
+                const tasksDetail = Object.entries(tasksStatus).slice(0, 2).map(([k, v]) => `${k}: ${v}`).join(', ');
+                document.getElementById('tasksDetail').textContent = tasksDetail || 'Нет данных';
+                
+                // Сотрудники
+                const employeesTotal = data.employees?.total?.total_employees || 0;
+                const employeesTasks = data.employees?.total?.total_tasks || 0;
+                document.getElementById('employeesTotal').textContent = employeesTotal;
+                document.getElementById('employeesDetail').textContent = `Задач: ${employeesTasks}`;
+                
+                // Запчасти
+                const partsTotal = data.spare_parts?.total?.total_parts || 0;
+                const partsQuantity = data.spare_parts?.total?.total_quantity || 0;
+                document.getElementById('partsTotal').textContent = partsTotal;
+                document.getElementById('partsDetail').textContent = `Всего: ${partsQuantity} шт.`;
+                
+                // Оборудование
+                const equipmentTotal = data.equipment?.total || 0;
+                document.getElementById('equipmentTotal').textContent = equipmentTotal;
+                const equipmentStatus = data.equipment?.by_status || {};
+                const equipmentDetail = Object.entries(equipmentStatus).slice(0, 2).map(([k, v]) => `${k}: ${v}`).join(', ');
+                document.getElementById('equipmentDetail').textContent = equipmentDetail || 'Нет данных';
+                
+                // Завершено задач
+                const completedTasks = data.employees?.total?.completed_tasks || 0;
+                document.getElementById('completedTasks').textContent = completedTasks;
+                const completionRate = tasksTotal > 0 ? Math.round((completedTasks / tasksTotal) * 100) : 0;
+                document.getElementById('completedTasksDetail').textContent = `${completionRate}% от всех задач`;
+            }
+            
+            // Создание диаграмм
+            function createCharts(data) {
+                // ПТО по статусам (круговая)
+                if (data.pto?.by_status) {
+                    const ctx = document.getElementById('ptoStatusChart');
+                    if (ctx) {
+                        if (charts.ptoStatus) charts.ptoStatus.destroy();
+                        charts.ptoStatus = new Chart(ctx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: Object.keys(data.pto.by_status),
+                                datasets: [{
+                                    data: Object.values(data.pto.by_status),
+                                    backgroundColor: chartColors.slice(0, Object.keys(data.pto.by_status).length)
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'bottom'
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+                
+                // Задачи по статусам (круговая)
+                if (data.tasks?.by_status) {
+                    const ctx = document.getElementById('tasksStatusChart');
+                    if (ctx) {
+                        if (charts.tasksStatus) charts.tasksStatus.destroy();
+                        charts.tasksStatus = new Chart(ctx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: Object.keys(data.tasks.by_status),
+                                datasets: [{
+                                    data: Object.values(data.tasks.by_status),
+                                    backgroundColor: chartColors.slice(0, Object.keys(data.tasks.by_status).length)
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'bottom'
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+                
+                // ПТО по месяцам (столбчатая)
+                if (data.pto?.by_month) {
+                    const ctx = document.getElementById('ptoMonthlyChart');
+                    if (ctx) {
+                        if (charts.ptoMonthly) charts.ptoMonthly.destroy();
+                        charts.ptoMonthly = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: Object.keys(data.pto.by_month),
+                                datasets: [{
+                                    label: 'Количество ПТО',
+                                    data: Object.values(data.pto.by_month),
+                                    backgroundColor: colors.primary
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+                
+                // Задачи по месяцам (столбчатая)
+                if (data.tasks?.by_month) {
+                    const ctx = document.getElementById('tasksMonthlyChart');
+                    if (ctx) {
+                        if (charts.tasksMonthly) charts.tasksMonthly.destroy();
+                        charts.tasksMonthly = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: Object.keys(data.tasks.by_month),
+                                datasets: [{
+                                    label: 'Созданные задачи',
+                                    data: Object.values(data.tasks.by_month),
+                                    backgroundColor: colors.info
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+                
+                // Топ сотрудников (столбчатая)
+                if (data.employees?.top_employees) {
+                    const ctx = document.getElementById('topEmployeesChart');
+                    if (ctx) {
+                        if (charts.topEmployees) charts.topEmployees.destroy();
+                        const employees = data.employees.top_employees.slice(0, 10);
+                        charts.topEmployees = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: employees.map(e => e.name),
+                                datasets: [{
+                                    label: 'Всего задач',
+                                    data: employees.map(e => e.tasks_count),
+                                    backgroundColor: colors.success
+                                }, {
+                                    label: 'Завершено',
+                                    data: employees.map(e => e.completed_tasks),
+                                    backgroundColor: colors.primary
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'top'
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+                
+                // Запчасти по типам (круговая)
+                if (data.spare_parts?.by_type) {
+                    const ctx = document.getElementById('partsTypeChart');
+                    if (ctx) {
+                        if (charts.partsType) charts.partsType.destroy();
+                        const types = data.spare_parts.by_type.slice(0, 8);
+                        charts.partsType = new Chart(ctx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: types.map(t => t.type),
+                                datasets: [{
+                                    data: types.map(t => t.total_quantity),
+                                    backgroundColor: chartColors.slice(0, types.length)
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'bottom'
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+                
+                // Топ используемых запчастей (столбчатая)
+                if (data.spare_parts?.top_used) {
+                    const ctx = document.getElementById('topPartsChart');
+                    if (ctx) {
+                        if (charts.topParts) charts.topParts.destroy();
+                        const parts = data.spare_parts.top_used.slice(0, 10);
+                        charts.topParts = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: parts.map(p => p.name),
+                                datasets: [{
+                                    label: 'Использовано раз',
+                                    data: parts.map(p => p.usage_count),
+                                    backgroundColor: colors.purple
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+                
+                // Оборудование по статусам (круговая)
+                if (data.equipment?.by_status) {
+                    const ctx = document.getElementById('equipmentStatusChart');
+                    if (ctx) {
+                        if (charts.equipmentStatus) charts.equipmentStatus.destroy();
+                        charts.equipmentStatus = new Chart(ctx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: Object.keys(data.equipment.by_status),
+                                datasets: [{
+                                    data: Object.values(data.equipment.by_status),
+                                    backgroundColor: chartColors.slice(0, Object.keys(data.equipment.by_status).length)
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'bottom'
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+            
+            // Загружаем статистику при загрузке страницы
+            if (document.getElementById('ptoStatusChart')) {
+                // Небольшая задержка для гарантии, что DOM готов
+                setTimeout(() => {
+                    loadStatistics();
+                }, 100);
+            }
+        })();
+        {% endif %}
     </script>
 </body>
 </html>

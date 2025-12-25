@@ -1,8 +1,314 @@
-/* Специфичные стили для страницы "Статистика" */
-/* Здесь можно добавлять стили, специфичные только для страницы статистики */
+/* Стили для страницы статистики */
 
+.statistics-dashboard {
+    padding: var(--spacing-lg);
+    width: 100%;
+    height: calc(100vh - 200px);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
 
+/* Кастомный скроллбар для статистики */
+.statistics-dashboard::-webkit-scrollbar {
+    width: 10px;
+}
 
+.statistics-dashboard::-webkit-scrollbar-track {
+    background: var(--bg-white);
+    border-radius: 10px;
+}
 
+.statistics-dashboard::-webkit-scrollbar-thumb {
+    background: var(--border-medium);
+    border-radius: 10px;
+}
 
+.statistics-dashboard::-webkit-scrollbar-thumb:hover {
+    background: var(--text-medium);
+}
 
+html.dark-theme .statistics-dashboard::-webkit-scrollbar-track {
+    background: var(--bg-dark-secondary);
+}
+
+html.dark-theme .statistics-dashboard::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+html.dark-theme .statistics-dashboard::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.statistics-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    gap: var(--spacing-md);
+    color: var(--text-medium);
+}
+
+.statistics-loading .loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--border-light);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Сетка карточек с метриками */
+.stats-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.stat-card {
+    background: var(--bg-white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-light);
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+html.dark-theme .stat-card {
+    background: var(--bg-dark-secondary);
+    border-color: var(--border-dark);
+}
+
+.stat-card-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.stat-card-icon.pto {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.stat-card-icon.tasks {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+}
+
+.stat-card-icon.employees {
+    background: rgba(221, 158, 0, 0.1);
+    color: var(--color-primary);
+}
+
+.stat-card-icon.parts {
+    background: rgba(168, 85, 247, 0.1);
+    color: #a855f7;
+}
+
+html.dark-theme .stat-card-icon.pto {
+    background: rgba(59, 130, 246, 0.2);
+}
+
+html.dark-theme .stat-card-icon.tasks {
+    background: rgba(34, 197, 94, 0.2);
+}
+
+html.dark-theme .stat-card-icon.employees {
+    background: rgba(221, 158, 0, 0.2);
+}
+
+html.dark-theme .stat-card-icon.parts {
+    background: rgba(168, 85, 247, 0.2);
+}
+
+.stat-card-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.stat-card-label {
+    font-size: 14px;
+    color: var(--text-medium);
+    margin-bottom: var(--spacing-xs);
+}
+
+.stat-card-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-dark);
+    line-height: 1.2;
+    margin-bottom: var(--spacing-xs);
+}
+
+html.dark-theme .stat-card-value {
+    color: var(--text-light);
+}
+
+.stat-card-detail {
+    font-size: 13px;
+    color: var(--text-medium);
+    margin-top: var(--spacing-xs);
+}
+
+.stat-card-icon.equipment {
+    background: rgba(14, 165, 233, 0.1);
+    color: #0ea5e9;
+}
+
+.stat-card-icon.completed {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+}
+
+html.dark-theme .stat-card-icon.equipment {
+    background: rgba(14, 165, 233, 0.2);
+}
+
+html.dark-theme .stat-card-icon.completed {
+    background: rgba(34, 197, 94, 0.2);
+}
+
+/* Сетка диаграмм */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.chart-container {
+    background: var(--bg-white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+    height: 400px;
+    max-height: 400px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.chart-container.chart-wide {
+    grid-column: 1 / -1;
+    height: 450px;
+    max-height: 450px;
+}
+
+.chart-container.chart-employees {
+    grid-column: 1 / span 2;
+    min-width: 0;
+}
+
+.chart-container.chart-parts-top {
+    grid-column: 2 / -1;
+    min-width: 0;
+}
+
+html.dark-theme .chart-container {
+    background: var(--bg-dark-secondary);
+    border-color: var(--border-dark);
+}
+
+.chart-header {
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 2px solid var(--border-light);
+}
+
+.chart-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+html.dark-theme .chart-header {
+    border-bottom-color: var(--border-dark);
+}
+
+html.dark-theme .chart-header h3 {
+    color: var(--text-light);
+}
+
+.chart-wrapper {
+    flex: 1;
+    position: relative;
+    height: 100%;
+    min-height: 0;
+    max-height: 100%;
+    overflow: hidden;
+}
+
+.chart-container.chart-wide .chart-wrapper {
+    height: 100%;
+    max-height: 100%;
+}
+
+.chart-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .stats-cards-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .chart-container.chart-wide {
+        grid-column: 1;
+    }
+    
+    .statistics-dashboard {
+        padding: var(--spacing-md);
+    }
+}
+
+@media (max-width: 480px) {
+    .stat-card {
+        padding: var(--spacing-md);
+    }
+    
+    .stat-card-icon {
+        width: 48px;
+        height: 48px;
+    }
+    
+    .stat-card-value {
+        font-size: 24px;
+    }
+    
+    .chart-container {
+        padding: var(--spacing-md);
+        height: 300px;
+        max-height: 300px;
+    }
+    
+    .chart-container.chart-wide {
+        height: 350px;
+        max-height: 350px;
+    }
+}

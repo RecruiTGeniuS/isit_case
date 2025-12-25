@@ -6,7 +6,22 @@ class AdminEquipmentService:
     
     def get_all(self, user_role=None, department_id=None):
         """Получить все оборудование с присвоениями"""
+        from datetime import date
         with get_db_cursor() as cur:
+            # Сначала получаем список equipment_id с ПТО в процессе
+            cur.execute("""
+                SELECT DISTINCT equipment_id
+                FROM maintenance_plan
+                WHERE maintenance_status IS NOT NULL
+                AND (
+                    LOWER(maintenance_status) LIKE '%в процессе%'
+                    OR LOWER(maintenance_status) LIKE '%in_progress%'
+                    OR LOWER(maintenance_status) LIKE '%in process%'
+                )
+            """)
+            pto_in_progress_ids = {row[0] for row in cur.fetchall()}
+            
+            # Теперь получаем основное оборудование
             query = """
                 SELECT 
                     e.equipment_id,
@@ -35,15 +50,37 @@ class AdminEquipmentService:
             
             query += " ORDER BY e.equipment_name"
             
-            cur.execute(query, params)
+            # Выполняем запрос
+            if params:
+                cur.execute(query, tuple(params))
+            else:
+                cur.execute(query)
             rows = cur.fetchall()
-            # Фильтруем записи без названия оборудования
+            
+            # Фильтруем записи без названия оборудования и обновляем статус
             result = []
-            for row in rows:
-                equipment_dict = self._row_to_dict(row)
-                # Пропускаем записи без названия оборудования
-                if equipment_dict.get('equipment_name') and equipment_dict.get('equipment_name').strip():
-                    result.append(equipment_dict)
+            for idx, row in enumerate(rows):
+                try:
+                    # Проверяем, что строка имеет правильное количество полей
+                    if not row or len(row) < 9:
+                        import logging
+                        logging.warning(f"Строка {idx} имеет неверное количество полей: {len(row) if row else 0}, ожидается минимум 9")
+                        continue
+                    equipment_dict = self._row_to_dict(row)
+                    
+                    # Если оборудование имеет ПТО в процессе, устанавливаем статус "На ПТО"
+                    equipment_id = equipment_dict.get('id')
+                    if equipment_id and equipment_id in pto_in_progress_ids:
+                        equipment_dict['equipment_status'] = 'На ПТО'
+                    
+                    # Пропускаем записи без названия оборудования
+                    if equipment_dict.get('equipment_name') and equipment_dict.get('equipment_name').strip():
+                        result.append(equipment_dict)
+                except (IndexError, TypeError) as e:
+                    # Логируем ошибку и пропускаем проблемную строку
+                    import logging
+                    logging.error(f"Ошибка обработки строки оборудования {idx}: {e}, row length: {len(row) if row else 0}")
+                    continue
             return result
     
     def get_by_id(self, equipment_id):
@@ -1188,8 +1225,31 @@ class AdminEquipmentService:
     def _row_to_dict(self, row):
         """Преобразование строки БД в словарь"""
         # Определяем количество полей для разных запросов
-        if len(row) == 9:
-            # Для get_all (9 полей)
+        row_len = len(row)
+        if row_len == 9:
+            # Для get_all (9 полей - без display_status, проверка ПТО делается в Python)
+            # row[0] = equipment_id
+            # row[1] = equipment_name
+            # row[2] = equipment_type
+            # row[3] = equipment_assignment_id
+            # row[4] = location
+            # row[5] = equipment_status (оригинальный)
+            # row[6] = department_id
+            # row[7] = department_name
+            # row[8] = facility_name
+            return {
+                'id': row[0],
+                'equipment_name': row[1] or '',
+                'equipment_type': row[2] or '',
+                'equipment_assignment_id': row[3],
+                'location': row[4] or '',
+                'equipment_status': row[5] or '',
+                'department_id': row[6],
+                'department': row[7] or '',
+                'facility': row[8] or '',
+            }
+        elif len(row) == 9:
+            # Для get_all (9 полей - старая версия без display_status)
             return {
                 'id': row[0],
                 'equipment_name': row[1] or '',

@@ -234,6 +234,24 @@ class AdminTasksService:
     def delete(self, repair_task_id):
         """Удалить задачу"""
         with get_db_cursor(commit=True) as cur:
+            # Проверяем существование задачи
+            cur.execute("SELECT repair_task_id FROM repair_task WHERE repair_task_id = %s", (repair_task_id,))
+            if not cur.fetchone():
+                raise ValueError('Задача не найдена')
+            
+            # 1. Удаляем связанные записи в repair_task_employee
+            cur.execute("""
+                DELETE FROM repair_task_employee 
+                WHERE repair_task_id = %s
+            """, (repair_task_id,))
+            
+            # 2. Удаляем связанные записи в repair_spare_part
+            cur.execute("""
+                DELETE FROM repair_spare_part 
+                WHERE repair_task_id = %s
+            """, (repair_task_id,))
+            
+            # 3. Удаляем саму задачу
             cur.execute("DELETE FROM repair_task WHERE repair_task_id = %s", (repair_task_id,))
             if cur.rowcount == 0:
                 raise ValueError('Задача не найдена')
@@ -304,7 +322,7 @@ class AdminTasksService:
             ]
     
     def get_employees_by_facility(self, facility_id):
-        """Получить список сотрудников ремонтной службы по предприятию"""
+        """Получить список сотрудников ремонтной службы по предприятию (исключая начальника ремонтной службы)"""
         with get_db_cursor() as cur:
             cur.execute("""
                 SELECT 
@@ -322,7 +340,7 @@ class AdminTasksService:
                 LEFT JOIN department d ON e.department_id = d.department_id
                 LEFT JOIN facility f ON d.facility_id = f.facility_id
                 WHERE f.facility_id = %s
-                AND e.user_role IN ('repair_head', 'repair_worker')
+                AND e.user_role = 'repair_worker'
                 ORDER BY e.last_name, e.first_name
             """, (facility_id,))
             return [
@@ -442,7 +460,7 @@ class AdminTasksService:
             # Обновляем задачу
             cur.execute("""
                 UPDATE repair_task 
-                SET repair_task_status = 'Завершено',
+                SET repair_task_status = 'Завершена',
                     repair_task_end_date = CURRENT_DATE,
                     repair_task_resolution = %s
                 WHERE repair_task_id = %s
@@ -512,10 +530,10 @@ class AdminTasksService:
         # Проверяем длину row для обратной совместимости
         if len(row) >= 16:  # Теперь 16 полей (добавлен equipment_id)
             assigned_count = row[15] or 0
-            # Определяем статус: если нет назначенных сотрудников и статус не "Завершено", то "Ожидает назначения"
+            # Определяем статус: если нет назначенных сотрудников и статус не "Завершено", то "Ожидают назначения"
             original_status = row[4] or 'В процессе'
             if assigned_count == 0 and original_status != 'Завершено':
-                display_status = 'Ожидает назначения'
+                display_status = 'Ожидают назначения'
             else:
                 display_status = original_status
             
@@ -542,7 +560,7 @@ class AdminTasksService:
             assigned_count = row[14] or 0
             original_status = row[4] or 'В процессе'
             if assigned_count == 0 and original_status != 'Завершено':
-                display_status = 'Ожидает назначения'
+                display_status = 'Ожидают назначения'
             else:
                 display_status = original_status
             
@@ -570,7 +588,7 @@ class AdminTasksService:
             assigned_count = row[14] or 0
             original_status = row[4] or 'В процессе'
             if assigned_count == 0 and original_status != 'Завершено':
-                display_status = 'Ожидает назначения'
+                display_status = 'Ожидают назначения'
             else:
                 display_status = original_status
             

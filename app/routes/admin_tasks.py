@@ -266,3 +266,240 @@ def get_spare_parts_for_task(task_id):
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
+@bp.route('/<int:task_id>/report', methods=['GET'])
+def generate_task_report(task_id):
+    """Генерация отчёта о завершённой задаче"""
+    auth_check = check_auth()
+    if auth_check:
+        return auth_check
+    
+    try:
+        service = AdminTasksService()
+        task = service.get_by_id(task_id)
+        if not task:
+            return jsonify({'success': False, 'message': 'Задача не найдена'}), 404
+        
+        # Проверяем, что задача завершена
+        if task.get('status') not in ['Завершено', 'Завершена']:
+            return jsonify({'success': False, 'message': 'Отчёт можно создать только для завершённых задач'}), 400
+        
+        # Получаем данные для отчёта
+        employees = service.get_task_employees(task_id)
+        
+        # Получаем использованные запчасти
+        from core.database import get_db_cursor
+        with get_db_cursor() as cur:
+            cur.execute("""
+                SELECT 
+                    sp.spare_part_id,
+                    sp.spare_part_name,
+                    sp.spare_part_type,
+                    COUNT(rsp.spare_part_id) as quantity_used
+                FROM repair_spare_part rsp
+                INNER JOIN spare_part sp ON rsp.spare_part_id = sp.spare_part_id
+                WHERE rsp.repair_task_id = %s
+                GROUP BY sp.spare_part_id, sp.spare_part_name, sp.spare_part_type
+                ORDER BY sp.spare_part_name
+            """, (task_id,))
+            spare_parts = [
+                {
+                    'id': row[0],
+                    'name': row[1] or '—',
+                    'type': row[2] or '—',
+                    'quantity': row[3] or 0
+                }
+                for row in cur.fetchall()
+            ]
+        
+        # Формируем HTML отчёт
+        from datetime import datetime
+        report_html = f"""
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отчёт о выполнении задачи #{task_id}</title>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            color: #333;
+        }}
+        .header {{
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #dd9e00;
+            padding-bottom: 20px;
+        }}
+        .header h1 {{
+            color: #dd9e00;
+            margin: 0;
+        }}
+        .section {{
+            margin-bottom: 25px;
+        }}
+        .section h2 {{
+            color: #dd9e00;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }}
+        .info-row {{
+            display: flex;
+            margin-bottom: 10px;
+        }}
+        .info-label {{
+            font-weight: bold;
+            width: 200px;
+        }}
+        .info-value {{
+            flex: 1;
+        }}
+        table {{
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }}
+        th, td {{
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }}
+        th {{
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }}
+        .resolution {{
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-left: 4px solid #dd9e00;
+            margin-top: 10px;
+            white-space: pre-wrap;
+        }}
+        .footer {{
+            margin-top: 30px;
+            text-align: right;
+            color: #666;
+            font-size: 12px;
+        }}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Отчёт о выполнении задачи на ремонт</h1>
+        <p>Дата формирования: {datetime.now().strftime('%d.%m.%Y %H:%M')}</p>
+    </div>
+    
+    <div class="section">
+        <h2>Общая информация</h2>
+        <div class="info-row">
+            <div class="info-label">Номер задачи:</div>
+            <div class="info-value">#{task_id}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Название:</div>
+            <div class="info-value">{task.get('heading', '—')}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Дата начала:</div>
+            <div class="info-value">{task.get('start_date', '—')}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Дата завершения:</div>
+            <div class="info-value">{task.get('end_date', '—')}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Статус:</div>
+            <div class="info-value">{task.get('status', '—')}</div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>Оборудование для которого нужен был ремонт</h2>
+        <div class="info-row">
+            <div class="info-label">Название:</div>
+            <div class="info-value">{task.get('equipment_name', '—')}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Отдел:</div>
+            <div class="info-value">{task.get('department_name', '—')}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Предприятие:</div>
+            <div class="info-value">{task.get('facility_name', '—')}</div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>Описание задачи</h2>
+        <div class="resolution">{task.get('description', '—')}</div>
+    </div>
+    
+    <div class="section">
+        <h2>Выполненные работы</h2>
+        <div class="resolution">{task.get('resolution', '—')}</div>
+    </div>
+    
+    <div class="section">
+        <h2>Сотрудники, выполнявшие ремонт</h2>
+        {f'''
+        <table>
+            <thead>
+                <tr>
+                    <th>№</th>
+                    <th>ФИО</th>
+                    <th>Должность</th>
+                </tr>
+            </thead>
+            <tbody>
+                {''.join([f'''
+                <tr>
+                    <td>{i+1}</td>
+                    <td>{emp.get('full_name', '—')}</td>
+                    <td>{emp.get('post', '—')}</td>
+                </tr>
+                ''' for i, emp in enumerate(employees)])}
+            </tbody>
+        </table>
+        ''' if employees else '<p>Сотрудники не назначены</p>'}
+    </div>
+    
+    <div class="section">
+        <h2>Используемые в ремонте детали</h2>
+        {f'''
+        <table>
+            <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Название</th>
+                    <th>Тип</th>
+                    <th>Количество</th>
+                </tr>
+            </thead>
+            <tbody>
+                {''.join([f'''
+                <tr>
+                    <td>{i+1}</td>
+                    <td>{part.get('name', '—')}</td>
+                    <td>{part.get('type', '—')}</td>
+                    <td>{part.get('quantity', 0)}</td>
+                </tr>
+                ''' for i, part in enumerate(spare_parts)])}
+            </tbody>
+        </table>
+        ''' if spare_parts else '<p>Запчасти не использовались</p>'}
+    </div>
+    
+    <div class="footer">
+        <p>Сгенерировано системой УТОР</p>
+    </div>
+</body>
+</html>
+        """
+        
+        from flask import Response
+        return Response(report_html, mimetype='text/html')
+        
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Не удалось создать отчёт: {str(e)}'}), 500
+

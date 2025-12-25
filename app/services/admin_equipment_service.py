@@ -855,27 +855,52 @@ class AdminEquipmentService:
         
         with get_db_cursor(commit=True) as cur:
             today = date.today()
-            
-            # Находим все перемещения с датой <= сегодня, которые еще не обработаны
-            # (проверяем, что текущее расположение не совпадает с целевым)
+
+            # Проверяем наличие колонки to_location
             cur.execute("""
-                SELECT 
-                    em.equipment_movement_id,
-                    em.equipment_assignment_id,
-                    em.to_department_id,
-                    em.to_location,
-                    ea.department_id as current_department_id
-                FROM equipment_movement em
-                JOIN equipment_assignment ea ON em.equipment_assignment_id = ea.equipment_assignment_id
-                WHERE em.move_date <= %s
-                AND (ea.department_id IS NULL OR ea.department_id != em.to_department_id)
-            """, (today,))
-            
+                SELECT 1
+                FROM information_schema.columns
+                WHERE table_name = 'equipment_movement'
+                AND column_name = 'to_location'
+            """)
+            has_to_location_column = cur.fetchone() is not None
+
+            if has_to_location_column:
+                # Находим все перемещения с датой <= сегодня, которые еще не обработаны
+                # (проверяем, что текущее расположение не совпадает с целевым)
+                cur.execute("""
+                    SELECT
+                        em.equipment_movement_id,
+                        em.equipment_assignment_id,
+                        em.to_department_id,
+                        em.to_location
+                    FROM equipment_movement em
+                    JOIN equipment_assignment ea ON em.equipment_assignment_id = ea.equipment_assignment_id
+                    WHERE em.move_date <= %s
+                    AND (ea.department_id IS NULL OR ea.department_id != em.to_department_id)
+                """, (today,))
+            else:
+                # Версия без колонки to_location
+                cur.execute("""
+                    SELECT
+                        em.equipment_movement_id,
+                        em.equipment_assignment_id,
+                        em.to_department_id
+                    FROM equipment_movement em
+                    JOIN equipment_assignment ea ON em.equipment_assignment_id = ea.equipment_assignment_id
+                    WHERE em.move_date <= %s
+                    AND (ea.department_id IS NULL OR ea.department_id != em.to_department_id)
+                """, (today,))
+
             movements = cur.fetchall()
             
             for movement in movements:
-                movement_id, assignment_id, to_department_id, to_location, current_department_id = movement
-                
+                if has_to_location_column:
+                    movement_id, assignment_id, to_department_id, to_location = movement
+                else:
+                    movement_id, assignment_id, to_department_id = movement
+                    to_location = None
+
                 # Обновляем department_id
                 cur.execute("""
                     UPDATE equipment_assignment
@@ -883,9 +908,8 @@ class AdminEquipmentService:
                     WHERE equipment_assignment_id = %s
                 """, (to_department_id, assignment_id))
                 
-                # Обновляем location только если указано to_location в перемещении
-                # Если to_location не указано, оставляем текущее значение location без изменений
-                if to_location and to_location.strip():
+                # Обновляем location только если есть колонка и указано to_location в перемещении
+                if has_to_location_column and to_location and to_location.strip():
                     cur.execute("""
                         UPDATE equipment_assignment
                         SET location = %s

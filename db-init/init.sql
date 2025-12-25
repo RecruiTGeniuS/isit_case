@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict 8PXfDkugaVGfeEpxIbVSec9Hw8ZTV2DwvasEb7LQDbp6bxZC6cc8Mes4BOhy6h1
+\restrict 5ZiPwzQbSDWzL2fvbEieoULSC3bpzjy434HxayWpCiqlZSvg1QhNzduvCV0es2R
 
 -- Dumped from database version 16.11 (Debian 16.11-1.pgdg13+1)
 -- Dumped by pg_dump version 16.11 (Debian 16.11-1.pgdg13+1)
@@ -911,6 +911,18 @@ INSERT INTO public.facility VALUES (6, 'ООО «Управляющая Комп
 -- Data for Name: maintenance_plan; Type: TABLE DATA; Schema: public; Owner: user
 --
 
+INSERT INTO public.maintenance_plan VALUES (2, 156, NULL, '2025-12-24', 'Ожидает ПТО', NULL);
+INSERT INTO public.maintenance_plan VALUES (3, 155, NULL, '2025-12-19', 'В процессе', NULL);
+INSERT INTO public.maintenance_plan VALUES (4, 189, NULL, '2025-12-17', 'В процессе', NULL);
+INSERT INTO public.maintenance_plan VALUES (5, 162, NULL, '2025-12-18', 'В процессе', NULL);
+INSERT INTO public.maintenance_plan VALUES (6, 149, NULL, '2025-12-19', 'Ожидает ПТО', NULL);
+INSERT INTO public.maintenance_plan VALUES (7, 142, NULL, '2025-12-16', 'Ожидает ПТО', NULL);
+INSERT INTO public.maintenance_plan VALUES (8, 179, NULL, '2025-12-14', 'Ожидает ПТО', NULL);
+INSERT INTO public.maintenance_plan VALUES (9, 146, NULL, '2025-12-07', 'Выполнено', NULL);
+INSERT INTO public.maintenance_plan VALUES (10, 169, NULL, '2025-12-07', 'Выполнено', NULL);
+INSERT INTO public.maintenance_plan VALUES (11, 173, NULL, '2025-12-02', 'Выполнено', NULL);
+INSERT INTO public.maintenance_plan VALUES (12, 142, NULL, '2025-12-06', 'В процессе', NULL);
+INSERT INTO public.maintenance_plan VALUES (1, 157, NULL, '2025-12-25', 'Ожидает ПТО', NULL);
 
 
 --
@@ -2749,7 +2761,7 @@ SELECT pg_catalog.setval('public.facility_facility_id_seq', 6, true);
 -- Name: maintenance_plan_maintenance_plan_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('public.maintenance_plan_maintenance_plan_id_seq', 1, false);
+SELECT pg_catalog.setval('public.maintenance_plan_maintenance_plan_id_seq', 12, true);
 
 
 --
@@ -3063,5 +3075,5 @@ ALTER TABLE ONLY public.warehouse
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 8PXfDkugaVGfeEpxIbVSec9Hw8ZTV2DwvasEb7LQDbp6bxZC6cc8Mes4BOhy6h1
+\unrestrict 5ZiPwzQbSDWzL2fvbEieoULSC3bpzjy434HxayWpCiqlZSvg1QhNzduvCV0es2R
 
